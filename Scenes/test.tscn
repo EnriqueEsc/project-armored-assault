@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://dqqp0g2xuoagd"]
+
+[ext_resource type="Script" uid="uid://b44xtts1goeo7" path="res://Scripts/Player/Tank_player_controller.gd" id="1_8od7v"]
+[ext_resource type="Script" uid="uid://bykhssfaytcmi" path="res://Scripts/Tanks/tank_rigidbody.gd" id="1_lc1oi"]
+[ext_resource type="PackedScene" uid="uid://koxj0b8ls2xa" path="res://Models/Test/Gun.fbx" id="2_qc4db"]
+[ext_resource type="Script" uid="uid://dgldqtulm4ymj" path="res://Scripts/Player/Tank_camera.gd" id="2_ys1qc"]
+[ext_resource type="PackedScene" uid="uid://cr2e151pg0ro6" path="res://Models/Test/Minor.fbx" id="4_ys1qc"]
+[ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Tanks/tank_turret.gd" id="5_i3aeo"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_qc4db"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_ys1qc"]
+sky_material = SubResource("ProceduralSkyMaterial_qc4db")
+
+[sub_resource type="Environment" id="Environment_35xla"]
+background_mode = 2
+sky = SubResource("Sky_ys1qc")
+glow_enabled = true
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bhunq"]
+size = Vector3(100, 1, 100)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_riqys"]
+
+[node name="Node3D" type="Node3D" unique_id=1260353081]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=333441885]
+environment = SubResource("Environment_35xla")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1669348989]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Game" type="Node" parent="." unique_id=1406123920]
+
+[node name="Area3D" type="Area3D" parent="Game" unique_id=1827467500]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Area3D" unique_id=672270032]
+shape = SubResource("BoxShape3D_bhunq")
+
+[node name="TankTest" type="Node3D" parent="." unique_id=1866001822]
+script = ExtResource("1_8od7v")
+
+[node name="Camera3D" type="Camera3D" parent="TankTest" unique_id=2064909490]
+transform = Transform3D(-1, 7.775525e-08, -3.9960778e-08, 0, 0.457098, 0.8894164, 8.742278e-08, 0.8894164, -0.457098, 0, 7.033662, -2.980245)
+script = ExtResource("2_ys1qc")
+camera_offset = Vector3(0, 7.034, -2.98)
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="TankTest" unique_id=81633684]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1436653, 0)
+script = ExtResource("1_lc1oi")
+
+[node name="Minor" parent="TankTest/CharacterBody3D" unique_id=60055419 instance=ExtResource("4_ys1qc")]
+transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TankTest/CharacterBody3D" unique_id=1218847732]
+shape = SubResource("BoxShape3D_riqys")
+debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
+
+[node name="Turret" type="Node3D" parent="TankTest/CharacterBody3D" unique_id=1696988476]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6108502, 0)
+script = ExtResource("5_i3aeo")
+
+[node name="Gun" parent="TankTest/CharacterBody3D/Turret" unique_id=51241174 instance=ExtResource("2_qc4db")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
