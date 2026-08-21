@@ -1,0 +1,162 @@
+[gd_scene format=3 uid="uid://dqqp0g2xuoagd"]
+
+[ext_resource type="Script" uid="uid://itcb8riovsv8" path="res://Scripts/Tanks/mine.gd" id="1_2cgwh"]
+[ext_resource type="Script" uid="uid://b44xtts1goeo7" path="res://Scripts/Player/Tank_player_controller.gd" id="1_8od7v"]
+[ext_resource type="Script" uid="uid://bykhssfaytcmi" path="res://Scripts/Tanks/tank_rigidbody.gd" id="1_lc1oi"]
+[ext_resource type="Script" uid="uid://d0krsqofvg78i" path="res://Scripts/Tanks/projectile.gd" id="2_0c07c"]
+[ext_resource type="PackedScene" uid="uid://koxj0b8ls2xa" path="res://Models/Test/Gun.fbx" id="2_qc4db"]
+[ext_resource type="PackedScene" uid="uid://m8354xipuvjd" path="res://Models/Test/mine.fbx" id="2_yb21e"]
+[ext_resource type="Script" uid="uid://dgldqtulm4ymj" path="res://Scripts/Player/Tank_camera.gd" id="2_ys1qc"]
+[ext_resource type="PackedScene" uid="uid://cr2e151pg0ro6" path="res://Models/Test/Minor.fbx" id="4_ys1qc"]
+[ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Tanks/tank_turret.gd" id="5_i3aeo"]
+[ext_resource type="Texture2D" uid="uid://dec3uo4slar6d" path="res://Sprites/Test/MousePointer.png" id="9_iaow0"]
+[ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="9_qpfo2"]
+[ext_resource type="PackedScene" uid="uid://bf7d7fljdkdcy" path="res://Models/Test/tanque_V2.fbx" id="10_mie3u"]
+[ext_resource type="Texture2D" uid="uid://yqsnwiuau3g7" path="res://Sprites/Test/ShootingPoint.png" id="10_qpfo2"]
+[ext_resource type="PackedScene" uid="uid://b8u4pylde5yu4" path="res://Models/Test/torreta_V2.fbx" id="11_0qy5o"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_qc4db"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_ys1qc"]
+sky_material = SubResource("ProceduralSkyMaterial_qc4db")
+
+[sub_resource type="Environment" id="Environment_35xla"]
+background_mode = 2
+sky = SubResource("Sky_ys1qc")
+glow_enabled = true
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bhunq"]
+size = Vector3(100, 1, 100)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6f8o3"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_riqys"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sn0t7"]
+
+[node name="Node3D" type="Node3D" unique_id=1260353081]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=333441885]
+environment = SubResource("Environment_35xla")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1669348989]
+transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Game" type="Node" parent="." unique_id=1406123920]
+
+[node name="Area3D" type="Area3D" parent="Game" unique_id=1827467500]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Area3D" unique_id=672270032]
+shape = SubResource("BoxShape3D_bhunq")
+
+[node name="Mine" type="Area3D" parent="Game" unique_id=869664892]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8907192, 0.15, -4.2875066)
+script = ExtResource("1_2cgwh")
+
+[node name="mine" parent="Game/Mine" unique_id=2084496998 instance=ExtResource("2_yb21e")]
+transform = Transform3D(0.45622343, 0, 0, 0, 0.13601846, 0, 0, 0, 0.4774503, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Mine" unique_id=1357803560]
+shape = SubResource("BoxShape3D_6f8o3")
+debug_color = Color(0.8558394, 0.36751, 7.70092e-07, 0.41960785)
+
+[node name="Mine2" type="Area3D" parent="Game" unique_id=1826517306]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1548045, 0.15, -7.014735)
+script = ExtResource("1_2cgwh")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Mine2" unique_id=1187622342]
+shape = SubResource("BoxShape3D_6f8o3")
+debug_color = Color(0.8558394, 0.36751, 7.70092e-07, 0.41960785)
+
+[node name="mine" parent="Game/Mine2" unique_id=1726120507 instance=ExtResource("2_yb21e")]
+transform = Transform3D(0.45622343, 0, 0, 0, 0.13601846, 0, 0, 0, 0.4774503, 0, 0, 0)
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="Game" unique_id=1547070097]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.321208, 1.1436653, 0)
+script = ExtResource("1_lc1oi")
+
+[node name="Minor" parent="Game/CharacterBody3D" unique_id=661398891 instance=ExtResource("4_ys1qc")]
+transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/CharacterBody3D" unique_id=1095076011]
+shape = SubResource("BoxShape3D_riqys")
+debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
+
+[node name="Turret" type="Node3D" parent="Game/CharacterBody3D" unique_id=2003874048]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6108502, 0)
+script = ExtResource("5_i3aeo")
+
+[node name="Gun" parent="Game/CharacterBody3D/Turret" unique_id=51241174 instance=ExtResource("2_qc4db")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+
+[node name="TankTest" type="Node3D" parent="." unique_id=1866001822]
+script = ExtResource("1_8od7v")
+
+[node name="Projectile" type="Area3D" parent="TankTest" unique_id=1172740109]
+script = ExtResource("2_0c07c")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TankTest/Projectile" unique_id=1933644000]
+shape = SubResource("BoxShape3D_sn0t7")
+debug_color = Color(0, 0.6485492, 0.20114565, 0.41960785)
+
+[node name="Gun" parent="TankTest/Projectile/CollisionShape3D" unique_id=1911512659 instance=ExtResource("2_qc4db")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+
+[node name="Camera3D" type="Camera3D" parent="TankTest" unique_id=2064909490]
+transform = Transform3D(-1, 7.775525e-08, -3.9960778e-08, 0, 0.457098, 0.8894164, 8.742278e-08, 0.8894164, -0.457098, 0, 7.033662, -2.980245)
+size = 10.0
+script = ExtResource("2_ys1qc")
+camera_offset = Vector3(0, 7.034, -2.98)
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="TankTest" unique_id=81633684]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1436653, 0)
+script = ExtResource("1_lc1oi")
+
+[node name="tanque_V2" parent="TankTest/CharacterBody3D" unique_id=2003364869 instance=ExtResource("10_mie3u")]
+transform = Transform3D(0.07866464, 0, 0, 0, 0.1365011, 0, 0, 0, 0.075632125, 0, -0.29108393, 0.040996313)
+
+[node name="Minor" parent="TankTest/CharacterBody3D" unique_id=171813643 instance=ExtResource("4_ys1qc")]
+transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
+visible = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="TankTest/CharacterBody3D" unique_id=1218847732]
+shape = SubResource("BoxShape3D_riqys")
+debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
+
+[node name="Turret" type="Node3D" parent="TankTest/CharacterBody3D" unique_id=1696988476]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04852271, 0)
+script = ExtResource("5_i3aeo")
+
+[node name="torreta_V2" parent="TankTest/CharacterBody3D/Turret" unique_id=29810314 instance=ExtResource("11_0qy5o")]
+transform = Transform3D(-5.2453664e-09, 0, -0.12, 0, 0.12, 0, 0.12, 0, -5.2453664e-09, 0, -0.2802639, 0)
+
+[node name="Gun" parent="TankTest/CharacterBody3D/Turret" unique_id=1960259875 instance=ExtResource("2_qc4db")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+
+[node name="Forward" type="Sprite3D" parent="TankTest/CharacterBody3D" unique_id=1436985097]
+transform = Transform3D(0.4, 0, 0, 0, -1.7484556e-08, -0.4, 0, 0.4, -1.7484556e-08, 0, -0.45413375, 1)
+modulate = Color(1, 1, 1, 0.2509804)
+texture = ExtResource("9_qpfo2")
+
+[node name="HUD" type="Node" parent="TankTest" unique_id=603275337]
+
+[node name="Icon" type="Sprite2D" parent="TankTest/HUD" unique_id=981951051]
+position = Vector2(631, 333)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("10_qpfo2")
+
+[node name="HUD_AP" type="RichTextLabel" parent="TankTest/HUD" unique_id=1606568337]
+offset_left = 37.0
+offset_top = 552.0
+offset_right = 195.0
+offset_bottom = 612.0
+theme_override_font_sizes/normal_font_size = 40
+text = "30 AP"
+
+[node name="Icon2" type="Sprite2D" parent="TankTest/HUD" unique_id=879129058]
+position = Vector2(815, 370)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("9_iaow0")
