@@ -3,34 +3,37 @@ class_name Projectile
 
 var current_pos: Vector3 = Vector3.ZERO
 var is_player: bool = true
-var speed: float = 0.5
+var speed: float = 10
 var base_speed: float = 0.5
 var direction: Vector3 = Vector3(1,0,0)
 var origin: Tank_Rigid
 var damage: int = 20
 var is_explosive: bool = false
 var blast_rad: float = 1
+var ignore = []
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	body_entered.connect(_on_area_entered)
+	area_entered.connect(_on_area_entered)
 	base_speed = speed
 	deactivate()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	move()
+	move(delta)
 
 
 func set_origin(tank: Tank_Rigid) -> void:
 	origin = tank
 	is_player = origin.is_player
 
-func shoot(pos: Vector3, rot: float) -> void:
+func shoot(pos: Vector3, rot: Vector2) -> void:
 	activate()
 	current_pos = pos
 	position = current_pos
-	rotation.y = rot
+	rotation.y = rot.y
+	rotation.z = rot.x
 	direction = Vector3(1,0,0)
 
 
@@ -46,12 +49,12 @@ func deactivate() -> void:
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
 	
-func move() -> void:
+func move(delta: float) -> void:
 	if direction == Vector3.ZERO:
 		return
 	
 	var current_pos_2d: Vector2 = (Vector2(0,1).rotated(-rotation.y))
-	global_position += Vector3(-current_pos_2d.y,0,current_pos_2d.x) * speed
+	global_position += -global_basis.x * speed * delta
 
 func _on_area_entered(body):
 	#print(body.collider.get_parent.name)
@@ -59,6 +62,9 @@ func _on_area_entered(body):
 	#print(body == origin)
 	
 	if body == origin:
+		return
+	
+	if ignore.has(body):
 		return
 	
 	if body.has_method("take_damage"):
@@ -70,10 +76,22 @@ func _on_area_entered(body):
 			deactivate()
 		else:
 			detonate()
+	elif body.has_method("detonate"):
+		direction = Vector3.ZERO
+		body.detonate()
+		if not is_explosive:
+			deactivate()
+		else:
+			detonate()
+	else:
+		direction = Vector3.ZERO
+		deactivate()
 
 
 func detonate() -> void:
 	
+	if not is_explosive:
+		return
 	
 	var explosion = SphereShape3D.new()
 	explosion.radius = blast_rad

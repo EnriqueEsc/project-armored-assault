@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://kw23p6nnus6h"]
+
+[ext_resource type="Script" uid="uid://ctnohbd026y3g" path="res://Scripts/Tanks/case.gd" id="1_3bjmo"]
+[ext_resource type="PackedScene" uid="uid://ee3mlqoac8ay" path="res://Models/Test/case.fbx" id="2_a3hal"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_bhunq"]
+height = 0.3
+radius = 0.11
+
+[node name="Case" type="RigidBody3D" unique_id=928592965]
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+collision_layer = 2
+mass = 0.004
+script = ExtResource("1_3bjmo")
+
+[node name="case" parent="." unique_id=1083201445 instance=ExtResource("2_a3hal")]
+transform = Transform3D(4, 1.7484557e-07, -1.4210855e-14, 0, -1.7484555e-07, -5.1406546, -1.7484557e-07, 4, -2.2470515e-07, 1.3274399e-08, -0.30368286, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=781711267]
+shape = SubResource("CylinderShape3D_bhunq")
