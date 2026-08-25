@@ -12,6 +12,8 @@ var is_explosive: bool = false
 var blast_rad: float = 1
 var ignore = []
 
+signal deactivated(projectile: Projectile)
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	body_entered.connect(_on_area_entered)
@@ -49,6 +51,8 @@ func deactivate() -> void:
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
 	
+	deactivated.emit(self)
+
 func move(delta: float) -> void:
 	if direction == Vector3.ZERO:
 		return
@@ -67,10 +71,12 @@ func _on_area_entered(body):
 	if ignore.has(body):
 		return
 	
+	#print(body)
+	
 	if body.has_method("take_damage"):
 		direction = Vector3.ZERO
 		#origin.projectile_to_pool(self)
-		body.take_damage(damage,origin)
+		body.take_damage(damage, origin, global_position)
 		#origin.get_score(damage)
 		if not is_explosive:
 			deactivate()
@@ -133,7 +139,7 @@ func detonate() -> void:
 					hitted_enemies.append(current_collider)
 					
 					if current_collider.has_method("take_damage"):
-						current_collider.take_damage(damage,origin)
+						current_collider.take_damage(damage,origin,global_position)
 					if current_collider.has_method("detonate"):
 						current_collider.detonate()
 				

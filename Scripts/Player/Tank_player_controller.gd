@@ -12,25 +12,53 @@ extends Node
 
 @onready var HUD_Death_Screen: Control = $HUD/Death_Screen
 
+@onready var HUD_Shoot_Ready: TextureProgressBar = $HUD/Icon2/HUD_Shoot_Ready
+
 var is_destroyed = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	
+	tank_rigid.add_to_group("Player")
 	
 	tank_rigid.hp_changed.connect(update_AP)
 	tank_rigid.score_changed.connect(update_Score)
 	
 	HUD_Death_Screen.visible = false
 	
+	tank_rigid.shoot_recharge.connect(shoot_ready)
+	
 	update_HUD()
+	
+	#await get_tree().physics_frame
+	#Node.print_orphan_nodes()
 	pass # Replace with function body.
+
+func shoot_ready(charge: float) -> void:
+	HUD_Shoot_Ready.value = charge
+
+func _physics_process(delta: float) -> void:
+	tank_camera.move_cam(tank_rigid.position, delta)
+	#tank_rigid.allign_with_floor(delta)
+	
+	
+	#print(tank_camera.get_mouse_3d_pos())
+	HUD_mouse.position = get_viewport().get_mouse_position()
+	
+	#print(tank_rigid.get_aim_point_3d())
+	HUD_aim.position = tank_camera.unproject_position(tank_rigid.get_aim_point_3d(tank_rigid.tank_turret.global_position.distance_to(tank_camera.get_mouse_3d_pos())))
+	#HUD_aim.position = tank_rigid.get_aim_point(get_viewport().get_mouse_position())
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	if is_destroyed:
 		if Input.is_action_just_pressed("Shoot"):
-			get_tree().change_scene_to_file("res://Scenes/test.tscn")
+			get_tree().reload_current_scene()
+		return
+	
+	if Input.is_action_just_pressed("Reload"):
+		get_tree().reload_current_scene()
 		return
 	
 	var input_dir := Input.get_vector("Left","Right","Backward","Forward")
@@ -41,17 +69,10 @@ func _process(delta: float) -> void:
 		tank_rigid.shoot()
 	
 	tank_rigid.move(input_dir, delta)
-	tank_camera.move_cam(tank_rigid.position)
 	
 	#tank_rigid.rotate_turret_to_point(get_viewport().get_mouse_position())
 	
 	tank_rigid.rotate_turret_to_point_3d(tank_camera.get_mouse_3d_pos())
-	#print(tank_camera.get_mouse_3d_pos())
-	HUD_mouse.position = get_viewport().get_mouse_position()
-	
-	#print(tank_rigid.get_aim_point_3d())
-	HUD_aim.position = tank_camera.unproject_position(tank_rigid.get_aim_point_3d(tank_rigid.tank_turret.global_position.distance_to(tank_camera.get_mouse_3d_pos())))
-	#HUD_aim.position = tank_rigid.get_aim_point(get_viewport().get_mouse_position())
 
 func update_HUD() -> void:
 	update_AP(tank_rigid.armor_points)

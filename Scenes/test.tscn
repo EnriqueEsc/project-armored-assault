@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Tanks/tank_turret.gd" id="5_i3aeo"]
 [ext_resource type="Script" uid="uid://coflapngtlfyb" path="res://Scripts/Emplacements/emplacement.gd" id="8_n0wup"]
 [ext_resource type="PackedScene" uid="uid://cxfvss6x0rphi" path="res://Models/Test/Tower/tower.fbx" id="8_q8sys"]
+[ext_resource type="Script" uid="uid://cxxlffo81ypm" path="res://Scripts/AI/Enemies/enemy_tank.gd" id="8_wjyqs"]
 [ext_resource type="Texture2D" uid="uid://dec3uo4slar6d" path="res://Sprites/Test/MousePointer.png" id="9_iaow0"]
 [ext_resource type="Script" uid="uid://dka80784jfym3" path="res://Scripts/Emplacements/auto_turret.gd" id="9_kxtw2"]
 [ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="9_qpfo2"]
@@ -20,6 +21,8 @@
 [ext_resource type="PackedScene" uid="uid://b8u4pylde5yu4" path="res://Models/Test/torreta_V2.fbx" id="11_0qy5o"]
 [ext_resource type="PackedScene" uid="uid://cm2gr8at5r6c0" path="res://Models/Test/Tank_Test/tanque_V3.fbx" id="12_2ocox"]
 [ext_resource type="PackedScene" uid="uid://caqoxtxta5muo" path="res://Models/Test/Tank_Test/turret_V3.fbx" id="14_kuf18"]
+[ext_resource type="Shader" uid="uid://c5r6qc4s673e8" path="res://Shaders/see_tank.gdshader" id="21_wojap"]
+[ext_resource type="Script" uid="uid://cgp8hd1nxjt5u" path="res://Scripts/Buildings/building.gd" id="22_copon"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_qc4db"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -37,6 +40,7 @@ glow_enabled = true
 size = Vector3(100, 1, 100)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_6f8o3"]
+size = Vector3(1, 0.5, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_riqys"]
 
@@ -45,6 +49,70 @@ size = Vector3(1.5, 0.7, 1.5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_qr0ht"]
 size = Vector3(1.3, 1.8, 1.3)
+
+[sub_resource type="NavigationMesh" id="NavigationMesh_bhunq"]
+vertices = PackedVector3Array(-1, 0.859077, -3.25, -0.5, 0.859077, -3.5, -0.5, 0.859077, -49.5, -49.5, 0.859077, -49.5, -49.5, 0.859077, -2.5, -1, 0.859077, -2.5, 9.5, 0.859077, -3.5, 9.75, 0.859077, -2.5, 10, 0.859077, -2.5, 10.25, 0.859077, -3.5, 16.75, 0.859077, -49.5, 16.75, 0.859077, -3.5, 17.25, 0.859077, -3.25, 17.25, 0.859077, -1.75, 20, 0.859077, -1.5, 24.25, 0.859077, -1.75, 24.5, 0.859077, -0.5, 49.5, 0.859077, -0.5, 49.5, 0.859077, -49.5, -1, 0.859077, 2.75, -0.75, 0.859077, 1.5, -0.75, 0.859077, -1.25, -49.5, 0.859077, 2.75, 20, 1.109077, -0.5, 27.25, 6.109077, -0.75, 20, 1.109077, -0.75, 9.5, 0.859077, 1.5, 9.75, 0.859077, 2.75, 10, 0.859077, 2.75, 10.25, 0.859077, 1.5, 10.25, 0.859077, -1.25, 9.5, 0.859077, -1.25, 17, 0.859077, 1.5, 17, 0.859077, -1.25, 17.25, 0.859077, 2, 20.25, 0.859077, 0.5, 17, 0.859077, 3.75, 24.25, 0.859077, 0.5, 15.5, 0.859077, 3.75, 15.75, 0.859077, 49.5, 49.5, 0.859077, 49.5, 0.5, 0.859077, 49.5, 0.75, 0.859077, 3.75, -0.75, 0.859077, 3.75, -49.5, 0.859077, 49.5, 10.25, 0.859077, 3.75, 9.5, 0.859077, 3.75)
+polygons = [PackedInt32Array(1, 0, 2), PackedInt32Array(2, 0, 3), PackedInt32Array(3, 0, 4), PackedInt32Array(0, 5, 4), PackedInt32Array(7, 6, 8), PackedInt32Array(8, 6, 9), PackedInt32Array(9, 6, 10), PackedInt32Array(1, 2, 6), PackedInt32Array(6, 2, 10), PackedInt32Array(10, 11, 9), PackedInt32Array(13, 12, 14), PackedInt32Array(14, 12, 15), PackedInt32Array(17, 16, 15), PackedInt32Array(12, 11, 15), PackedInt32Array(15, 11, 17), PackedInt32Array(17, 11, 10), PackedInt32Array(17, 10, 18), PackedInt32Array(20, 19, 21), PackedInt32Array(21, 19, 5), PackedInt32Array(5, 19, 22), PackedInt32Array(5, 22, 4), PackedInt32Array(25, 24, 23), PackedInt32Array(27, 26, 28), PackedInt32Array(28, 26, 29), PackedInt32Array(29, 26, 31), PackedInt32Array(29, 31, 30), PackedInt32Array(30, 33, 29), PackedInt32Array(29, 33, 32), PackedInt32Array(8, 30, 7), PackedInt32Array(7, 30, 31), PackedInt32Array(31, 26, 21), PackedInt32Array(21, 26, 20), PackedInt32Array(13, 14, 25), PackedInt32Array(13, 25, 23), PackedInt32Array(33, 13, 32), PackedInt32Array(32, 13, 34), PackedInt32Array(34, 13, 23), PackedInt32Array(34, 23, 35), PackedInt32Array(34, 35, 36), PackedInt32Array(36, 35, 37), PackedInt32Array(39, 38, 36), PackedInt32Array(37, 16, 17), PackedInt32Array(37, 17, 36), PackedInt32Array(36, 17, 39), PackedInt32Array(39, 17, 40), PackedInt32Array(43, 42, 41), PackedInt32Array(43, 41, 19), PackedInt32Array(19, 41, 22), PackedInt32Array(22, 41, 44), PackedInt32Array(28, 45, 27), PackedInt32Array(27, 45, 46), PackedInt32Array(46, 45, 39), PackedInt32Array(42, 46, 41), PackedInt32Array(41, 46, 39), PackedInt32Array(45, 38, 39)]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_riqys"]
+render_priority = 0
+shader = ExtResource("21_wojap")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/cutout_radius = 2.0
+shader_parameter/cutout_feather = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_bhunq"]
+material = SubResource("ShaderMaterial_riqys")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sn0t7"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wojap"]
+size = Vector3(2, 2, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sn0t7"]
+render_priority = 0
+shader = ExtResource("21_wojap")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/cutout_radius = 2.0
+shader_parameter/cutout_feather = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_riqys"]
+material = SubResource("ShaderMaterial_sn0t7")
+size = Vector3(2, 2, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8yus5"]
+size = Vector3(1, 20, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_copon"]
+render_priority = 0
+shader = ExtResource("21_wojap")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/cutout_radius = 2.0
+shader_parameter/cutout_feather = 1.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_80d66"]
+material = SubResource("ShaderMaterial_copon")
+size = Vector3(1, 20, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_2r0jt"]
+size = Vector3(1, 5, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_xvofd"]
+size = Vector3(1, 5, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wojap"]
+render_priority = 0
+shader = ExtResource("21_wojap")
+shader_parameter/albedo = Color(1, 1, 1, 1)
+shader_parameter/cutout_radius = 2.0
+shader_parameter/cutout_feather = 1.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qr0ht"]
+albedo_color = Color(0.2, 0.18431373, 0.19215687, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sn0t7"]
+material = SubResource("StandardMaterial3D_qr0ht")
+size = Vector3(100, 1, 100)
 
 [node name="Node3D" type="Node3D" unique_id=1260353081]
 
@@ -60,11 +128,6 @@ shadow_enabled = true
 
 [node name="Game" type="Node" parent="." unique_id=1406123920]
 
-[node name="Ground" type="StaticBody3D" parent="Game" unique_id=2123863326]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Ground" unique_id=421761137]
-shape = SubResource("BoxShape3D_bhunq")
-
 [node name="Old_Ground" type="Area3D" parent="Game" unique_id=1827467500]
 visible = false
 
@@ -78,7 +141,7 @@ shape = SubResource("BoxShape3D_bhunq")
 [node name="Mines" type="Node" parent="Game" unique_id=1249790979]
 
 [node name="Mine" type="Area3D" parent="Game/Mines" unique_id=232227240]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8907192, 0.15, -4.2875066)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8907192, 0.59314954, -4.2875066)
 script = ExtResource("1_2cgwh")
 
 [node name="mine" parent="Game/Mines/Mine" unique_id=1044669614 instance=ExtResource("2_yb21e")]
@@ -89,7 +152,7 @@ shape = SubResource("BoxShape3D_6f8o3")
 debug_color = Color(0.8558394, 0.36751, 7.70092e-07, 0.41960785)
 
 [node name="Mine2" type="Area3D" parent="Game/Mines" unique_id=1719638967]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1548045, 0.15, -7.014735)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1548045, 0.59314954, -7.014735)
 script = ExtResource("1_2cgwh")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Mines/Mine2" unique_id=1849417853]
@@ -100,7 +163,7 @@ debug_color = Color(0.8558394, 0.36751, 7.70092e-07, 0.41960785)
 transform = Transform3D(0.45622343, 0, 0, 0, 0.13601846, 0, 0, 0, 0.4774503, 0, 0, 0)
 
 [node name="Mine3" type="Area3D" parent="Game/Mines" unique_id=923337118]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.456543, 0.15, 1.2086773)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.456543, 0.59314954, 1.2086773)
 script = ExtResource("1_2cgwh")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Mines/Mine3" unique_id=379807519]
@@ -111,7 +174,7 @@ debug_color = Color(0.8558394, 0.36751, 7.70092e-07, 0.41960785)
 transform = Transform3D(0.45622343, 0, 0, 0, 0.13601846, 0, 0, 0, 0.4774503, 0, 0, 0)
 
 [node name="Mine4" type="Area3D" parent="Game/Mines" unique_id=1346216603]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.518482, 0.15, 2.8067737)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.518482, 0.59314954, 2.8067737)
 script = ExtResource("1_2cgwh")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Mines/Mine4" unique_id=2025659957]
@@ -122,7 +185,7 @@ debug_color = Color(0.8558394, 0.36751, 7.70092e-07, 0.41960785)
 transform = Transform3D(0.45622343, 0, 0, 0, 0.13601846, 0, 0, 0, 0.4774503, 0, 0, 0)
 
 [node name="Mine5" type="Area3D" parent="Game/Mines" unique_id=1103371730]
-transform = Transform3D(0.45273757, 0, 0.8916438, 0, 1, 0, -0.8916438, 0, 0.45273757, -14.099395, 0.15, -0.16493511)
+transform = Transform3D(0.45273757, 0, 0.8916438, 0, 1, 0, -0.8916438, 0, 0.45273757, -14.099395, 0.59314954, -0.16493511)
 script = ExtResource("1_2cgwh")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Mines/Mine5" unique_id=1304906152]
@@ -133,7 +196,7 @@ debug_color = Color(0.8558394, 0.36751, 7.70092e-07, 0.41960785)
 transform = Transform3D(0.45622343, 0, 0, 0, 0.13601846, 0, 0, 0, 0.4774503, 0, 0, 0)
 
 [node name="Mine6" type="Area3D" parent="Game/Mines" unique_id=694056533]
-transform = Transform3D(0.45273757, 0, 0.8916438, 0, 1, 0, -0.8916438, 0, 0.45273757, -14.513455, 0.15, 4.180386)
+transform = Transform3D(0.45273757, 0, 0.8916438, 0, 1, 0, -0.8916438, 0, 0.45273757, -14.513455, 0.59314954, 4.180386)
 script = ExtResource("1_2cgwh")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Mines/Mine6" unique_id=1074012266]
@@ -144,7 +207,7 @@ debug_color = Color(0.8558394, 0.36751, 7.70092e-07, 0.41960785)
 transform = Transform3D(0.45622343, 0, 0, 0, 0.13601846, 0, 0, 0, 0.4774503, 0, 0, 0)
 
 [node name="Mine7" type="Area3D" parent="Game/Mines" unique_id=1356652024]
-transform = Transform3D(0.066568926, 0, 0.9977819, 0, 1, 0, -0.9977819, 0, 0.066568926, -20.745703, 0.15, 4.4060335)
+transform = Transform3D(0.066568926, 0, 0.9977819, 0, 1, 0, -0.9977819, 0, 0.066568926, -20.745703, 0.59314954, 4.4060335)
 script = ExtResource("1_2cgwh")
 
 [node name="mine" parent="Game/Mines/Mine7" unique_id=398516430 instance=ExtResource("2_yb21e")]
@@ -155,7 +218,7 @@ shape = SubResource("BoxShape3D_6f8o3")
 debug_color = Color(0.8558394, 0.36751, 7.70092e-07, 0.41960785)
 
 [node name="Mine8" type="Area3D" parent="Game/Mines" unique_id=336323208]
-transform = Transform3D(0.066568926, 0, 0.9977819, 0, 1, 0, -0.9977819, 0, 0.066568926, -23.197575, 0.15, 0.18793392)
+transform = Transform3D(0.066568926, 0, 0.9977819, 0, 1, 0, -0.9977819, 0, 0.066568926, -23.197575, 0.59314954, 0.18793392)
 script = ExtResource("1_2cgwh")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Mines/Mine8" unique_id=878966123]
@@ -166,7 +229,7 @@ debug_color = Color(0.8558394, 0.36751, 7.70092e-07, 0.41960785)
 transform = Transform3D(0.45622343, 0, 0, 0, 0.13601846, 0, 0, 0, 0.4774503, 0, 0, 0)
 
 [node name="Mine9" type="Area3D" parent="Game/Mines" unique_id=1142532021]
-transform = Transform3D(0.066568926, 0, 0.9977819, 0, 1, 0, -0.9977819, 0, 0.066568926, -15.499083, 0.15, 8.329823)
+transform = Transform3D(0.066568926, 0, 0.9977819, 0, 1, 0, -0.9977819, 0, 0.066568926, -15.499083, 0.59314954, 8.329823)
 script = ExtResource("1_2cgwh")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Mines/Mine9" unique_id=919180626]
@@ -177,7 +240,7 @@ debug_color = Color(0.8558394, 0.36751, 7.70092e-07, 0.41960785)
 transform = Transform3D(0.45622343, 0, 0, 0, 0.13601846, 0, 0, 0, 0.4774503, 0, 0, 0)
 
 [node name="Mine10" type="Area3D" parent="Game/Mines" unique_id=1114876244]
-transform = Transform3D(0.066568926, 0, 0.9977819, 0, 1, 0, -0.9977819, 0, 0.066568926, -14.17493, 0.15, 12.489134)
+transform = Transform3D(0.066568926, 0, 0.9977819, 0, 1, 0, -0.9977819, 0, 0.066568926, -14.17493, 0.59314954, 12.489134)
 script = ExtResource("1_2cgwh")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Mines/Mine10" unique_id=454337396]
@@ -188,7 +251,7 @@ debug_color = Color(0.8558394, 0.36751, 7.70092e-07, 0.41960785)
 transform = Transform3D(0.45622343, 0, 0, 0, 0.13601846, 0, 0, 0, 0.4774503, 0, 0, 0)
 
 [node name="Mine11" type="Area3D" parent="Game/Mines" unique_id=277277324]
-transform = Transform3D(-0.85952777, 0, 0.5110891, 0, 1, 0, -0.5110891, 0, -0.85952777, -17.444994, 0.15, 16.862062)
+transform = Transform3D(-0.85952777, 0, 0.5110891, 0, 1, 0, -0.5110891, 0, -0.85952777, -17.444994, 0.59314954, 16.862062)
 script = ExtResource("1_2cgwh")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Mines/Mine11" unique_id=1931355234]
@@ -199,7 +262,7 @@ debug_color = Color(0.8558394, 0.36751, 7.70092e-07, 0.41960785)
 transform = Transform3D(0.45622343, 0, 0, 0, 0.13601846, 0, 0, 0, 0.4774503, 0, 0, 0)
 
 [node name="Mine12" type="Area3D" parent="Game/Mines" unique_id=680268912]
-transform = Transform3D(-0.85952777, 0, 0.5110891, 0, 1, 0, -0.5110891, 0, -0.85952777, -13.136875, 0.15, 17.564468)
+transform = Transform3D(-0.85952777, 0, 0.5110891, 0, 1, 0, -0.5110891, 0, -0.85952777, -13.136875, 0.59314954, 17.564468)
 script = ExtResource("1_2cgwh")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Mines/Mine12" unique_id=1896168884]
@@ -229,224 +292,242 @@ script = ExtResource("5_i3aeo")
 [node name="Gun" parent="Game/Tanques/CTanque/Turret" unique_id=51241174 instance=ExtResource("2_qc4db")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
 
-[node name="CTanque13" type="CharacterBody3D" parent="Game/Tanques" unique_id=1889184628]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.321208, 3.3477638, -4.4462457)
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="Game/Tanques/CTanque" unique_id=1229611689]
+script = ExtResource("8_wjyqs")
+
+[node name="CTanque2" type="CharacterBody3D" parent="Game/Tanques" unique_id=235383509]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.028941, 1.1436653, 13.024862)
 script = ExtResource("1_lc1oi")
 
-[node name="Minor" parent="Game/Tanques/CTanque13" unique_id=393436446 instance=ExtResource("4_ys1qc")]
+[node name="Minor" parent="Game/Tanques/CTanque2" unique_id=1449353517 instance=ExtResource("4_ys1qc")]
 transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque13" unique_id=146677100]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque2" unique_id=2077257559]
 shape = SubResource("BoxShape3D_riqys")
 debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 
-[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque13" unique_id=1915818440]
+[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque2" unique_id=317562573]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6108502, 0)
 script = ExtResource("5_i3aeo")
 
-[node name="Gun" parent="Game/Tanques/CTanque13/Turret" unique_id=1329670379 instance=ExtResource("2_qc4db")]
+[node name="Gun" parent="Game/Tanques/CTanque2/Turret" unique_id=1185393778 instance=ExtResource("2_qc4db")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
 
-[node name="CTanque2" type="CharacterBody3D" parent="Game/Tanques" unique_id=1176393147]
-transform = Transform3D(0.22473162, 0, 0.9744207, 0, 1, 0, -0.9744207, 0, 0.22473162, -13.534941, 1.1436653, -9.732428)
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="Game/Tanques/CTanque2" unique_id=1284424337]
+script = ExtResource("8_wjyqs")
+
+[node name="CTanque3" type="CharacterBody3D" parent="Game/Tanques" unique_id=1596663879]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.02746, 1.1436653, 8.710472)
 script = ExtResource("1_lc1oi")
 
-[node name="Minor" parent="Game/Tanques/CTanque2" unique_id=314948784 instance=ExtResource("4_ys1qc")]
+[node name="Minor" parent="Game/Tanques/CTanque3" unique_id=1034490291 instance=ExtResource("4_ys1qc")]
 transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque2" unique_id=608171668]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque3" unique_id=476999337]
 shape = SubResource("BoxShape3D_riqys")
 debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 
-[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque2" unique_id=937923167]
+[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque3" unique_id=84043264]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6108502, 0)
 script = ExtResource("5_i3aeo")
 
-[node name="Gun" parent="Game/Tanques/CTanque2/Turret" unique_id=2105519908 instance=ExtResource("2_qc4db")]
+[node name="Gun" parent="Game/Tanques/CTanque3/Turret" unique_id=1259913896 instance=ExtResource("2_qc4db")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
 
-[node name="CTanque3" type="CharacterBody3D" parent="Game/Tanques" unique_id=592633860]
-transform = Transform3D(0.9885614, 0, 0.15081893, 0, 1, 0, -0.15081893, 0, 0.9885614, -13.534941, 1.1436653, 8.488955)
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="Game/Tanques/CTanque3" unique_id=1939492537]
+script = ExtResource("8_wjyqs")
+
+[node name="CTanque4" type="CharacterBody3D" parent="Game/Tanques" unique_id=2041761419]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.418488, 1.1436653, 1.170536)
 script = ExtResource("1_lc1oi")
 
-[node name="Minor" parent="Game/Tanques/CTanque3" unique_id=1818663605 instance=ExtResource("4_ys1qc")]
+[node name="Minor" parent="Game/Tanques/CTanque4" unique_id=1237399820 instance=ExtResource("4_ys1qc")]
 transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque3" unique_id=1484735514]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque4" unique_id=1123142478]
 shape = SubResource("BoxShape3D_riqys")
 debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 
-[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque3" unique_id=1682623505]
+[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque4" unique_id=123067336]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6108502, 0)
 script = ExtResource("5_i3aeo")
 
-[node name="Gun" parent="Game/Tanques/CTanque3/Turret" unique_id=1426445332 instance=ExtResource("2_qc4db")]
+[node name="Gun" parent="Game/Tanques/CTanque4/Turret" unique_id=803728929 instance=ExtResource("2_qc4db")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
 
-[node name="CTanque4" type="CharacterBody3D" parent="Game/Tanques" unique_id=955867214]
-transform = Transform3D(-0.54286623, 0, -0.8398192, 0, 1, 0, 0.8398192, 0, -0.54286623, -29.202345, 1.1436653, 4.8324523)
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="Game/Tanques/CTanque4" unique_id=1767860293]
+script = ExtResource("8_wjyqs")
+
+[node name="CTanque5" type="CharacterBody3D" parent="Game/Tanques" unique_id=374197211]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.970852, 1.1436653, 6.8651776)
 script = ExtResource("1_lc1oi")
 
-[node name="Minor" parent="Game/Tanques/CTanque4" unique_id=146321327 instance=ExtResource("4_ys1qc")]
+[node name="Minor" parent="Game/Tanques/CTanque5" unique_id=1902596331 instance=ExtResource("4_ys1qc")]
 transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque4" unique_id=319892581]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque5" unique_id=1205483321]
 shape = SubResource("BoxShape3D_riqys")
 debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 
-[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque4" unique_id=1917378785]
+[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque5" unique_id=1778024054]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6108502, 0)
 script = ExtResource("5_i3aeo")
 
-[node name="Gun" parent="Game/Tanques/CTanque4/Turret" unique_id=1539472219 instance=ExtResource("2_qc4db")]
+[node name="Gun" parent="Game/Tanques/CTanque5/Turret" unique_id=1351619641 instance=ExtResource("2_qc4db")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
 
-[node name="CTanque5" type="CharacterBody3D" parent="Game/Tanques" unique_id=1732905189]
-transform = Transform3D(0.696338, 0, -0.7177141, 0, 1, 0, 0.7177141, 0, 0.696338, -17.112774, 1.1436653, 4.0576262)
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="Game/Tanques/CTanque5" unique_id=1837095683]
+script = ExtResource("8_wjyqs")
+
+[node name="CTanque6" type="CharacterBody3D" parent="Game/Tanques" unique_id=1860843330]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26.909184, 1.1436653, 4.3069863)
 script = ExtResource("1_lc1oi")
 
-[node name="Minor" parent="Game/Tanques/CTanque5" unique_id=1985019266 instance=ExtResource("4_ys1qc")]
+[node name="Minor" parent="Game/Tanques/CTanque6" unique_id=46980504 instance=ExtResource("4_ys1qc")]
 transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque5" unique_id=176615865]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque6" unique_id=1176578956]
 shape = SubResource("BoxShape3D_riqys")
 debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 
-[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque5" unique_id=1772848514]
+[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque6" unique_id=1213147227]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6108502, 0)
 script = ExtResource("5_i3aeo")
 
-[node name="Gun" parent="Game/Tanques/CTanque5/Turret" unique_id=1308512293 instance=ExtResource("2_qc4db")]
+[node name="Gun" parent="Game/Tanques/CTanque6/Turret" unique_id=2008632377 instance=ExtResource("2_qc4db")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
 
-[node name="CTanque6" type="CharacterBody3D" parent="Game/Tanques" unique_id=868892716]
-transform = Transform3D(-0.40999603, 0, -0.91208744, 0, 1, 0, 0.91208744, 0, -0.40999603, -32.41544, 1.1436653, -5.8341465)
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="Game/Tanques/CTanque6" unique_id=272146365]
+script = ExtResource("8_wjyqs")
+
+[node name="CTanque7" type="CharacterBody3D" parent="Game/Tanques" unique_id=423015684]
+transform = Transform3D(0.9263886, 0, -0.3765689, 0, 1, 0, 0.3765689, 0, 0.9263886, -4.93999, 1.1436653, -2.7139072)
 script = ExtResource("1_lc1oi")
 
-[node name="Minor" parent="Game/Tanques/CTanque6" unique_id=1411573921 instance=ExtResource("4_ys1qc")]
+[node name="Minor" parent="Game/Tanques/CTanque7" unique_id=727415908 instance=ExtResource("4_ys1qc")]
 transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque6" unique_id=140695467]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque7" unique_id=1007643720]
 shape = SubResource("BoxShape3D_riqys")
 debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 
-[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque6" unique_id=440311980]
+[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque7" unique_id=127749494]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6108502, 0)
 script = ExtResource("5_i3aeo")
 
-[node name="Gun" parent="Game/Tanques/CTanque6/Turret" unique_id=1530920630 instance=ExtResource("2_qc4db")]
+[node name="Gun" parent="Game/Tanques/CTanque7/Turret" unique_id=1380614548 instance=ExtResource("2_qc4db")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
 
-[node name="CTanque7" type="CharacterBody3D" parent="Game/Tanques" unique_id=73395606]
-transform = Transform3D(0.83583474, 0, -0.5489812, 0, 1, 0, 0.5489812, 0, 0.83583474, -8.24449, 1.1436653, 17.333696)
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="Game/Tanques/CTanque7" unique_id=464111477]
+script = ExtResource("8_wjyqs")
+
+[node name="CTanque8" type="CharacterBody3D" parent="Game/Tanques" unique_id=464833543]
+transform = Transform3D(0.9263886, 0, -0.3765689, 0, 1, 0, 0.3765689, 0, 0.9263886, -13.279551, 1.1436653, 7.9559603)
 script = ExtResource("1_lc1oi")
 
-[node name="Minor" parent="Game/Tanques/CTanque7" unique_id=1991913137 instance=ExtResource("4_ys1qc")]
+[node name="Minor" parent="Game/Tanques/CTanque8" unique_id=1371403961 instance=ExtResource("4_ys1qc")]
 transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque7" unique_id=1726573855]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque8" unique_id=1499641601]
 shape = SubResource("BoxShape3D_riqys")
 debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 
-[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque7" unique_id=1001120559]
+[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque8" unique_id=241285084]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6108502, 0)
 script = ExtResource("5_i3aeo")
 
-[node name="Gun" parent="Game/Tanques/CTanque7/Turret" unique_id=1357197444 instance=ExtResource("2_qc4db")]
+[node name="Gun" parent="Game/Tanques/CTanque8/Turret" unique_id=1230938966 instance=ExtResource("2_qc4db")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
 
-[node name="CTanque8" type="CharacterBody3D" parent="Game/Tanques" unique_id=570130843]
-transform = Transform3D(0.7227771, 0, 0.6910812, 0, 1, 0, -0.6910812, 0, 0.7227771, -8.931059, 1.1436653, 5.2387905)
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="Game/Tanques/CTanque8" unique_id=1480402946]
+script = ExtResource("8_wjyqs")
+
+[node name="CTanque9" type="CharacterBody3D" parent="Game/Tanques" unique_id=1627124486]
+transform = Transform3D(0.9263886, 0, -0.3765689, 0, 1, 0, 0.3765689, 0, 0.9263886, -21.843788, 1.1436653, -0.18254232)
 script = ExtResource("1_lc1oi")
 
-[node name="Minor" parent="Game/Tanques/CTanque8" unique_id=959956677 instance=ExtResource("4_ys1qc")]
+[node name="Minor" parent="Game/Tanques/CTanque9" unique_id=1140126765 instance=ExtResource("4_ys1qc")]
 transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque8" unique_id=815708467]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque9" unique_id=1111277372]
 shape = SubResource("BoxShape3D_riqys")
 debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 
-[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque8" unique_id=691629556]
+[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque9" unique_id=580917517]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6108502, 0)
 script = ExtResource("5_i3aeo")
 
-[node name="Gun" parent="Game/Tanques/CTanque8/Turret" unique_id=1513165054 instance=ExtResource("2_qc4db")]
+[node name="Gun" parent="Game/Tanques/CTanque9/Turret" unique_id=332103370 instance=ExtResource("2_qc4db")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
 
-[node name="CTanque9" type="CharacterBody3D" parent="Game/Tanques" unique_id=1319271699]
-transform = Transform3D(0.90907085, 0, -0.41664195, 0, 1, 0, 0.41664195, 0, 0.90907085, -18.934256, 1.1436653, 20.468855)
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="Game/Tanques/CTanque9" unique_id=278610122]
+script = ExtResource("8_wjyqs")
+
+[node name="CTanque10" type="CharacterBody3D" parent="Game/Tanques" unique_id=1572062447]
+transform = Transform3D(0.9263886, 0, -0.3765689, 0, 1, 0, 0.3765689, 0, 0.9263886, -16.587559, 1.1436653, -6.184995)
 script = ExtResource("1_lc1oi")
 
-[node name="Minor" parent="Game/Tanques/CTanque9" unique_id=1756874186 instance=ExtResource("4_ys1qc")]
+[node name="Minor" parent="Game/Tanques/CTanque10" unique_id=361822881 instance=ExtResource("4_ys1qc")]
 transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque9" unique_id=428188938]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque10" unique_id=619197000]
 shape = SubResource("BoxShape3D_riqys")
 debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 
-[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque9" unique_id=1447059842]
+[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque10" unique_id=111473539]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6108502, 0)
 script = ExtResource("5_i3aeo")
 
-[node name="Gun" parent="Game/Tanques/CTanque9/Turret" unique_id=576952432 instance=ExtResource("2_qc4db")]
+[node name="Gun" parent="Game/Tanques/CTanque10/Turret" unique_id=1348722059 instance=ExtResource("2_qc4db")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
 
-[node name="CTanque10" type="CharacterBody3D" parent="Game/Tanques" unique_id=343763277]
-transform = Transform3D(-0.9147914, 0, -0.40392673, 0, 1, 0, 0.40392673, 0, -0.9147914, -30.022266, 1.1436653, 8.811514)
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="Game/Tanques/CTanque10" unique_id=980896322]
+script = ExtResource("8_wjyqs")
+
+[node name="CTanque11" type="CharacterBody3D" parent="Game/Tanques" unique_id=2057418130]
+transform = Transform3D(0.9263886, 0, -0.3765689, 0, 1, 0, 0.3765689, 0, 0.9263886, -17.390911, 1.1436653, -0.3644097)
 script = ExtResource("1_lc1oi")
 
-[node name="Minor" parent="Game/Tanques/CTanque10" unique_id=714231276 instance=ExtResource("4_ys1qc")]
+[node name="Minor" parent="Game/Tanques/CTanque11" unique_id=476591578 instance=ExtResource("4_ys1qc")]
 transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque10" unique_id=1089912160]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque11" unique_id=721920060]
 shape = SubResource("BoxShape3D_riqys")
 debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 
-[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque10" unique_id=819644167]
+[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque11" unique_id=997125011]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6108502, 0)
 script = ExtResource("5_i3aeo")
 
-[node name="Gun" parent="Game/Tanques/CTanque10/Turret" unique_id=1561697799 instance=ExtResource("2_qc4db")]
+[node name="Gun" parent="Game/Tanques/CTanque11/Turret" unique_id=2031091013 instance=ExtResource("2_qc4db")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
 
-[node name="CTanque11" type="CharacterBody3D" parent="Game/Tanques" unique_id=908949878]
-transform = Transform3D(0.18801197, 0, -0.9821668, 0, 1, 0, 0.9821668, 0, 0.18801197, -19.492018, 1.1436653, 14.800835)
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="Game/Tanques/CTanque11" unique_id=489222980]
+script = ExtResource("8_wjyqs")
+
+[node name="CTanque12" type="CharacterBody3D" parent="Game/Tanques" unique_id=1331767603]
+transform = Transform3D(0.9263886, 0, -0.3765689, 0, 1, 0, 0.3765689, 0, 0.9263886, -25.634335, 1.1436653, -6.4767556)
 script = ExtResource("1_lc1oi")
 
-[node name="Minor" parent="Game/Tanques/CTanque11" unique_id=1921124072 instance=ExtResource("4_ys1qc")]
+[node name="Minor" parent="Game/Tanques/CTanque12" unique_id=919400650 instance=ExtResource("4_ys1qc")]
 transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque11" unique_id=360762215]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque12" unique_id=895098624]
 shape = SubResource("BoxShape3D_riqys")
 debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 
-[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque11" unique_id=201333477]
+[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque12" unique_id=1081201530]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6108502, 0)
 script = ExtResource("5_i3aeo")
 
-[node name="Gun" parent="Game/Tanques/CTanque11/Turret" unique_id=1282789791 instance=ExtResource("2_qc4db")]
+[node name="Gun" parent="Game/Tanques/CTanque12/Turret" unique_id=441067193 instance=ExtResource("2_qc4db")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
 
-[node name="CTanque12" type="CharacterBody3D" parent="Game/Tanques" unique_id=315529400]
-transform = Transform3D(-0.84340775, 0, -0.53727424, 0, 1, 0, 0.53727424, 0, -0.84340775, -26.85212, 1.1436653, -1.8679285)
-script = ExtResource("1_lc1oi")
-
-[node name="Minor" parent="Game/Tanques/CTanque12" unique_id=865200622 instance=ExtResource("4_ys1qc")]
-transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Game/Tanques/CTanque12" unique_id=148840762]
-shape = SubResource("BoxShape3D_riqys")
-debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
-
-[node name="Turret" type="Node3D" parent="Game/Tanques/CTanque12" unique_id=323164512]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6108502, 0)
-script = ExtResource("5_i3aeo")
-
-[node name="Gun" parent="Game/Tanques/CTanque12/Turret" unique_id=1468537407 instance=ExtResource("2_qc4db")]
-transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="Game/Tanques/CTanque12" unique_id=475470865]
+script = ExtResource("8_wjyqs")
 
 [node name="Tower" type="StaticBody3D" parent="Game" unique_id=887397148]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.70499, 1.4567956, -11.447157)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8701682, 1.4567956, -11.447157)
 script = ExtResource("8_n0wup")
 
 [node name="Tower_Turret" type="StaticBody3D" parent="Game/Tower" unique_id=748174167]
@@ -579,3 +660,787 @@ horizontal_alignment = 1
 position = Vector2(815, 370)
 scale = Vector2(0.15, 0.15)
 texture = ExtResource("9_iaow0")
+
+[node name="HUD_Shoot_Ready" type="TextureProgressBar" parent="TankTest/HUD/Icon2" unique_id=198533344]
+offset_left = -166.66658
+offset_top = -166.66658
+offset_right = 89.33342
+offset_bottom = 89.33342
+scale = Vector2(1.3, 1.3)
+value = 100.0
+fill_mode = 4
+texture_progress = ExtResource("10_qpfo2")
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=95419261]
+navigation_mesh = SubResource("NavigationMesh_bhunq")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D" unique_id=1415700536]
+transform = Transform3D(9.358581, 0, 0, 0, 5.689644, 0, 0, 0, 1, 4.386136, 2.9242048, -2.479158)
+mesh = SubResource("BoxMesh_bhunq")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="NavigationRegion3D/MeshInstance3D" unique_id=624901000]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/MeshInstance3D/StaticBody3D" unique_id=1871422381]
+shape = SubResource("BoxShape3D_sn0t7")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="NavigationRegion3D" unique_id=1276401906]
+transform = Transform3D(9.358581, 0, 0, 0, 5.689644, 0, 0, 0, 1, 4.386136, 2.9242048, 2.5929117)
+mesh = SubResource("BoxMesh_bhunq")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="NavigationRegion3D/MeshInstance3D2" unique_id=300657829]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/MeshInstance3D2/StaticBody3D" unique_id=1079494224]
+shape = SubResource("BoxShape3D_sn0t7")
+
+[node name="StaticBody3D2" type="StaticBody3D" parent="NavigationRegion3D" unique_id=1292290019]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.695581, 1.4846504, 2.5929117)
+script = ExtResource("8_n0wup")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/StaticBody3D2" unique_id=2019165468]
+shape = SubResource("BoxShape3D_wojap")
+debug_color = Color(0.8709093, 0.34337163, 0.18573666, 0.41960785)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/StaticBody3D2" unique_id=565307065]
+mesh = SubResource("BoxMesh_riqys")
+
+[node name="StaticBody3D3" type="StaticBody3D" parent="NavigationRegion3D" unique_id=2021010891]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.695581, 1.4846504, 2.5929117)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/StaticBody3D3" unique_id=212707394]
+shape = SubResource("BoxShape3D_wojap")
+debug_color = Color(0.8709093, 0.34337163, 0.18573666, 0.41960785)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/StaticBody3D3" unique_id=953515961]
+mesh = SubResource("BoxMesh_riqys")
+
+[node name="StaticBody3D8" type="StaticBody3D" parent="NavigationRegion3D" unique_id=1306194947]
+transform = Transform3D(-2.4657405e-08, 0.8257092, 0.5640958, 3.6092892e-08, 0.564096, -0.8257091, -0.9999999, 0, -4.371138e-08, 19.770176, -0.08710861, -0.7019408)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/StaticBody3D8" unique_id=1598599680]
+shape = SubResource("BoxShape3D_8yus5")
+debug_color = Color(0.8709093, 0.34337163, 0.18573666, 0.41960785)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/StaticBody3D8" unique_id=1890699511]
+mesh = SubResource("BoxMesh_80d66")
+
+[node name="StaticBody3D9" type="StaticBody3D" parent="NavigationRegion3D" unique_id=1031119113]
+transform = Transform3D(-3.9098108e-08, 0.4471464, 0.89446056, 1.9545391e-08, 0.8944608, -0.44714642, -0.9999999, -2.0040715e-15, -4.3711378e-08, 28.850813, 7.439699, -0.7019408)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/StaticBody3D9" unique_id=1577092422]
+shape = SubResource("BoxShape3D_2r0jt")
+debug_color = Color(0.8709093, 0.34337163, 0.18573666, 0.41960785)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/StaticBody3D9" unique_id=1560286949]
+mesh = SubResource("BoxMesh_xvofd")
+
+[node name="StaticBody3D10" type="StaticBody3D" parent="NavigationRegion3D" unique_id=2070014895]
+transform = Transform3D(-4.369206e-08, 0.02972567, 0.9995579, 1.2993603e-09, 0.9995581, -0.02972582, -0.9999999, -4.154884e-16, -4.3711374e-08, 29.914442, 11.283028, -0.7019408)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/StaticBody3D10" unique_id=2028880189]
+shape = SubResource("BoxShape3D_2r0jt")
+debug_color = Color(0.8709093, 0.34337163, 0.18573666, 0.41960785)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/StaticBody3D10" unique_id=113624921]
+mesh = SubResource("BoxMesh_xvofd")
+
+[node name="StaticBody3D4" type="StaticBody3D" parent="NavigationRegion3D" unique_id=1195489203]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.695581, 1.4846504, 2.5929117)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/StaticBody3D4" unique_id=434208864]
+shape = SubResource("BoxShape3D_wojap")
+debug_color = Color(0.8709093, 0.34337163, 0.18573666, 0.41960785)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/StaticBody3D4" unique_id=1537154337]
+mesh = SubResource("BoxMesh_riqys")
+
+[node name="StaticBody3D5" type="StaticBody3D" parent="NavigationRegion3D" unique_id=1062013143]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.695581, 3.4846504, 2.5929117)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/StaticBody3D5" unique_id=17496312]
+shape = SubResource("BoxShape3D_wojap")
+debug_color = Color(0.8709093, 0.34337163, 0.18573666, 0.41960785)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/StaticBody3D5" unique_id=1496917135]
+mesh = SubResource("BoxMesh_riqys")
+
+[node name="StaticBody3D6" type="StaticBody3D" parent="NavigationRegion3D" unique_id=1990946289]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.695581, 3.4846504, 2.5929117)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/StaticBody3D6" unique_id=1713078819]
+shape = SubResource("BoxShape3D_wojap")
+debug_color = Color(0.8709093, 0.34337163, 0.18573666, 0.41960785)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/StaticBody3D6" unique_id=1304868401]
+mesh = SubResource("BoxMesh_riqys")
+
+[node name="StaticBody3D7" type="StaticBody3D" parent="NavigationRegion3D" unique_id=315825870]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.695581, 3.4846504, 2.5929117)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/StaticBody3D7" unique_id=1283272044]
+shape = SubResource("BoxShape3D_wojap")
+debug_color = Color(0.8709093, 0.34337163, 0.18573666, 0.41960785)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/StaticBody3D7" unique_id=1259445538]
+mesh = SubResource("BoxMesh_riqys")
+
+[node name="CSGCombiner3D" type="CSGCombiner3D" parent="NavigationRegion3D" unique_id=1454344025]
+use_collision = true
+script = ExtResource("22_copon")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D" unique_id=1736816864]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D" unique_id=1559245755]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D" unique_id=1453658113]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D" unique_id=1866979408]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D" unique_id=1763138588]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D6" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D" unique_id=470519561]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGCombiner3D2" type="CSGCombiner3D" parent="NavigationRegion3D" unique_id=1357633067]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8)
+use_collision = true
+script = ExtResource("22_copon")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=220616891]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1760075992]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=409234165]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1941505805]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=913153717]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D6" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1700865352]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D7" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=154326901]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D8" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1954134881]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D9" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1107310549]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D10" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1262586763]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D11" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=524881635]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D12" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=2084153781]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D13" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=887512084]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D14" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1241131150]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D15" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1252818772]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D16" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=86822247]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D17" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1505003359]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D18" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1440729461]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D19" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=338906860]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D20" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=529380436]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D21" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1883899540]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D22" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1919172697]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D23" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=653975652]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D24" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=840211534]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D25" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=730133566]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D26" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=701810527]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D27" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1429606787]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D28" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=370637298]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D29" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=638510563]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D30" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1054840647]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGCombiner3D3" type="CSGCombiner3D" parent="NavigationRegion3D" unique_id=1607215713]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 13)
+use_collision = true
+script = ExtResource("22_copon")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=1023886574]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=561874425]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=445500928]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=864403572]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=147049844]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D6" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=909085694]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D7" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=1853897491]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D8" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=474864468]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D9" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=896594961]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D10" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=504312391]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D11" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=453342964]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D12" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=1785507532]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D13" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=1143297068]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D14" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=216214687]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D15" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=514723224]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D16" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=444007954]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D17" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=1680467114]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D18" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=364597083]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D19" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=524218278]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D20" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=22778199]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D21" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=688611904]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D22" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=945255771]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D23" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=168401639]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D24" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=1494319141]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D25" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=180846898]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D26" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=807857932]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D27" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=335412927]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D28" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=1967020716]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D29" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=947275156]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D30" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=1899710598]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGCombiner3D4" type="CSGCombiner3D" parent="NavigationRegion3D" unique_id=1906358303]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, -13)
+use_collision = true
+script = ExtResource("22_copon")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1833307569]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1579742324]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2012897366]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1882406832]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2060320302]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D6" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1669830048]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D7" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1654730624]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D8" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=242902958]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D9" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=856338233]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D10" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=342396629]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D11" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=738328180]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D12" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=484014804]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D13" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1297275254]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D14" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1305440033]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D15" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1435509820]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D16" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1264414495]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D17" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=576801104]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D18" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=951829385]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D19" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1431288328]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D20" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=779571783]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D21" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1023829698]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D22" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=462051690]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D23" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=823759805]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D24" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=449060940]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D25" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=922450179]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D26" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=326920870]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D27" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=597660691]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D28" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=13967878]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D29" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1468324571]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D30" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1753129382]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGCombiner3D5" type="CSGCombiner3D" parent="NavigationRegion3D" unique_id=517297659]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, -12)
+use_collision = true
+script = ExtResource("22_copon")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=733145875]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=519149321]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=366506513]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1221626536]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1108189601]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D6" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=112176906]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -2.4690764)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D7" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=821703597]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D8" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=437569717]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D9" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=922254379]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D10" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=419405014]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D11" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1588915730]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D12" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=23070583]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -3.4690762)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D13" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=929383044]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D14" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=392070482]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D15" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1491027987]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D16" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1333831218]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D17" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=338871089]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D18" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1471809720]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -4.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D19" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=990070644]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D20" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1920627955]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D21" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1323867908]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D22" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1136443832]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D23" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1591628819]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D24" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1741604370]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -5.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D25" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1704885338]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D26" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1065891298]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D27" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1851763035]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D28" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=11674598]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D29" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=438879568]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D30" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=321295229]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -6.469076)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="Ground" type="StaticBody3D" parent="NavigationRegion3D" unique_id=2123863326]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="NavigationRegion3D/Ground" unique_id=421761137]
+shape = SubResource("BoxShape3D_bhunq")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/Ground" unique_id=1860959951]
+mesh = SubResource("BoxMesh_sn0t7")

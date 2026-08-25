@@ -1,45 +1,139 @@
 extends Node3D
 
-@onready var turret: Tank_turret = $Turret
-var target
+enum AI_State {IDLE, ENGAGED, SCANNING}
+var current_state: AI_State = AI_State.IDLE
 
-var barrel_upper_limit: float = 360
-var barrel_lower_limit: float = -360
-# Called when the node enters the scene tree for the first time.
+@onready var turret: Tank_turret = $Turret
+var player_ref: Node3D = null
+var last_known_position: Vector3 = Vector3.ZERO
+
+# Parámetros de la Torreta
+var barrel_upper_limit: float = 360.0
+var barrel_lower_limit: float = -360.0
+var max_shoot_angle: float = 1.0
+var max_vision_distance: float = 15.0
+var fire_rate: float = 1.0
+var time_since_last_shot: float = 0.0
+
+# Sistema de Detección
+var detection_meter: float = 0.0
+@export var detection_time_front: float = 0.5
+@export var detection_time_rear: float = 2.0
+@export var vision_cone_degrees: float = 90.0
+
+var scan_timer: float = 0.0
+
 func _ready() -> void:
-	target = get_tree().root.find_child("Tank_Player",true,false)
 	turret.barrel_lower_limit = barrel_lower_limit
 	turret.barrel_upper_limit = barrel_upper_limit
-	turret.turret_turning_speed = 1
-	turret.spawn()
-	turret.projectile.ignore = [get_parent_node_3d(), get_parent_node_3d().get_parent_node_3d()]
+	turret.turret_turning_speed = 0.05
 	
+	var parent_col = get_parent_node_3d()
+	var grand_parent_col = parent_col.get_parent_node_3d()
+	turret.ignore = [parent_col, grand_parent_col]
 	
-	Time_Controller.INSTANCE.timeout.connect(shoot)
-	Time_Controller.INSTANCE.start(1)
+	turret.create_projectiles()
+	
+	await get_tree().physics_frame
+	player_ref = get_tree().get_first_node_in_group("Player")
 
-func shoot() -> void:
-	turret.shoot()
+func _physics_process(delta: float) -> void:
+	if not is_instance_valid(player_ref):
+		return
+		
+	time_since_last_shot += delta
+	var can_see_player: bool = is_on_sight_range()
+	
+	update_state_machine(delta, can_see_player)
+	execute_current_state(delta, can_see_player)
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	#print(target.position)
-	turret.rotate_turret_to_point_3d(target.position)
+func update_state_machine(delta: float, can_see_player: bool) -> void:
+	var distance = global_position.distance_to(player_ref.global_position)
+	
+	match current_state:
+		AI_State.IDLE:
+			update_detection_meter(delta, can_see_player, distance)
+			if detection_meter >= 1.0:
+				current_state = AI_State.ENGAGED
+				
+		AI_State.ENGAGED:
+			detection_meter = 1.0
+			
+			if can_see_player and distance <= max_vision_distance * 2:
+				last_known_position = player_ref.global_position
+			else:
+				current_state = AI_State.SCANNING
+				scan_timer = 0.0
+				
+		AI_State.SCANNING:
+			update_detection_meter(delta, can_see_player, distance)
+			if detection_meter >= 1.0:
+				current_state = AI_State.ENGAGED
+			elif detection_meter <= 0.0:
+				current_state = AI_State.IDLE
 
+func update_detection_meter(delta: float, can_see_player: bool, distance: float) -> void:
+	if can_see_player and distance <= max_vision_distance:
+		var dir_to_player = turret.global_position.direction_to(player_ref.global_position)
+		var turret_forward = -turret.global_basis.x.normalized()
+		var angle = turret_forward.angle_to(dir_to_player)
+		var is_in_cone = angle <= deg_to_rad(vision_cone_degrees)
+		
+		if is_in_cone:
+			detection_meter += delta / detection_time_front
+		else:
+			detection_meter += delta / detection_time_rear
+	else:
+		detection_meter -= delta / detection_time_rear
+		
+	detection_meter = clampf(detection_meter, 0.0, 1.0)
+
+func execute_current_state(delta: float, can_see_player: bool) -> void:
+	match current_state:
+		AI_State.IDLE:
+			if detection_meter > 0.0 and can_see_player:
+				turret.rotate_turret_to_point_3d(player_ref.global_position)
+				
+		AI_State.ENGAGED:
+			turret.rotate_turret_to_point_3d(player_ref.global_position)
+			attempt_shoot(player_ref.global_position)
+			
+		AI_State.SCANNING:
+			scan_timer += delta
+			var scan_offset = Vector3(sin(scan_timer * 2.0) * 5.0, 0, cos(scan_timer * 2.0) * 5.0)
+			var scan_target = last_known_position + scan_offset
+			turret.rotate_turret_to_point_3d(scan_target)
+
+func attempt_shoot(aim_pos: Vector3) -> void:
+	var dir_to_target = turret.global_position.direction_to(aim_pos).normalized()
+	var turret_forward = -turret.global_basis.x.normalized()
+	var angle = turret_forward.signed_angle_to(dir_to_target, turret.global_basis.y)
+	
+	if abs(angle) < max_shoot_angle and time_since_last_shot >= fire_rate:
+		turret.shoot()
+		time_since_last_shot = 0.0
+
+func is_on_sight_range() -> bool:
+	if not is_instance_valid(player_ref) or not player_ref.visible:
+		return false
+		
+	var space = get_world_3d().direct_space_state
+	var origin = turret.global_position
+	var end = player_ref.global_position
+	
+	var query = PhysicsRayQueryParameters3D.create(origin, end)
+	
+	var parent_col = get_parent_node_3d() as CollisionObject3D
+	var grand_col = parent_col.get_parent_node_3d() as CollisionObject3D
+	query.exclude = [parent_col.get_rid(), grand_col.get_rid()]
+	
+	var raycast = space.intersect_ray(query)
+	if raycast:
+		return raycast.collider == player_ref or raycast.collider.is_in_group("Player")
+	return false
 
 func activate() -> void:
-	visible = true
 	process_mode = Node.PROCESS_MODE_INHERIT
-	set_deferred("monitoring", true)
-	set_deferred("monitorable", true)
-	
 
 func deactivate() -> void:
-	visible = false
 	process_mode = Node.PROCESS_MODE_DISABLED
-	set_deferred("monitoring", false)
-	set_deferred("monitorable", false)
-	
-	Time_Controller.INSTANCE.timeout.disconnect(shoot)
-	
-	print("sexo")

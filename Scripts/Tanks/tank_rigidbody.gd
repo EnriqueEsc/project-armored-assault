@@ -9,9 +9,9 @@ signal hp_changed (hp: int)
 signal score_changed (score: int)
 
 
-const max_speed = 3
-const acceleration = 5
-const tank_turn_speed = 1
+const max_speed: float = 3.0
+const acceleration: float = 5.0
+var tank_turn_speed: float = 1.0
 
 
 var turning_velocity: float = 0
@@ -36,37 +36,67 @@ var time_controller: Time_Controller
 @export var fire_rate_prim: float = 2
 var last_shoot_prim: float = -10
 
+var time_passed: float = 0
+signal shoot_recharge(charge: float)
+
+@export var allign_speed: float = 3
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	time_controller = Time_Controller.INSTANCE
 	tank_turret.recoil.connect(recoil)
 	
-	tank_turret.spawn()
-	tank_turret.projectile.origin = self
+	tank_turret.origin = self
+	tank_turret.create_projectiles()
+	
+	time_passed = fire_rate_prim
+	
 
+func calculate_charge(delta: float) -> void:
+	time_passed += delta
+	var percent = time_passed / fire_rate_prim
+	percent = clampf(percent,0,1)
+	percent *= 100
+	shoot_recharge.emit(percent)
 
 func recoil(dir: Vector3) -> void:
 	var push = Vector3.ZERO.move_toward(dir, friction)
 	#push = Vector3(push.x, 0 ,push.z)
 	velocity += push
 
+func allign_with_floor(delta: float) -> void:
+	var normal: Vector3 = Vector3.UP
+	
+	if is_on_floor():
+		normal = get_floor_normal()
+	var current_transform = global_transform
+	var current_right = current_transform.basis.x
+	var forward = current_right.cross(normal).normalized()
+	var right = normal.cross(forward).normalized()
+	var target_basis = Basis(right,normal,forward)
+	var new_basis = current_transform.basis.slerp(target_basis, allign_speed * delta)
+	global_transform.basis = new_basis.orthonormalized()
+
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 	
+	allign_with_floor(delta)
+	
+	calculate_charge(delta)
 	
 	if direction:
 		velocity.x = lerpf(velocity.x, direction.x * current_speed, acceleration * delta)
 		velocity.z = lerpf(velocity.z, direction.z * current_speed, acceleration * delta)
-	
-	velocity.x = lerpf(velocity.x, 0.0, friction * delta)
-	velocity.z = lerpf(velocity.z, 0.0, friction * delta)
+	else:
+		velocity.x = lerpf(velocity.x, 0.0, friction * delta)
+		velocity.z = lerpf(velocity.z, 0.0, friction * delta)
 	
 	turning_velocity = lerpf(turning_velocity,0,friction * 5 * delta)
 	rotate_y(turning_velocity)
 	
 	move_and_slide()
+	
 	
 	for i in get_slide_collision_count():
 		var collision = get_slide_collision(i)
@@ -77,6 +107,10 @@ func _physics_process(delta: float) -> void:
 			var push = dir * velocity.length()
 			
 			collider.apply_central_force(push)
+		
+		if collider is Building:
+			collider.take_damage(1,self,global_position)
+
 
 func move(move: Vector2, delta: float) -> void:
 	#rotate_y(-move.x * tank_turn_speed * delta)
@@ -95,6 +129,8 @@ func shoot() -> void:
 	last_shoot_prim = time_controller.running_time
 	
 	tank_turret.shoot()
+	
+	time_passed = 0
 
 func rotate_turret_to_point_3d(point: Vector3) -> void:
 	tank_turret.rotate_turret_to_point_3d(point)
@@ -109,7 +145,7 @@ func get_aim_point_3d(distance: float) -> Vector3:
 	return tank_turret.get_aim_point_3d(distance)
 
 
-func take_damage(damage: int, source: Tank_Rigid) -> void:
+func take_damage(damage: int, source: Tank_Rigid, impact_point: Vector3) -> void:
 	armor_points -= damage
 	armor_points = clamp(armor_points,0,max_armor_points)
 	

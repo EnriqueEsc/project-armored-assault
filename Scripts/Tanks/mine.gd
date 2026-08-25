@@ -45,11 +45,11 @@ func deactivate() -> void:
 func _on_area_entered(body: Node3D):
 	#print(body..get_parent.name)
 	
-	print("Holaaaaaa")
+	#print("Holaaaaaa")
 	
 	if body.has_method("take_damage"):
 		#origin.projectile_to_pool(self)
-		body.take_damage(damage,origin)
+		body.take_damage(damage,origin,global_position)
 		detonate()
 		if origin:
 			origin.get_score(damage)
@@ -98,7 +98,7 @@ func detonate() -> void:
 					hitted_enemies.append(current_collider)
 					
 					if current_collider.has_method("take_damage"):
-						current_collider.take_damage(damage,origin)
+						current_collider.take_damage(damage,origin,global_position)
 					if current_collider.has_method("detonate"):
 						current_collider.detonate()
 				
