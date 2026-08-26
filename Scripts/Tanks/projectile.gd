@@ -7,12 +7,14 @@ var speed: float = 10
 var base_speed: float = 0.5
 var direction: Vector3 = Vector3(1,0,0)
 var origin: Tank_Rigid
-var damage: int = 20
-var is_explosive: bool = false
-var blast_rad: float = 1
+var damage: int = 10
+var is_explosive: bool = true
+var blast_rad: float = 2
 var ignore = []
 
 signal deactivated(projectile: Projectile)
+
+var detonated: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -44,6 +46,9 @@ func activate() -> void:
 	process_mode = Node.PROCESS_MODE_INHERIT
 	set_deferred("monitoring", true)
 	set_deferred("monitorable", true)
+	
+	if is_explosive:
+		detonated = false
 
 func deactivate() -> void:
 	visible = false
@@ -91,10 +96,18 @@ func _on_area_entered(body):
 			detonate()
 	else:
 		direction = Vector3.ZERO
-		deactivate()
+		if not is_explosive:
+			deactivate()
+		else:
+			detonate()
 
 
 func detonate() -> void:
+	
+	if detonated:
+		return
+	
+	detonated = true
 	
 	if not is_explosive:
 		return
@@ -122,8 +135,10 @@ func detonate() -> void:
 		
 		if current_collider and not hitted_enemies.has(current_collider):
 			
+			if current_collider.has_method("take_explosion"):
+				current_collider.take_explosion(damage,origin,global_position,blast_rad)
 			
-			if current_collider.has_method("take_damage") or current_collider.has_method("detonate") :
+			if current_collider.has_method("take_damage") or current_collider.has_method("detonate") or current_collider.has_method("take_explosion"):
 				
 				var raycast = PhysicsRayQueryParameters3D.create(global_position,current_collider.global_position)
 				raycast.exclude = [self]

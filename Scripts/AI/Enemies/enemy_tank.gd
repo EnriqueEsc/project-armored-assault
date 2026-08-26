@@ -14,7 +14,7 @@ var max_shoot_angle: float = 0.2
 var is_omniscent: bool = false
 var max_chase_distance: float = 10.0
 
-var aggro_max_time: float = 5.0
+var aggro_max_time: float = 25.0
 var current_aggro_time: float = 0.0
 
 var fire_rate: float = 1.0
@@ -48,7 +48,12 @@ func _ready() -> void:
 	tank_turret = tank_rigid.tank_turret
 	tank_turret.turret_turning_speed /= 2
 	fire_rate = tank_rigid.fire_rate_prim
+	
+	tank_rigid.got_hit.connect(got_hit)
 
+func got_hit(source: Tank_Rigid, impact_point: Vector3) -> void:
+	current_state = AI_State.ENGAGED
+	detection_meter = 1.0
 
 func _physics_process(delta: float) -> void:
 	

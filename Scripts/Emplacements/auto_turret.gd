@@ -11,7 +11,7 @@ var last_known_position: Vector3 = Vector3.ZERO
 var barrel_upper_limit: float = 360.0
 var barrel_lower_limit: float = -360.0
 var max_shoot_angle: float = 1.0
-var max_vision_distance: float = 15.0
+var max_vision_distance: float = 10.0
 var fire_rate: float = 1.0
 var time_since_last_shot: float = 0.0
 
@@ -36,6 +36,22 @@ func _ready() -> void:
 	
 	await get_tree().physics_frame
 	player_ref = get_tree().get_first_node_in_group("Player")
+	
+	var turret_rigid = null
+	turret_rigid = get_parent_node_3d() as Emplacement
+	var emplacement = null
+	
+	if turret_rigid:
+		turret_rigid.got_hit.connect(got_hit)
+		emplacement = turret_rigid.get_parent_node_3d() as Emplacement
+	
+	if emplacement:
+		emplacement.got_hit.connect(got_hit)
+
+
+func got_hit(source: Tank_Rigid, impact_point: Vector3) -> void:
+	current_state = AI_State.ENGAGED
+	detection_meter = 1.0
 
 func _physics_process(delta: float) -> void:
 	if not is_instance_valid(player_ref):

@@ -1,8 +1,10 @@
 extends StaticBody3D
-
+class_name Emplacement
 
 var max_armor_points: int = 40
 var armor_points: int = 40
+
+signal got_hit(source: Tank_Rigid, impact_point: Vector3)
 
 func take_damage(damage: int, source: Tank_Rigid, impact_point: Vector3) -> void:
 	armor_points -= damage
@@ -16,6 +18,9 @@ func take_damage(damage: int, source: Tank_Rigid, impact_point: Vector3) -> void
 		#if is_player:
 			#self.get_parent().get_parent().death_screen.visible = true
 		deactivate() 
+		return
+	
+	got_hit.emit(source, impact_point)
 
 
 func activate() -> void:

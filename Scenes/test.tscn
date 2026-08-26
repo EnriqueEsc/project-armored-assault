@@ -23,6 +23,7 @@
 [ext_resource type="PackedScene" uid="uid://caqoxtxta5muo" path="res://Models/Test/Tank_Test/turret_V3.fbx" id="14_kuf18"]
 [ext_resource type="Shader" uid="uid://c5r6qc4s673e8" path="res://Shaders/see_tank.gdshader" id="21_wojap"]
 [ext_resource type="Script" uid="uid://cgp8hd1nxjt5u" path="res://Scripts/Buildings/building.gd" id="22_copon"]
+[ext_resource type="Script" uid="uid://d054fnyrmgj2k" path="res://Scripts/Terrain/nav_region.gd" id="22_kxtw2"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_qc4db"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -640,6 +641,7 @@ scale = Vector2(0.15, 0.15)
 texture = ExtResource("10_qpfo2")
 
 [node name="HUD_AP" type="RichTextLabel" parent="TankTest/HUD" unique_id=1606568337]
+modulate = Color(0.81259817, 0.69858956, 0, 1)
 offset_left = 37.0
 offset_top = 552.0
 offset_right = 195.0
@@ -648,10 +650,21 @@ theme_override_font_sizes/normal_font_size = 40
 text = "30 AP"
 
 [node name="HUD_Score" type="RichTextLabel" parent="TankTest/HUD" unique_id=775566597]
+modulate = Color(0.81259817, 0.69858956, 0, 1)
 offset_left = 16.0
 offset_top = 601.0
 offset_right = 174.0
 offset_bottom = 638.0
+theme_override_font_sizes/normal_font_size = 20
+text = "Score: 2000000"
+horizontal_alignment = 1
+
+[node name="HUD_Velocimeter" type="RichTextLabel" parent="TankTest/HUD" unique_id=2015946372]
+modulate = Color(0.81259817, 0.69858956, 0, 1)
+offset_left = 17.0
+offset_top = 525.0
+offset_right = 175.0
+offset_bottom = 562.0
 theme_override_font_sizes/normal_font_size = 20
 text = "Score: 2000000"
 horizontal_alignment = 1
@@ -671,8 +684,14 @@ value = 100.0
 fill_mode = 4
 texture_progress = ExtResource("10_qpfo2")
 
+[node name="Height_Line" type="Line2D" parent="TankTest/HUD" unique_id=170805685]
+points = PackedVector2Array(0, 0, 0, 0)
+width = 3.0
+default_color = Color(0.41981313, 0.41981313, 0.4198131, 1)
+
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=95419261]
 navigation_mesh = SubResource("NavigationMesh_bhunq")
+script = ExtResource("22_kxtw2")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D" unique_id=1415700536]
 transform = Transform3D(9.358581, 0, 0, 0, 5.689644, 0, 0, 0, 1, 4.386136, 2.9242048, -2.479158)
@@ -783,657 +802,1354 @@ debug_color = Color(0.8709093, 0.34337163, 0.18573666, 0.41960785)
 [node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/StaticBody3D7" unique_id=1259445538]
 mesh = SubResource("BoxMesh_riqys")
 
-[node name="CSGCombiner3D" type="CSGCombiner3D" parent="NavigationRegion3D" unique_id=1454344025]
-use_collision = true
-script = ExtResource("22_copon")
-
-[node name="CSGBox3D" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D" unique_id=1736816864]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -2.4690764)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D2" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D" unique_id=1559245755]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -2.4690764)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D3" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D" unique_id=1453658113]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -2.4690764)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D4" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D" unique_id=1866979408]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -2.4690764)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D5" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D" unique_id=1763138588]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -2.4690764)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D6" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D" unique_id=470519561]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -2.4690764)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGCombiner3D2" type="CSGCombiner3D" parent="NavigationRegion3D" unique_id=1357633067]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -8)
-use_collision = true
-script = ExtResource("22_copon")
-
-[node name="CSGBox3D" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=220616891]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -2.4690764)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D2" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1760075992]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -2.4690764)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D3" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=409234165]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -2.4690764)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D4" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1941505805]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -2.4690764)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D5" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=913153717]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -2.4690764)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D6" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1700865352]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -2.4690764)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D7" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=154326901]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -3.4690762)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D8" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1954134881]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -3.4690762)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D9" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1107310549]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -3.4690762)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D10" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1262586763]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -3.4690762)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D11" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=524881635]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -3.4690762)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D12" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=2084153781]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -3.4690762)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D13" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=887512084]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -4.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D14" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1241131150]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -4.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D15" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1252818772]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -4.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D16" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=86822247]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -4.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D17" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1505003359]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -4.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D18" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1440729461]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -4.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D19" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=338906860]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -5.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D20" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=529380436]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -5.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D21" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1883899540]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -5.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D22" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1919172697]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -5.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D23" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=653975652]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -5.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D24" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=840211534]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -5.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D25" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=730133566]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -6.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D26" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=701810527]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -6.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D27" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1429606787]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -6.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D28" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=370637298]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -6.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D29" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=638510563]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -6.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D30" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D2" unique_id=1054840647]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -6.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGCombiner3D3" type="CSGCombiner3D" parent="NavigationRegion3D" unique_id=1607215713]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0, 13)
-use_collision = true
-script = ExtResource("22_copon")
-
-[node name="CSGBox3D" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=1023886574]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -2.4690764)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D2" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=561874425]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -2.4690764)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D3" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=445500928]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -2.4690764)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D4" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=864403572]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -2.4690764)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D5" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=147049844]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -2.4690764)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D6" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=909085694]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -2.4690764)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D7" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=1853897491]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -3.4690762)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D8" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=474864468]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -3.4690762)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D9" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=896594961]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -3.4690762)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D10" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=504312391]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -3.4690762)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D11" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=453342964]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -3.4690762)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D12" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=1785507532]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -3.4690762)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D13" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=1143297068]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -4.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D14" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=216214687]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -4.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D15" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=514723224]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -4.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D16" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=444007954]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -4.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D17" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=1680467114]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -4.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D18" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=364597083]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -4.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D19" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=524218278]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -5.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D20" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=22778199]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -5.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D21" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=688611904]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -5.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D22" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=945255771]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -5.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D23" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=168401639]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -5.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D24" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=1494319141]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -5.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D25" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=180846898]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -6.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D26" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=807857932]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -6.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D27" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=335412927]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -6.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D28" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=1967020716]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -6.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D29" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=947275156]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -6.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
-[node name="CSGBox3D30" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D3" unique_id=1899710598]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -6.469076)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wojap")
-
 [node name="CSGCombiner3D4" type="CSGCombiner3D" parent="NavigationRegion3D" unique_id=1906358303]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, -13)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.497589, 1.5, -17)
 use_collision = true
 script = ExtResource("22_copon")
 
 [node name="CSGBox3D" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1833307569]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -2.4690764)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D2" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1579742324]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -2.4690764)
+[node name="CSGBox3D2" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1016747391]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D3" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2012897366]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -2.4690764)
+[node name="CSGBox3D3" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=741236666]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D4" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1882406832]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -2.4690764)
+[node name="CSGBox3D4" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=831154252]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D5" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2060320302]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -2.4690764)
+[node name="CSGBox3D5" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=320515313]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D6" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1669830048]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -2.4690764)
+[node name="CSGBox3D6" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1512417090]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D7" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1654730624]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -3.4690762)
+[node name="CSGBox3D7" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1729449721]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D8" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=242902958]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -3.4690762)
+[node name="CSGBox3D8" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=96167862]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D9" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=856338233]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -3.4690762)
+[node name="CSGBox3D9" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1148056074]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D10" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=342396629]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -3.4690762)
+[node name="CSGBox3D10" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1367144211]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D11" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=738328180]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -3.4690762)
+[node name="CSGBox3D11" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=988665354]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D12" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=484014804]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -3.4690762)
+[node name="CSGBox3D12" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=551979303]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D13" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1297275254]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -4.469076)
+[node name="CSGBox3D13" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=451414533]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D14" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1305440033]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -4.469076)
+[node name="CSGBox3D14" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=762454976]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D15" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1435509820]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -4.469076)
+[node name="CSGBox3D15" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=812851566]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D16" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1264414495]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -4.469076)
+[node name="CSGBox3D16" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=436816969]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D17" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=576801104]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -4.469076)
+[node name="CSGBox3D17" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=63957129]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D18" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=951829385]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -4.469076)
+[node name="CSGBox3D18" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2057215321]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D19" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1431288328]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -5.469076)
+[node name="CSGBox3D19" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1549128860]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D20" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=779571783]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -5.469076)
+[node name="CSGBox3D20" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1181227155]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D21" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1023829698]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -5.469076)
+[node name="CSGBox3D21" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=911305604]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D22" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=462051690]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -5.469076)
+[node name="CSGBox3D22" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1958754638]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D23" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=823759805]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -5.469076)
+[node name="CSGBox3D23" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1540488475]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D24" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=449060940]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -5.469076)
+[node name="CSGBox3D24" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1525949384]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 0)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D25" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=922450179]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -6.469076)
+[node name="CSGBox3D25" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=11210424]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D26" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=326920870]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -6.469076)
+[node name="CSGBox3D26" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1803625486]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D27" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=597660691]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -6.469076)
+[node name="CSGBox3D27" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=833168]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D28" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=13967878]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -6.469076)
+[node name="CSGBox3D28" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=550871330]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, -1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D29" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1468324571]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -6.469076)
+[node name="CSGBox3D29" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=957694905]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D30" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1753129382]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -6.469076)
+[node name="CSGBox3D30" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=374754194]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGCombiner3D5" type="CSGCombiner3D" parent="NavigationRegion3D" unique_id=517297659]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, -12)
+[node name="CSGBox3D31" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=45633849]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D32" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=419053336]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D33" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1661351321]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D34" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=890160022]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D35" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2099053494]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D36" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2131920465]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D37" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1297200842]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D38" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=211541842]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D39" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1908452293]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D40" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1881944913]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D41" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=714186012]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D42" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1810082526]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D43" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1382718429]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D44" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=132328902]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D45" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2119597695]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D46" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=984411587]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D47" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1591333333]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D48" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2078722754]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D49" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=815793015]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D50" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=490351684]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D51" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=886084240]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D52" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1925143810]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D53" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1714540715]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D54" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=221816496]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D55" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1645024233]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D56" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1050527792]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D57" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=46970197]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D58" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1668294615]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D59" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2003838829]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D60" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1659470500]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D61" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=695559958]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D62" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1879117082]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 6, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D63" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=641542563]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 6, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D64" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1525165298]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 6, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D65" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1070270552]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D66" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=25964737]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 6, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D67" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=173604276]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 6, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D68" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=177470525]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 6, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D69" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=132125364]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D70" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2102591014]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 6, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D71" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1341942739]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 6, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D72" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=114626861]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 6, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D73" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=785760926]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D74" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=293161006]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 6, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D75" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1653212832]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 6, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D76" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=301074941]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 6, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D77" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=459695127]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D78" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=14090699]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 6, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D79" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2005512650]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 6, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D80" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1725671598]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 6, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D81" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=540174043]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D82" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2047608106]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D83" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=203446750]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D84" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1648337496]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D85" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1463173118]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D86" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1752926996]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D87" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1643637123]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D88" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2068542315]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D89" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1379933352]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D90" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1379371968]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D91" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2006095213]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D92" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1821495288]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D93" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=13550344]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D94" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=328774397]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D95" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1593564917]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D96" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1957614745]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D97" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=585894615]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D98" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=757041408]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D99" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1597407039]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 8, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D100" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1387000787]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D101" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1530047669]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D102" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2031286662]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 10, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D103" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=780953033]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 10, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D104" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=62755004]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 10, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D105" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=300137954]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D106" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1532051164]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 10, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D107" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=232193600]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 10, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D108" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1094979379]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 10, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D109" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=290063917]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D110" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=845036321]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 10, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D111" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=845410515]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 10, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D112" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=445569696]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 10, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D113" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=451666877]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D114" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=48165053]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 10, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D115" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1452862834]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 10, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D116" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1220008802]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 10, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D117" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=827407256]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D118" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=514706512]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 10, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D119" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=736000532]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 10, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D120" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1852527392]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 10, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D121" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=131643723]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D122" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=824378540]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 12, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D123" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2107630454]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 12, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D124" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=197674699]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 12, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D125" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=910529513]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D126" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1756890151]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 12, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D127" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=781993603]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 12, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D128" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=15987582]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 12, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D129" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=53996656]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D130" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=824367373]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 12, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D131" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1162303828]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 12, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D132" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1076448369]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 12, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D133" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1400895319]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D134" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2013471272]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 12, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D135" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=760385439]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 12, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D136" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1047025354]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 12, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D137" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1401408952]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D138" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1313986797]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 12, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D139" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2022561395]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 12, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D140" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2137269465]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 12, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D141" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=20476852]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D142" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=946234799]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 14, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D143" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=226673317]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 14, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D144" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=2072451812]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 14, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D145" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=198145791]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D146" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=481827837]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 14, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D147" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=930495183]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 14, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D148" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=421566943]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 14, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D149" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1639655434]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D150" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=853940706]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 14, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D151" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1631699994]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 14, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D152" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1105348631]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 14, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D153" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=865474612]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D154" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1580654932]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 14, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D155" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=198046445]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 14, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D156" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=18103150]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 14, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D157" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=385134097]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 14, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D158" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=613625731]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 14, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D159" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1717717027]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 14, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D160" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D4" unique_id=1820396716]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 14, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGCombiner3D5" type="CSGCombiner3D" parent="NavigationRegion3D" unique_id=446070981]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.497589, 1.5, -17)
 use_collision = true
 script = ExtResource("22_copon")
 
-[node name="CSGBox3D" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=733145875]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -2.4690764)
+[node name="CSGBox3D" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=308194412]
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D2" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=519149321]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -2.4690764)
+[node name="CSGBox3D2" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1998649635]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D3" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=366506513]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -2.4690764)
+[node name="CSGBox3D3" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1120830448]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D4" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1221626536]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -2.4690764)
+[node name="CSGBox3D4" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=495197013]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D5" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1108189601]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -2.4690764)
+[node name="CSGBox3D5" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=509135416]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D6" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=112176906]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -2.4690764)
+[node name="CSGBox3D6" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1953589179]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D7" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=821703597]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -3.4690762)
+[node name="CSGBox3D7" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1038911455]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D8" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=437569717]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -3.4690762)
+[node name="CSGBox3D8" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1806741611]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D9" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=922254379]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -3.4690762)
+[node name="CSGBox3D9" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=691513782]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D10" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=419405014]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -3.4690762)
+[node name="CSGBox3D10" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=2031897517]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D11" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1588915730]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -3.4690762)
+[node name="CSGBox3D11" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=442837693]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D12" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=23070583]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -3.4690762)
+[node name="CSGBox3D12" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=30439213]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D13" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=929383044]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -4.469076)
+[node name="CSGBox3D13" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=842836880]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D14" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=392070482]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -4.469076)
+[node name="CSGBox3D14" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=166257107]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D15" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1491027987]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -4.469076)
+[node name="CSGBox3D15" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=289585061]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D16" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1333831218]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -4.469076)
+[node name="CSGBox3D16" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=2053163536]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D17" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=338871089]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -4.469076)
+[node name="CSGBox3D17" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1341207052]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D18" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1471809720]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -4.469076)
+[node name="CSGBox3D18" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1521796099]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D19" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=990070644]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -5.469076)
+[node name="CSGBox3D19" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1363226243]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D20" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1920627955]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -5.469076)
+[node name="CSGBox3D20" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=634937683]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D21" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1323867908]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -5.469076)
+[node name="CSGBox3D21" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1194249297]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D22" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1136443832]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -5.469076)
+[node name="CSGBox3D22" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=629541503]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D23" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1591628819]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -5.469076)
+[node name="CSGBox3D23" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=406324185]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D24" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1741604370]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -5.469076)
+[node name="CSGBox3D24" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1520927578]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 0)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D25" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1704885338]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 1.467, -6.469076)
+[node name="CSGBox3D25" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1462953566]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D26" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1065891298]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 1.467, -6.469076)
+[node name="CSGBox3D26" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1645878082]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D27" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1851763035]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 1.467, -6.469076)
+[node name="CSGBox3D27" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=928193923]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D28" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=11674598]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.7, 3.467, -6.469076)
+[node name="CSGBox3D28" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=318608768]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, -1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D29" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=438879568]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.7, 3.467, -6.469076)
+[node name="CSGBox3D29" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1206532911]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 1)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 
-[node name="CSGBox3D30" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=321295229]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 3.467, -6.469076)
+[node name="CSGBox3D30" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=600132968]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D31" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=848661855]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D32" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1882453381]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D33" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1123155108]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D34" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1175974768]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D35" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1582779978]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D36" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=956855950]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D37" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1949225488]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D38" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1622290139]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D39" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1392139440]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D40" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=346319941]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D41" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=267082816]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D42" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=653837652]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D43" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=560766850]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D44" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1332855715]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D45" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=97940494]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D46" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1920150657]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D47" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1217237326]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D48" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=785900426]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D49" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=676409973]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D50" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=718807726]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D51" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1063496723]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D52" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=925802092]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D53" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=686353328]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D54" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1342518709]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D55" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=314684694]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D56" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=401826347]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D57" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=707528684]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D59" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=1092236805]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D58" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D5" unique_id=108352824]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGCombiner3D6" type="CSGCombiner3D" parent="NavigationRegion3D" unique_id=1432961784]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.49759, 1.5, -16)
+use_collision = true
+script = ExtResource("22_copon")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=115315609]
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1616043429]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1861887677]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=994516788]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=326225440]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D6" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=645644017]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D7" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1909325687]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D8" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1538294061]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D9" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=833383875]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D10" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1243096276]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D11" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1101765480]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D12" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1643809107]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D13" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1507098160]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D14" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1946020458]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D15" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1963458037]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D16" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=2143357208]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D17" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=404287905]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D18" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=454046810]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D19" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=772747003]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D20" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1724015305]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D21" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=79928198]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D22" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1244506651]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D23" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1354870993]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D24" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=189314418]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D25" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=998607260]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D26" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=306296119]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D27" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1302581935]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D28" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=629067444]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, -1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D29" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=744512685]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D30" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1166094647]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D31" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1208388404]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D32" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=853383299]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 1)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D33" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=546988537]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D34" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1781855866]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D35" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=461245293]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D36" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1396877195]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D37" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1994238162]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D38" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=75938461]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D39" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=1865327462]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D40" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D6" unique_id=456697030]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, -2)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGCombiner3D7" type="CSGCombiner3D" parent="NavigationRegion3D" unique_id=1946969515]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.49759, 1.5, -7)
+use_collision = true
+script = ExtResource("22_copon")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D7" unique_id=1473519358]
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D7" unique_id=286176541]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D7" unique_id=1190683602]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D7" unique_id=1589989409]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D7" unique_id=1422122080]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D6" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D7" unique_id=306163127]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D7" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D7" unique_id=380980436]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 0)
+size = Vector3(2, 2, 1)
+material = SubResource("ShaderMaterial_wojap")
+
+[node name="CSGBox3D8" type="CSGBox3D" parent="NavigationRegion3D/CSGCombiner3D7" unique_id=11185442]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2, 0)
 size = Vector3(2, 2, 1)
 material = SubResource("ShaderMaterial_wojap")
 

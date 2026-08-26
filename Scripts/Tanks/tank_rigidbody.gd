@@ -37,9 +37,14 @@ var time_controller: Time_Controller
 var last_shoot_prim: float = -10
 
 var time_passed: float = 0
+
 signal shoot_recharge(charge: float)
+signal velocimeter(velocity: float)
+signal got_hit(source: Tank_Rigid, impact_point: Vector3)
 
 @export var allign_speed: float = 3
+
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -92,8 +97,12 @@ func _physics_process(delta: float) -> void:
 		velocity.x = lerpf(velocity.x, 0.0, friction * delta)
 		velocity.z = lerpf(velocity.z, 0.0, friction * delta)
 	
+	velocimeter.emit(velocity.length())
+	
 	turning_velocity = lerpf(turning_velocity,0,friction * 5 * delta)
 	rotate_y(turning_velocity)
+	
+	var pre_impact_vel: Vector3 = velocity
 	
 	move_and_slide()
 	
@@ -102,14 +111,31 @@ func _physics_process(delta: float) -> void:
 		var collision = get_slide_collision(i)
 		var collider = collision.get_collider()
 		
+		'''
 		if collider is RigidBody3D:
 			var dir = -collision.get_normal()
 			var push = dir * velocity.length()
 			
 			collider.apply_central_force(push)
+		'''
 		
-		if collider is Building:
-			collider.take_damage(1,self,global_position)
+		var normal = collision.get_normal()
+		var impact = pre_impact_vel.dot(-normal)
+		
+		if impact > 2.0:
+			if collider is RigidBody3D:
+				var push = -normal * impact
+				collider.apply_central_force(push)
+				
+			#if collider is Building:
+			if collider.has_method("take_damage"):
+				var impact_damage = (armor_points/20.0) * impact
+				collider.take_damage(impact_damage, self, global_position)
+		
+		
+		#Para seguir desgastando las estructuras si se sigue avanzando
+		if collider is Building and impact != 0:
+			collider.take_damage(1 ,self, global_position)
 
 
 func move(move: Vector2, delta: float) -> void:
@@ -161,6 +187,9 @@ func take_damage(damage: int, source: Tank_Rigid, impact_point: Vector3) -> void
 		#if is_player:
 			#self.get_parent().get_parent().death_screen.visible = true
 		deactivate() 
+		return
+	
+	got_hit.emit(source, impact_point)
 
 
 func activate() -> void:
