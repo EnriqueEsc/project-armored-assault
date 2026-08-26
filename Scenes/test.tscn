@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://itcb8riovsv8" path="res://Scripts/Tanks/mine.gd" id="1_2cgwh"]
 [ext_resource type="Script" uid="uid://b44xtts1goeo7" path="res://Scripts/Player/Tank_player_controller.gd" id="1_8od7v"]
 [ext_resource type="Script" uid="uid://bykhssfaytcmi" path="res://Scripts/Tanks/tank_rigidbody.gd" id="1_lc1oi"]
+[ext_resource type="Script" uid="uid://cr1p5ljg6rrir" path="res://Scripts/Game/Missions/mission_test.gd" id="1_pgu05"]
 [ext_resource type="PackedScene" uid="uid://koxj0b8ls2xa" path="res://Models/Test/Gun.fbx" id="2_qc4db"]
 [ext_resource type="PackedScene" uid="uid://m8354xipuvjd" path="res://Models/Test/mine.fbx" id="2_yb21e"]
 [ext_resource type="Script" uid="uid://dgldqtulm4ymj" path="res://Scripts/Player/Tank_camera.gd" id="2_ys1qc"]
@@ -24,17 +25,18 @@
 [ext_resource type="Shader" uid="uid://c5r6qc4s673e8" path="res://Shaders/see_tank.gdshader" id="21_wojap"]
 [ext_resource type="Script" uid="uid://cgp8hd1nxjt5u" path="res://Scripts/Buildings/building.gd" id="22_copon"]
 [ext_resource type="Script" uid="uid://d054fnyrmgj2k" path="res://Scripts/Terrain/nav_region.gd" id="22_kxtw2"]
+[ext_resource type="Script" uid="uid://b4qtvehq7gqo6" path="res://Scripts/Menu/Utilities_menus/pause_menu.gd" id="22_rhq6j"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_qc4db"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
 ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
 
-[sub_resource type="Sky" id="Sky_ys1qc"]
+[sub_resource type="Sky" id="Sky_pgu05"]
 sky_material = SubResource("ProceduralSkyMaterial_qc4db")
 
 [sub_resource type="Environment" id="Environment_35xla"]
 background_mode = 2
-sky = SubResource("Sky_ys1qc")
+sky = SubResource("Sky_pgu05")
 glow_enabled = true
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_bhunq"]
@@ -55,7 +57,7 @@ size = Vector3(1.3, 1.8, 1.3)
 vertices = PackedVector3Array(-1, 0.859077, -3.25, -0.5, 0.859077, -3.5, -0.5, 0.859077, -49.5, -49.5, 0.859077, -49.5, -49.5, 0.859077, -2.5, -1, 0.859077, -2.5, 9.5, 0.859077, -3.5, 9.75, 0.859077, -2.5, 10, 0.859077, -2.5, 10.25, 0.859077, -3.5, 16.75, 0.859077, -49.5, 16.75, 0.859077, -3.5, 17.25, 0.859077, -3.25, 17.25, 0.859077, -1.75, 20, 0.859077, -1.5, 24.25, 0.859077, -1.75, 24.5, 0.859077, -0.5, 49.5, 0.859077, -0.5, 49.5, 0.859077, -49.5, -1, 0.859077, 2.75, -0.75, 0.859077, 1.5, -0.75, 0.859077, -1.25, -49.5, 0.859077, 2.75, 20, 1.109077, -0.5, 27.25, 6.109077, -0.75, 20, 1.109077, -0.75, 9.5, 0.859077, 1.5, 9.75, 0.859077, 2.75, 10, 0.859077, 2.75, 10.25, 0.859077, 1.5, 10.25, 0.859077, -1.25, 9.5, 0.859077, -1.25, 17, 0.859077, 1.5, 17, 0.859077, -1.25, 17.25, 0.859077, 2, 20.25, 0.859077, 0.5, 17, 0.859077, 3.75, 24.25, 0.859077, 0.5, 15.5, 0.859077, 3.75, 15.75, 0.859077, 49.5, 49.5, 0.859077, 49.5, 0.5, 0.859077, 49.5, 0.75, 0.859077, 3.75, -0.75, 0.859077, 3.75, -49.5, 0.859077, 49.5, 10.25, 0.859077, 3.75, 9.5, 0.859077, 3.75)
 polygons = [PackedInt32Array(1, 0, 2), PackedInt32Array(2, 0, 3), PackedInt32Array(3, 0, 4), PackedInt32Array(0, 5, 4), PackedInt32Array(7, 6, 8), PackedInt32Array(8, 6, 9), PackedInt32Array(9, 6, 10), PackedInt32Array(1, 2, 6), PackedInt32Array(6, 2, 10), PackedInt32Array(10, 11, 9), PackedInt32Array(13, 12, 14), PackedInt32Array(14, 12, 15), PackedInt32Array(17, 16, 15), PackedInt32Array(12, 11, 15), PackedInt32Array(15, 11, 17), PackedInt32Array(17, 11, 10), PackedInt32Array(17, 10, 18), PackedInt32Array(20, 19, 21), PackedInt32Array(21, 19, 5), PackedInt32Array(5, 19, 22), PackedInt32Array(5, 22, 4), PackedInt32Array(25, 24, 23), PackedInt32Array(27, 26, 28), PackedInt32Array(28, 26, 29), PackedInt32Array(29, 26, 31), PackedInt32Array(29, 31, 30), PackedInt32Array(30, 33, 29), PackedInt32Array(29, 33, 32), PackedInt32Array(8, 30, 7), PackedInt32Array(7, 30, 31), PackedInt32Array(31, 26, 21), PackedInt32Array(21, 26, 20), PackedInt32Array(13, 14, 25), PackedInt32Array(13, 25, 23), PackedInt32Array(33, 13, 32), PackedInt32Array(32, 13, 34), PackedInt32Array(34, 13, 23), PackedInt32Array(34, 23, 35), PackedInt32Array(34, 35, 36), PackedInt32Array(36, 35, 37), PackedInt32Array(39, 38, 36), PackedInt32Array(37, 16, 17), PackedInt32Array(37, 17, 36), PackedInt32Array(36, 17, 39), PackedInt32Array(39, 17, 40), PackedInt32Array(43, 42, 41), PackedInt32Array(43, 41, 19), PackedInt32Array(19, 41, 22), PackedInt32Array(22, 41, 44), PackedInt32Array(28, 45, 27), PackedInt32Array(27, 45, 46), PackedInt32Array(46, 45, 39), PackedInt32Array(42, 46, 41), PackedInt32Array(41, 46, 39), PackedInt32Array(45, 38, 39)]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_riqys"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_3nkef"]
 render_priority = 0
 shader = ExtResource("21_wojap")
 shader_parameter/albedo = Color(1, 1, 1, 1)
@@ -63,14 +65,14 @@ shader_parameter/cutout_radius = 2.0
 shader_parameter/cutout_feather = 1.0
 
 [sub_resource type="BoxMesh" id="BoxMesh_bhunq"]
-material = SubResource("ShaderMaterial_riqys")
+material = SubResource("ShaderMaterial_3nkef")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_sn0t7"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_wojap"]
 size = Vector3(2, 2, 1)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_sn0t7"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_vpf1r"]
 render_priority = 0
 shader = ExtResource("21_wojap")
 shader_parameter/albedo = Color(1, 1, 1, 1)
@@ -78,13 +80,13 @@ shader_parameter/cutout_radius = 2.0
 shader_parameter/cutout_feather = 1.0
 
 [sub_resource type="BoxMesh" id="BoxMesh_riqys"]
-material = SubResource("ShaderMaterial_sn0t7")
+material = SubResource("ShaderMaterial_vpf1r")
 size = Vector3(2, 2, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_8yus5"]
 size = Vector3(1, 20, 1)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_copon"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_m64o6"]
 render_priority = 0
 shader = ExtResource("21_wojap")
 shader_parameter/albedo = Color(1, 1, 1, 1)
@@ -92,7 +94,7 @@ shader_parameter/cutout_radius = 2.0
 shader_parameter/cutout_feather = 1.0
 
 [sub_resource type="BoxMesh" id="BoxMesh_80d66"]
-material = SubResource("ShaderMaterial_copon")
+material = SubResource("ShaderMaterial_m64o6")
 size = Vector3(1, 20, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_2r0jt"]
@@ -108,14 +110,17 @@ shader_parameter/albedo = Color(1, 1, 1, 1)
 shader_parameter/cutout_radius = 2.0
 shader_parameter/cutout_feather = 1.0
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qr0ht"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_55gk5"]
 albedo_color = Color(0.2, 0.18431373, 0.19215687, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_sn0t7"]
-material = SubResource("StandardMaterial3D_qr0ht")
+material = SubResource("StandardMaterial3D_55gk5")
 size = Vector3(100, 1, 100)
 
 [node name="Node3D" type="Node3D" unique_id=1260353081]
+
+[node name="Mission_Control" type="Node3D" parent="." unique_id=1450836206]
+script = ExtResource("1_pgu05")
 
 [node name="Timer" type="Timer" parent="." unique_id=120626411]
 script = ExtResource("1_0qy5o")
@@ -276,7 +281,7 @@ transform = Transform3D(0.45622343, 0, 0, 0, 0.13601846, 0, 0, 0, 0.4774503, 0, 
 [node name="Tanques" type="Node" parent="Game" unique_id=1472340308]
 
 [node name="CTanque" type="CharacterBody3D" parent="Game/Tanques" unique_id=1970346675]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.321208, 1.1436653, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.054556, 1.1436653, 1.407826)
 script = ExtResource("1_lc1oi")
 
 [node name="Minor" parent="Game/Tanques/CTanque" unique_id=60055419 instance=ExtResource("4_ys1qc")]
@@ -402,7 +407,7 @@ transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0
 script = ExtResource("8_wjyqs")
 
 [node name="CTanque7" type="CharacterBody3D" parent="Game/Tanques" unique_id=423015684]
-transform = Transform3D(0.9263886, 0, -0.3765689, 0, 1, 0, 0.3765689, 0, 0.9263886, -4.93999, 1.1436653, -2.7139072)
+transform = Transform3D(0.9263886, 0, -0.3765689, 0, 1, 0, 0.3765689, 0, 0.9263886, -10.124132, 1.1436653, -2.7139072)
 script = ExtResource("1_lc1oi")
 
 [node name="Minor" parent="Game/Tanques/CTanque7" unique_id=727415908 instance=ExtResource("4_ys1qc")]
@@ -568,6 +573,7 @@ shape = SubResource("BoxShape3D_qr0ht")
 
 [node name="TankTest" type="Node3D" parent="." unique_id=1866001822]
 script = ExtResource("1_8od7v")
+color = Color(0.70029247, 0.69744277, 7.70092e-07, 1)
 
 [node name="Camera3D" type="Camera3D" parent="TankTest" unique_id=2064909490]
 transform = Transform3D(-1, 7.775525e-08, -3.9960778e-08, 0, 0.457098, 0.8894164, 8.742278e-08, 0.8894164, -0.457098, 0, 7.033662, -2.980245)
@@ -615,66 +621,76 @@ texture = ExtResource("9_qpfo2")
 
 [node name="HUD" type="Node" parent="TankTest" unique_id=603275337]
 
-[node name="Death_Screen" type="Control" parent="TankTest/HUD" unique_id=1853318380]
+[node name="HUD_Player" type="Control" parent="TankTest/HUD" unique_id=1373650381]
 layout_mode = 3
-anchors_preset = 0
-offset_right = 1150.0
-offset_bottom = 650.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -576.0
+offset_top = -324.0
+offset_right = 576.0
+offset_bottom = 324.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="HUD_Score2" type="RichTextLabel" parent="TankTest/HUD/Death_Screen" unique_id=1199174622]
-layout_mode = 0
-offset_left = 510.0
-offset_top = 209.0
-offset_right = 668.0
-offset_bottom = 351.0
-theme_override_font_sizes/normal_font_size = 20
-bbcode_enabled = true
-text = "[color=red][font_size=38]DEAD[/font_size]
-
-Press Spacebar
-to respawn[/color]"
-horizontal_alignment = 1
-
-[node name="Icon" type="Sprite2D" parent="TankTest/HUD" unique_id=981951051]
+[node name="Icon" type="Sprite2D" parent="TankTest/HUD/HUD_Player" unique_id=981951051]
 position = Vector2(631, 333)
 scale = Vector2(0.15, 0.15)
 texture = ExtResource("10_qpfo2")
 
-[node name="HUD_AP" type="RichTextLabel" parent="TankTest/HUD" unique_id=1606568337]
-modulate = Color(0.81259817, 0.69858956, 0, 1)
+[node name="HUD_Objectives" type="RichTextLabel" parent="TankTest/HUD/HUD_Player" unique_id=527348694]
+layout_mode = 0
+offset_left = 25.0
+offset_top = 25.0
+offset_right = 425.0
+offset_bottom = 425.0
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 20
+bbcode_enabled = true
+
+[node name="HUD_AP" type="RichTextLabel" parent="TankTest/HUD/HUD_Player" unique_id=1606568337]
+layout_mode = 0
 offset_left = 37.0
 offset_top = 552.0
 offset_right = 195.0
 offset_bottom = 612.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
 theme_override_font_sizes/normal_font_size = 40
 text = "30 AP"
 
-[node name="HUD_Score" type="RichTextLabel" parent="TankTest/HUD" unique_id=775566597]
-modulate = Color(0.81259817, 0.69858956, 0, 1)
+[node name="HUD_Score" type="RichTextLabel" parent="TankTest/HUD/HUD_Player" unique_id=775566597]
+layout_mode = 0
 offset_left = 16.0
 offset_top = 601.0
 offset_right = 174.0
 offset_bottom = 638.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
 theme_override_font_sizes/normal_font_size = 20
 text = "Score: 2000000"
 horizontal_alignment = 1
 
-[node name="HUD_Velocimeter" type="RichTextLabel" parent="TankTest/HUD" unique_id=2015946372]
-modulate = Color(0.81259817, 0.69858956, 0, 1)
+[node name="HUD_Velocimeter" type="RichTextLabel" parent="TankTest/HUD/HUD_Player" unique_id=2015946372]
+layout_mode = 0
 offset_left = 17.0
 offset_top = 525.0
 offset_right = 175.0
 offset_bottom = 562.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
 theme_override_font_sizes/normal_font_size = 20
 text = "Score: 2000000"
 horizontal_alignment = 1
 
-[node name="Icon2" type="Sprite2D" parent="TankTest/HUD" unique_id=879129058]
+[node name="Icon2" type="Sprite2D" parent="TankTest/HUD/HUD_Player" unique_id=879129058]
 position = Vector2(815, 370)
 scale = Vector2(0.15, 0.15)
 texture = ExtResource("9_iaow0")
 
-[node name="HUD_Shoot_Ready" type="TextureProgressBar" parent="TankTest/HUD/Icon2" unique_id=198533344]
+[node name="HUD_Shoot_Ready" type="TextureProgressBar" parent="TankTest/HUD/HUD_Player/Icon2" unique_id=198533344]
 offset_left = -166.66658
 offset_top = -166.66658
 offset_right = 89.33342
@@ -684,10 +700,136 @@ value = 100.0
 fill_mode = 4
 texture_progress = ExtResource("10_qpfo2")
 
-[node name="Height_Line" type="Line2D" parent="TankTest/HUD" unique_id=170805685]
+[node name="Height_Line" type="Line2D" parent="TankTest/HUD/HUD_Player" unique_id=170805685]
 points = PackedVector2Array(0, 0, 0, 0)
 width = 3.0
 default_color = Color(0.41981313, 0.41981313, 0.4198131, 1)
+
+[node name="Death_Screen" type="Control" parent="TankTest/HUD" unique_id=1853318380]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1150.0
+offset_bottom = 650.0
+
+[node name="HUD_Score2" type="RichTextLabel" parent="TankTest/HUD/Death_Screen" unique_id=1199174622]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -90.0
+offset_right = 100.0
+offset_bottom = 90.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 20
+bbcode_enabled = true
+text = "[color=red][font_size=38]DEAD[/font_size]
+
+Press Spacebar
+to respawn[/color]"
+horizontal_alignment = 1
+
+[node name="Victory" type="Control" parent="TankTest/HUD" unique_id=269077472]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1150.0
+offset_bottom = 650.0
+
+[node name="HUD_Score2" type="RichTextLabel" parent="TankTest/HUD/Victory" unique_id=2039495147]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -90.0
+offset_right = 100.0
+offset_bottom = 90.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 20
+bbcode_enabled = true
+text = "[color=green][font_size=38]VICTORY[/font_size]
+
+Press Spacebar
+to go back to main menu[/color]"
+horizontal_alignment = 1
+
+[node name="Pause_menu" type="Control" parent="TankTest" unique_id=623292969]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -576.0
+offset_top = -324.0
+offset_right = 576.0
+offset_bottom = 324.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("22_rhq6j")
+
+[node name="Buttons" type="Control" parent="TankTest/Pause_menu" unique_id=1862901759]
+layout_mode = 1
+anchors_preset = 0
+offset_top = 100.0
+offset_right = 400.0
+offset_bottom = 400.0
+
+[node name="Resume" type="Button" parent="TankTest/Pause_menu/Buttons" unique_id=1591038558]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_right = 100.0
+offset_bottom = 50.0
+grow_horizontal = 2
+text = "Resume"
+
+[node name="Restart" type="Button" parent="TankTest/Pause_menu/Buttons" unique_id=686743364]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 75.0
+offset_right = 100.0
+offset_bottom = 125.0
+grow_horizontal = 2
+text = "Restart"
+
+[node name="Main_menu" type="Button" parent="TankTest/Pause_menu/Buttons" unique_id=1660474070]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 150.0
+offset_right = 100.0
+offset_bottom = 200.0
+grow_horizontal = 2
+text = "Back to main menu"
+
+[node name="Quit_game" type="Button" parent="TankTest/Pause_menu/Buttons" unique_id=792748385]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 225.0
+offset_right = 100.0
+offset_bottom = 275.0
+grow_horizontal = 2
+text = "Quit game"
 
 [node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=95419261]
 navigation_mesh = SubResource("NavigationMesh_bhunq")

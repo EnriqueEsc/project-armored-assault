@@ -1,0 +1,281 @@
+[gd_scene format=3 uid="uid://nhyiifq8qbsx"]
+
+[ext_resource type="Script" uid="uid://b44xtts1goeo7" path="res://Scripts/Player/Tank_player_controller.gd" id="1_cxhj6"]
+[ext_resource type="Script" uid="uid://dgldqtulm4ymj" path="res://Scripts/Player/Tank_camera.gd" id="2_cyoa3"]
+[ext_resource type="Script" uid="uid://bykhssfaytcmi" path="res://Scripts/Tanks/tank_rigidbody.gd" id="3_q50ch"]
+[ext_resource type="PackedScene" uid="uid://cm2gr8at5r6c0" path="res://Models/Test/Tank_Test/tanque_V3.fbx" id="4_6le8y"]
+[ext_resource type="PackedScene" uid="uid://bf7d7fljdkdcy" path="res://Models/Test/tanque_V2.fbx" id="5_gbcfg"]
+[ext_resource type="PackedScene" uid="uid://cr2e151pg0ro6" path="res://Models/Test/Minor.fbx" id="6_e6v2v"]
+[ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Tanks/tank_turret.gd" id="7_8emn8"]
+[ext_resource type="PackedScene" uid="uid://caqoxtxta5muo" path="res://Models/Test/Tank_Test/turret_V3.fbx" id="8_cenlj"]
+[ext_resource type="PackedScene" uid="uid://b82jytfr4l81p" path="res://Prefabs/Test/projectile_he.tscn" id="8_cyoa3"]
+[ext_resource type="PackedScene" uid="uid://b8u4pylde5yu4" path="res://Models/Test/torreta_V2.fbx" id="9_025iw"]
+[ext_resource type="PackedScene" uid="uid://koxj0b8ls2xa" path="res://Models/Test/Gun.fbx" id="10_bxt5p"]
+[ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="11_esq4c"]
+[ext_resource type="Texture2D" uid="uid://yqsnwiuau3g7" path="res://Sprites/Test/ShootingPoint.png" id="12_2fia6"]
+[ext_resource type="Texture2D" uid="uid://dec3uo4slar6d" path="res://Sprites/Test/MousePointer.png" id="13_jq5cy"]
+[ext_resource type="Script" uid="uid://b4qtvehq7gqo6" path="res://Scripts/Menu/Utilities_menus/pause_menu.gd" id="14_055jd"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6blnc"]
+
+[node name="TankTest" type="Node3D" unique_id=1212598530]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, 0, 0, 0)
+script = ExtResource("1_cxhj6")
+color = Color(0.70029247, 0.69744277, 7.70092e-07, 1)
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=857435729]
+transform = Transform3D(-1, 7.775525e-08, -3.9960778e-08, 0, 0.457098, 0.8894164, 8.742278e-08, 0.8894164, -0.457098, 0, 7.033662, -2.980245)
+size = 10.0
+script = ExtResource("2_cyoa3")
+camera_offset = Vector3(0, 7.034, -2.98)
+
+[node name="Tank_Player" type="CharacterBody3D" parent="." unique_id=1248634669]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 1.1436653, 0)
+script = ExtResource("3_q50ch")
+
+[node name="tanque_V3" parent="Tank_Player" unique_id=1683942184 instance=ExtResource("4_6le8y")]
+transform = Transform3D(1.002, 0, 0, 0, 1.3, 0, 0, 0, 1.002, 0, -0.28692198, 0)
+
+[node name="tanque_V2" parent="Tank_Player" unique_id=2003364869 instance=ExtResource("5_gbcfg")]
+transform = Transform3D(0.07866464, 0, 0, 0, 0.1365011, 0, 0, 0, 0.075632125, 0, -0.29108393, 0.040996313)
+visible = false
+
+[node name="Minor" parent="Tank_Player" unique_id=60055419 instance=ExtResource("6_e6v2v")]
+transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
+visible = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Tank_Player" unique_id=791327592]
+shape = SubResource("BoxShape3D_6blnc")
+debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
+
+[node name="Turret" type="Node3D" parent="Tank_Player" unique_id=306535899]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0.04852271, 0)
+script = ExtResource("7_8emn8")
+projectile_prefab = ExtResource("8_cyoa3")
+
+[node name="turret_V3" parent="Tank_Player/Turret" unique_id=1331242705 instance=ExtResource("8_cenlj")]
+transform = Transform3D(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.25, 0, -0.29506743, 0)
+
+[node name="torreta_V2" parent="Tank_Player/Turret" unique_id=29810314 instance=ExtResource("9_025iw")]
+transform = Transform3D(-5.2453664e-09, 0, -0.12, 0, 0.12, 0, 0.12, 0, -5.2453664e-09, 0, -0.2802639, 0)
+visible = false
+
+[node name="Gun" parent="Tank_Player/Turret" unique_id=51241174 instance=ExtResource("10_bxt5p")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+
+[node name="Forward" type="Sprite3D" parent="Tank_Player" unique_id=1208600305]
+transform = Transform3D(0.4, 0, 0, 0, -1.7484556e-08, -0.4, 0, 0.4, -1.7484556e-08, 0, -0.45413375, 1)
+modulate = Color(1, 1, 1, 0.2509804)
+texture = ExtResource("11_esq4c")
+
+[node name="HUD" type="Node" parent="." unique_id=330056864]
+
+[node name="HUD_Player" type="Control" parent="HUD" unique_id=587406314]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -576.0
+offset_top = -324.0
+offset_right = 576.0
+offset_bottom = 324.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Icon" type="Sprite2D" parent="HUD/HUD_Player" unique_id=1942774347]
+position = Vector2(631, 333)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("12_2fia6")
+
+[node name="HUD_Objectives" type="RichTextLabel" parent="HUD/HUD_Player" unique_id=616542815]
+layout_mode = 0
+offset_left = 25.0
+offset_top = 25.0
+offset_right = 425.0
+offset_bottom = 425.0
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 20
+bbcode_enabled = true
+
+[node name="HUD_AP" type="RichTextLabel" parent="HUD/HUD_Player" unique_id=974705429]
+layout_mode = 0
+offset_left = 37.0
+offset_top = 552.0
+offset_right = 195.0
+offset_bottom = 612.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 40
+text = "30 AP"
+
+[node name="HUD_Score" type="RichTextLabel" parent="HUD/HUD_Player" unique_id=1503902098]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 601.0
+offset_right = 174.0
+offset_bottom = 638.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 20
+text = "Score: 2000000"
+horizontal_alignment = 1
+
+[node name="HUD_Velocimeter" type="RichTextLabel" parent="HUD/HUD_Player" unique_id=1921696932]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 525.0
+offset_right = 175.0
+offset_bottom = 562.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 20
+text = "Score: 2000000"
+horizontal_alignment = 1
+
+[node name="Icon2" type="Sprite2D" parent="HUD/HUD_Player" unique_id=605629065]
+position = Vector2(815, 370)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("13_jq5cy")
+
+[node name="HUD_Shoot_Ready" type="TextureProgressBar" parent="HUD/HUD_Player/Icon2" unique_id=1986894046]
+offset_left = -166.66658
+offset_top = -166.66658
+offset_right = 89.33342
+offset_bottom = 89.33342
+scale = Vector2(1.3, 1.3)
+value = 100.0
+fill_mode = 4
+texture_progress = ExtResource("12_2fia6")
+
+[node name="Height_Line" type="Line2D" parent="HUD/HUD_Player" unique_id=550708219]
+points = PackedVector2Array(0, 0, 0, 0)
+width = 3.0
+default_color = Color(0.41981313, 0.41981313, 0.4198131, 1)
+
+[node name="Death_Screen" type="Control" parent="HUD" unique_id=1385155183]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1150.0
+offset_bottom = 650.0
+
+[node name="HUD_Score2" type="RichTextLabel" parent="HUD/Death_Screen" unique_id=625922634]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -90.0
+offset_right = 100.0
+offset_bottom = 90.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 20
+bbcode_enabled = true
+text = "[color=red][font_size=38]DEAD[/font_size]
+
+Press Spacebar
+to respawn[/color]"
+horizontal_alignment = 1
+
+[node name="Victory" type="Control" parent="HUD" unique_id=1011252196]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1150.0
+offset_bottom = 650.0
+
+[node name="HUD_Score2" type="RichTextLabel" parent="HUD/Victory" unique_id=315436714]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -90.0
+offset_right = 100.0
+offset_bottom = 90.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 20
+bbcode_enabled = true
+text = "[color=green][font_size=38]VICTORY[/font_size]
+
+Press Spacebar
+to go back to main menu[/color]"
+horizontal_alignment = 1
+
+[node name="Pause_menu" type="Control" parent="." unique_id=243743113]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -576.0
+offset_top = -324.0
+offset_right = 576.0
+offset_bottom = 324.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("14_055jd")
+
+[node name="Buttons" type="Control" parent="Pause_menu" unique_id=554353519]
+layout_mode = 1
+anchors_preset = 0
+offset_top = 100.0
+offset_right = 400.0
+offset_bottom = 400.0
+
+[node name="Resume" type="Button" parent="Pause_menu/Buttons" unique_id=794089177]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_right = 100.0
+offset_bottom = 50.0
+grow_horizontal = 2
+text = "Resume"
+
+[node name="Restart" type="Button" parent="Pause_menu/Buttons" unique_id=449320024]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 75.0
+offset_right = 100.0
+offset_bottom = 125.0
+grow_horizontal = 2
+text = "Restart"
+
+[node name="Main_menu" type="Button" parent="Pause_menu/Buttons" unique_id=1320576536]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 150.0
+offset_right = 100.0
+offset_bottom = 200.0
+grow_horizontal = 2
+text = "Back to main menu"
+
+[node name="Quit_game" type="Button" parent="Pause_menu/Buttons" unique_id=1773462796]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 225.0
+offset_right = 100.0
+offset_bottom = 275.0
+grow_horizontal = 2
+text = "Quit game"

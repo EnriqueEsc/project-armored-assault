@@ -9,26 +9,26 @@ signal hp_changed (hp: int)
 signal score_changed (score: int)
 
 
-const max_speed: float = 3.0
-const acceleration: float = 5.0
-var tank_turn_speed: float = 1.0
+@export var max_speed: float = 3.0
+@export var acceleration: float = 5.0
+@export var tank_turn_speed: float = 1.0
 
 
-var turning_velocity: float = 0
-var turning_acceleration: float = 0.2
+@export var turning_velocity: float = 0
+@export var turning_acceleration: float = 0.2
 
-var is_player: bool = false
+@export var is_player: bool = false
 
 var current_speed = max_speed
 var score: int = 0
-var friction: float = 1
+@export var friction: float = 1
 
 var direction: Vector3 = Vector3.ZERO
 
 @onready var collision = $CollisionShape3D
 @onready var tank_turret: Tank_turret = $Turret
 
-var max_armor_points: int = 40
+@export var max_armor_points: int = 40
 var armor_points: int = 40
 
 

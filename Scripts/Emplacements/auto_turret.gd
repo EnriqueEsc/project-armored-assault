@@ -1,5 +1,7 @@
 extends Node3D
 
+signal gets_disabled
+
 enum AI_State {IDLE, ENGAGED, SCANNING}
 var current_state: AI_State = AI_State.IDLE
 
@@ -8,12 +10,12 @@ var player_ref: Node3D = null
 var last_known_position: Vector3 = Vector3.ZERO
 
 # Parámetros de la Torreta
-var barrel_upper_limit: float = 360.0
-var barrel_lower_limit: float = -360.0
-var max_shoot_angle: float = 1.0
-var max_vision_distance: float = 10.0
-var fire_rate: float = 1.0
-var time_since_last_shot: float = 0.0
+@export var barrel_upper_limit: float = 360.0
+@export var barrel_lower_limit: float = -360.0
+@export var max_shoot_angle: float = 1.0
+@export var max_vision_distance: float = 10.0
+@export var fire_rate: float = 1.0
+@export var time_since_last_shot: float = 0.0
 
 # Sistema de Detección
 var detection_meter: float = 0.0
@@ -22,6 +24,9 @@ var detection_meter: float = 0.0
 @export var vision_cone_degrees: float = 90.0
 
 var scan_timer: float = 0.0
+
+
+@export var is_enemy: bool = true
 
 func _ready() -> void:
 	turret.barrel_lower_limit = barrel_lower_limit
@@ -32,10 +37,17 @@ func _ready() -> void:
 	var grand_parent_col = parent_col.get_parent_node_3d()
 	turret.ignore = [parent_col, grand_parent_col]
 	
+	
+	if is_enemy:
+		self.add_to_group("Enemy")
+	
 	turret.create_projectiles()
 	
 	await get_tree().physics_frame
-	player_ref = get_tree().get_first_node_in_group("Player")
+	
+	
+	if is_enemy:
+		player_ref = get_tree().get_first_node_in_group("Player")
 	
 	var turret_rigid = null
 	turret_rigid = get_parent_node_3d() as Emplacement
@@ -152,4 +164,5 @@ func activate() -> void:
 	process_mode = Node.PROCESS_MODE_INHERIT
 
 func deactivate() -> void:
+	gets_disabled.emit()
 	process_mode = Node.PROCESS_MODE_DISABLED

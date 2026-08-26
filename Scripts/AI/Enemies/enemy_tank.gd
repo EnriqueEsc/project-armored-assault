@@ -9,16 +9,16 @@ var tank_turret: Node3D = null
 var player_ref: Node3D = null
 var last_known_position: Vector3 = Vector3.ZERO
 
-var shoot_angle: float = 0.0
-var max_shoot_angle: float = 0.2
-var is_omniscent: bool = false
-var max_chase_distance: float = 10.0
+@export var shoot_angle: float = 0.0
+@export var max_shoot_angle: float = 0.2
+@export var is_omniscent: bool = false
+@export var max_chase_distance: float = 10.0
 
-var aggro_max_time: float = 25.0
+@export var aggro_max_time: float = 25.0
 var current_aggro_time: float = 0.0
 
-var fire_rate: float = 1.0
-var time_since_last_shot: float = 0.0
+@export var fire_rate: float = 1.0
+@export var time_since_last_shot: float = 0.0
 
 var detection_meter: float = 0.0
 
@@ -26,23 +26,20 @@ var detection_meter: float = 0.0
 @export var detection_time_rear: float = 6.5
 @export var vision_cone_degrees: float = 60.0
 
-@export var is_player: bool = false
+@export var is_enemy: bool = true
 
 func _ready() -> void:
 	tank_rigid = get_parent() as Tank_Rigid
 	tank_rigid.current_speed /= 2
 	tank_rigid.tank_turn_speed /= 2
 	
-	tank_rigid.add_to_group("Enemy")
-	if is_player:
-		tank_rigid.remove_from_group("Enemy")
-		tank_rigid.add_to_group("Player")
+	if is_enemy:
+		tank_rigid.add_to_group("Enemy")
 	
 	await get_tree().physics_frame
 	
-	if is_player:
-		player_ref = get_tree().get_first_node_in_group("Enemy")
-	else:
+	
+	if is_enemy:
 		player_ref = get_tree().get_first_node_in_group("Player")
 	
 	tank_turret = tank_rigid.tank_turret

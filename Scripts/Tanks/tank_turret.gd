@@ -19,8 +19,8 @@ signal recoil (dir: Vector3)
 var ignore = []
 
 
-const projectile_prefab = preload("res://Prefabs/Test/projectile.tscn")
-const case_prefab = preload("res://Prefabs/Test/case.tscn")
+@export var projectile_prefab = preload("res://Prefabs/Test/projectile.tscn")
+@export var case_prefab = preload("res://Prefabs/Test/case.tscn")
 var projectile: Projectile
 var case: Case
 

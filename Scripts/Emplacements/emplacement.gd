@@ -1,10 +1,17 @@
 extends StaticBody3D
 class_name Emplacement
 
-var max_armor_points: int = 40
-var armor_points: int = 40
+signal gets_disabled
+
+@export var max_armor_points: int = 40
+@export var armor_points: int = 40
+@export var is_enemy: bool = true
 
 signal got_hit(source: Tank_Rigid, impact_point: Vector3)
+
+func _ready() -> void:
+	if is_enemy:
+		self.add_to_group("Enemy")
 
 func take_damage(damage: int, source: Tank_Rigid, impact_point: Vector3) -> void:
 	armor_points -= damage
@@ -33,6 +40,7 @@ func activate() -> void:
 	
 
 func deactivate() -> void:
+	gets_disabled.emit()
 	
 	visible = false
 	process_mode = Node.PROCESS_MODE_DISABLED

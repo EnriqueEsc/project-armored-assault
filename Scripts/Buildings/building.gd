@@ -9,7 +9,7 @@ var building_bounds: Vector2 = Vector2.ZERO
 var total_blocks: int = 0
 var min_blocks: int = 0
 
-var max_armor_points: int = 40
+@export var max_armor_points: int = 40
 var armor_points: int = 40
 
 var lowest_height = INF
@@ -21,6 +21,8 @@ var destruction_sensor: ShapeCast3D
 var damage_zone: ShapeCast3D = null
 
 func _ready() -> void:
+	
+	max_armor_points = randi_range(1,10)
 	
 	for b in get_children():
 		if b is CSGShape3D and b.visible:
@@ -85,7 +87,7 @@ func _physics_process(delta: float) -> void:
 	if not destroyed:
 		return
 	
-	global_position -= global_basis.y * delta * 3
+	global_position -= global_basis.y * delta * 2
 	
 	destruction()
 

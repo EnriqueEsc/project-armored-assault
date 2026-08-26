@@ -3,13 +3,14 @@ class_name Projectile
 
 var current_pos: Vector3 = Vector3.ZERO
 var is_player: bool = true
-var speed: float = 10
-var base_speed: float = 0.5
+@export var speed: float = 10
+@export var base_speed: float = 0.5
 var direction: Vector3 = Vector3(1,0,0)
 var origin: Tank_Rigid
-var damage: int = 10
-var is_explosive: bool = true
-var blast_rad: float = 2
+@export var damage: int = 10
+@export var is_explosive: bool = true
+@export var blast_rad: float = 2
+@export var blast_damage: float = 10
 var ignore = []
 
 signal deactivated(projectile: Projectile)
@@ -154,7 +155,7 @@ func detonate() -> void:
 					hitted_enemies.append(current_collider)
 					
 					if current_collider.has_method("take_damage"):
-						current_collider.take_damage(damage,origin,global_position)
+						current_collider.take_damage(blast_damage,origin,global_position)
 					if current_collider.has_method("detonate"):
 						current_collider.detonate()
 				
