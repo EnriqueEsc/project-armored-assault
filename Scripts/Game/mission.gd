@@ -4,6 +4,8 @@ class_name Mission
 var player: Tank_player_controller = null
 var objectives_text: String = ""
 
+var briefing_text: String = "Sample_text"
+
 signal mission_finished(result: bool)
 signal update_objectives(objectives: String)
 

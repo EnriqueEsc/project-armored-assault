@@ -29,10 +29,55 @@ void fragment(){
 	
 	float final_mask = mix(circle_mask, 1.0, is_behind);
 	
+	// --- EL TRUCO PARA EL MINIMAPA ---
+	// Si PROJECTION_MATRIX[3][3] es 1.0 (Ortogonal), is_ortho será 1.0. 
+	// Si es Perspectiva, será 0.0.
+	float is_ortho = PROJECTION_MATRIX[3][3];
+	
+	// Mezclamos la máscara final. Si is_ortho es 1.0, forzamos la opacidad total (1.0).
+	final_mask = mix(final_mask, 1.0, is_ortho);
+	
 	ALBEDO = albedo.rgb * albedo_tex.rgb;
 	ALPHA = final_mask * albedo.a * albedo_tex.a;
 }
 
+
+
+/*shader_type spatial;
+render_mode depth_prepass_alpha, depth_draw_opaque, cull_back;
+
+uniform vec4 albedo : source_color = vec4(1.0);
+uniform sampler2D texture_albedo : source_color, filter_linear_mipmap, repeat_enable;
+
+uniform float cutout_radius : hint_range(0.0, 10.0) = 2.0;
+uniform float cutout_feather : hint_range(0.0, 5.0) = 1.0;
+
+global uniform vec3 player_pos;
+
+varying vec3 world_position;
+
+void vertex(){
+	world_position = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+}
+
+void fragment(){
+	vec4 albedo_tex = texture(texture_albedo, UV);
+	
+	vec3 player_view_pos = (VIEW_MATRIX * vec4(player_pos, 1.0)).xyz;
+	float distance_to_player_screen = distance(VERTEX.xy, player_view_pos.xy);
+	float circle_mask = smoothstep(cutout_radius, cutout_radius + cutout_feather, distance_to_player_screen);
+	
+	float frag_dist_xz = distance(CAMERA_POSITION_WORLD.xz, world_position.xz);
+	float player_dist_xz = distance(CAMERA_POSITION_WORLD.xz, player_pos.xz);
+	
+	float is_behind = smoothstep(player_dist_xz - 0.5, player_dist_xz, frag_dist_xz);
+	
+	float final_mask = mix(circle_mask, 1.0, is_behind);
+	
+	ALBEDO = albedo.rgb * albedo_tex.rgb;
+	ALPHA = final_mask * albedo.a * albedo_tex.a;
+}
+*/
 
 /*
 

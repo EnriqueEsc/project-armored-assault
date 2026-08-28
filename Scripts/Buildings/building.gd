@@ -20,9 +20,14 @@ var destruction_sensor: ShapeCast3D
 
 var damage_zone: ShapeCast3D = null
 
+var building_half_extents: Vector3 = Vector3.ZERO
+var building_max_radius: float = 0
+
+signal got_destroyed
+
 func _ready() -> void:
 	
-	max_armor_points = randi_range(1,10)
+	max_armor_points = randi_range(1,5)
 	
 	for b in get_children():
 		if b is CSGShape3D and b.visible:
@@ -54,6 +59,9 @@ func _ready() -> void:
 	print(building_bounds)
 	
 	set_shape_cast()
+	
+	building_half_extents = damage_zone.shape.size / 2.0
+	building_max_radius = building_half_extents.length()
 	#global_position.y = 10
 
 func set_shape_cast() -> void:
@@ -62,7 +70,7 @@ func set_shape_cast() -> void:
 	var cube = BoxShape3D.new()
 	damage_zone.shape = cube
 	
-	damage_zone.collide_with_areas = true
+	#damage_zone.collide_with_areas = true
 	
 	damage_zone.shape.size = Vector3(building_bounds.x,5,building_bounds.y)
 	
@@ -139,6 +147,8 @@ func block_destroyed(block: Building_Block) -> void:
 	if key_blocks.has(block):
 		key_blocks.erase(block)
 	
+	if blocks.is_empty():
+		deactivate()
 	
 	if key_blocks.is_empty():
 		destroyed = true
@@ -153,11 +163,24 @@ func take_explosion(damage: int, source: Tank_Rigid, impact_point: Vector3, radi
 	if destroyed:
 		return
 	
-	for b in blocks:
-		var dist = b.global_position.distance_to(impact_point)
-		if dist <= radius:
-			b.take_damage(damage,source,impact_point)
+	if impact_point.distance_to(global_position) + building_max_radius <= radius:
+		for b in blocks:
+			b.got_destroyed.emit(b)
+		destroyed = true
+		deactivate()
+		return
 	
+	var radius_squared: float = radius * radius
+	
+	var affected_blocks: Array[Building_Block] = []
+	for b in blocks:
+		var dist_squared = b.global_position.distance_squared_to(impact_point)
+		if dist_squared <= radius_squared:
+			affected_blocks.append(b)
+			#b.take_damage(damage, source, impact_point)
+	
+	for a in affected_blocks:
+		a.call_deferred("take_damage",damage, source, impact_point)
 
 func take_damage(damage: int, source: Tank_Rigid, impact_point: Vector3) -> void:
 	armor_points -= damage
@@ -184,7 +207,9 @@ func activate() -> void:
 	
 
 func deactivate() -> void:
-	
+	got_destroyed.emit()
+	print("siuuuuuuu")
+	queue_free()
 	visible = false
 	process_mode = Node.PROCESS_MODE_DISABLED
 	set_deferred("disabled",true)

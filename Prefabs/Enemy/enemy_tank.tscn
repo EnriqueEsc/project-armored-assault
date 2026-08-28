@@ -1,0 +1,43 @@
+[gd_scene format=3 uid="uid://cbe7lu5n17lq0"]
+
+[ext_resource type="Script" uid="uid://bykhssfaytcmi" path="res://Scripts/Tanks/tank_rigidbody.gd" id="1_lfxob"]
+[ext_resource type="PackedScene" uid="uid://cm2gr8at5r6c0" path="res://Models/Test/Tank_Test/tanque_V3.fbx" id="2_wnkmq"]
+[ext_resource type="PackedScene" uid="uid://cr2e151pg0ro6" path="res://Models/Test/Minor.fbx" id="3_j5cde"]
+[ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Tanks/tank_turret.gd" id="4_pkc78"]
+[ext_resource type="PackedScene" uid="uid://caqoxtxta5muo" path="res://Models/Test/Tank_Test/turret_V3.fbx" id="5_kv7ca"]
+[ext_resource type="PackedScene" uid="uid://koxj0b8ls2xa" path="res://Models/Test/Gun.fbx" id="6_akjte"]
+[ext_resource type="Script" uid="uid://cxxlffo81ypm" path="res://Scripts/AI/Enemies/enemy_tank.gd" id="7_6b5od"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6blnc"]
+
+[node name="Enemy_tank" type="CharacterBody3D" unique_id=450725569]
+transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, 0, 0, 0)
+script = ExtResource("1_lfxob")
+
+[node name="tanque_V3" parent="." unique_id=1683942184 instance=ExtResource("2_wnkmq")]
+transform = Transform3D(1.002, 0, 0, 0, 1.3, 0, 0, 0, 1.002, 0, -0.28692198, 0)
+visible = false
+
+[node name="Minor" parent="." unique_id=60055419 instance=ExtResource("3_j5cde")]
+transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2001859621]
+shape = SubResource("BoxShape3D_6blnc")
+debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
+
+[node name="Turret" type="Node3D" parent="." unique_id=1777633236]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5295446, 0)
+script = ExtResource("4_pkc78")
+side_angle_limit = 90.0
+
+[node name="turret_V3" parent="Turret" unique_id=1331242705 instance=ExtResource("5_kv7ca")]
+transform = Transform3D(1.6391772e-07, 0, 1.25, 0, 1.25, 0, -1.25, 0, 1.6391772e-07, 0, -0.29506743, 0)
+visible = false
+
+[node name="Gun" parent="Turret" unique_id=51241174 instance=ExtResource("6_akjte")]
+transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0, 0)
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=2039303950]
+avoidance_enabled = true
+radius = 1.0
+script = ExtResource("7_6b5od")

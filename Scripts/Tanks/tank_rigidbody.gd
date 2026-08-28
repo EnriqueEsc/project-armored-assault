@@ -7,7 +7,7 @@ signal gets_enabled
 signal gets_disabled
 signal hp_changed (hp: int)
 signal score_changed (score: int)
-
+signal ap_percent (ap: float)
 
 @export var max_speed: float = 3.0
 @export var acceleration: float = 5.0
@@ -44,15 +44,26 @@ signal got_hit(source: Tank_Rigid, impact_point: Vector3)
 
 @export var allign_speed: float = 3
 
+var last_building_impact: float = 0
 
+@export var tank_Data: Tank_Data = null
+
+@export var traction: float = 5.0
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	time_controller = Time_Controller.INSTANCE
+	
+	if tank_Data:
+		tank_Data._apply_values(self)
+	
 	tank_turret.recoil.connect(recoil)
 	
 	tank_turret.origin = self
 	tank_turret.create_projectiles()
+	
+	
+	ap_percent.emit(float(armor_points)/float(max_armor_points) * 100.0)
 	
 	time_passed = fire_rate_prim
 	
@@ -64,10 +75,10 @@ func calculate_charge(delta: float) -> void:
 	percent *= 100
 	shoot_recharge.emit(percent)
 
-func recoil(dir: Vector3) -> void:
+func recoil(dir: Vector3, force: float) -> void:
 	var push = Vector3.ZERO.move_toward(dir, friction)
 	#push = Vector3(push.x, 0 ,push.z)
-	velocity += push
+	velocity += push * force
 
 func allign_with_floor(delta: float) -> void:
 	var normal: Vector3 = Vector3.UP
@@ -86,6 +97,9 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 	
+	if last_building_impact <= 1:
+		last_building_impact += delta
+	
 	allign_with_floor(delta)
 	
 	calculate_charge(delta)
@@ -103,6 +117,9 @@ func _physics_process(delta: float) -> void:
 	rotate_y(turning_velocity)
 	
 	var pre_impact_vel: Vector3 = velocity
+	
+	var lat_vel = transform.basis.x * velocity.dot(transform.basis.x)
+	velocity -= lat_vel * (traction * delta)
 	
 	move_and_slide()
 	
@@ -132,10 +149,14 @@ func _physics_process(delta: float) -> void:
 				var impact_damage = (armor_points/20.0) * impact
 				collider.take_damage(impact_damage, self, global_position)
 		
+		#print(last_building_impact)
+		if last_building_impact < 1:
+			return
 		
 		#Para seguir desgastando las estructuras si se sigue avanzando
-		if collider is Building and impact != 0:
-			collider.take_damage(1 ,self, global_position)
+		if collider is Building:
+			collider.take_damage(5 ,self, global_position)
+			last_building_impact = 0
 
 
 func move(move: Vector2, delta: float) -> void:
@@ -175,9 +196,9 @@ func take_damage(damage: int, source: Tank_Rigid, impact_point: Vector3) -> void
 	armor_points -= damage
 	armor_points = clamp(armor_points,0,max_armor_points)
 	
-	print("Salud ",armor_points)
+	#print("Salud ",armor_points)
 	
-	
+	ap_percent.emit(float(armor_points)/float(max_armor_points) * 100.0)
 	hp_changed.emit(armor_points)
 	
 	if armor_points <= 0:

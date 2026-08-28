@@ -17,6 +17,8 @@ signal deactivated(projectile: Projectile)
 
 var detonated: bool = false
 
+@export var blast_det_max_entities = 32
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	body_entered.connect(_on_area_entered)
@@ -38,7 +40,7 @@ func shoot(pos: Vector3, rot: Vector2) -> void:
 	current_pos = pos
 	position = current_pos
 	rotation.y = rot.y
-	rotation.z = rot.x
+	rotation.x = rot.x
 	direction = Vector3(1,0,0)
 
 
@@ -64,7 +66,7 @@ func move(delta: float) -> void:
 		return
 	
 	var current_pos_2d: Vector2 = (Vector2(0,1).rotated(-rotation.y))
-	global_position += -global_basis.x * speed * delta
+	global_position += global_basis.z * speed * delta
 
 func _on_area_entered(body):
 	#print(body.collider.get_parent.name)
@@ -104,7 +106,6 @@ func _on_area_entered(body):
 
 
 func detonate() -> void:
-	
 	if detonated:
 		return
 	
@@ -118,46 +119,66 @@ func detonate() -> void:
 	
 	var query = PhysicsShapeQueryParameters3D.new()
 	query.shape = explosion
-	query.transform = global_transform
+	query.transform = Transform3D(Basis(), global_position)
 	query.collision_mask = 1
-	
-	query.collide_with_areas = true
+	query.collide_with_areas = false
 	query.collide_with_bodies = true
 	
-	query.exclude = [self]
+	query.exclude = [self.get_rid()] 
 	
 	var space = get_world_3d().direct_space_state
-	var targets = space.intersect_shape(query)
+	
+	var targets = space.intersect_shape(query,blast_det_max_entities)
 	
 	var hitted_enemies = []
+	
+	var ray_origin = global_position + Vector3(0.0, 0.5, 0.0)
 	
 	for t in targets:
 		var current_collider = t.collider
 		
 		if current_collider and not hitted_enemies.has(current_collider):
 			
-			if current_collider.has_method("take_explosion"):
-				current_collider.take_explosion(damage,origin,global_position,blast_rad)
 			
-			if current_collider.has_method("take_damage") or current_collider.has_method("detonate") or current_collider.has_method("take_explosion"):
+			if current_collider.has_method("take_explosion") or current_collider.has_method("detonate"):
+				#current_collider.take_explosion(blast_damage, origin, global_position, blast_rad)
+				hitted_enemies.append(current_collider)
+				continue
+			
+			if current_collider.has_method("take_damage"):
 				
-				var raycast = PhysicsRayQueryParameters3D.create(global_position,current_collider.global_position)
-				raycast.exclude = [self]
 				
+				var target_center = current_collider.global_position + Vector3(0.0, 0.5, 0.0)
+				var raycast = PhysicsRayQueryParameters3D.create(ray_origin, target_center)
+				
+				raycast.exclude = [self.get_rid()]
 				raycast.collide_with_areas = true
-				raycast.hit_from_inside = true
+				raycast.collide_with_bodies = true
+				
+				raycast.hit_from_inside = false 
 				
 				var res = space.intersect_ray(raycast)
 				
-				#print(res," --|-- ", current_collider)
-				
 				if res and res.collider == current_collider:
 					hitted_enemies.append(current_collider)
-					
+					#print(current_collider)
 					if current_collider.has_method("take_damage"):
-						current_collider.take_damage(blast_damage,origin,global_position)
-					if current_collider.has_method("detonate"):
-						current_collider.detonate()
+						pass
+						#current_collider.take_damage(blast_damage, origin, global_position)
 				
+	for t in hitted_enemies:
+		if t.has_method("take_explosion"):
+			t.call_deferred("take_explosion", blast_damage, origin, global_position, blast_rad)
+			continue
+			
+		if t.has_method("detonate"):
+			t.call_deferred("detonate")
+			continue
 	
+		if t.has_method("take_damage"):
+			t.call_deferred("take_damage", blast_damage, origin, global_position)
+		
+		if t.has_method("recoil"):
+			#print(t)
+			t.call_deferred("recoil",global_position.direction_to(t.global_position),blast_rad)
 	deactivate()

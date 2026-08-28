@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Tank_Data" format=3 uid="uid://4vicdmnrqh3t"]
+
+[ext_resource type="Script" uid="uid://o0qesee4s8dx" path="res://Data/Tanks/Tank_Data.gd" id="1_ce4cm"]
+
+[resource]
+script = ExtResource("1_ce4cm")
+max_speed = 1.5
+acceleration = 1.0
+friction = 1.2
+metadata/_custom_type_script = "uid://o0qesee4s8dx"

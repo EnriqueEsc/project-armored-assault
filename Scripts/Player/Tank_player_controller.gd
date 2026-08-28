@@ -15,14 +15,18 @@ class_name Tank_player_controller
 @onready var HUD_Velocimeter: RichTextLabel = $HUD/HUD_Player/HUD_Velocimeter
 @onready var HUD_Objectives: RichTextLabel = $HUD/HUD_Player/HUD_Objectives
 
+@onready var HUD_AP_Bar: ProgressBar = $HUD/HUD_Player/HUD_AP_Bar
+
 @onready var HUD_Death_Screen: Control = $HUD/Death_Screen
 @onready var HUD_Victory_Screen: Control = $HUD/Victory
 
 @onready var HUD_Shoot_Ready: TextureProgressBar = $HUD/HUD_Player/Icon2/HUD_Shoot_Ready
 
+@onready var HUD_Map: Map_Visualization = $HUD/HUD_Player/Map
+
 @onready var pause_menu: Pause_menu = $Pause_menu
 
-@export var color: Color
+@export var color: Color = Color.GREEN
 
 @export var max_armor_points: int = 120
 
@@ -32,6 +36,8 @@ var is_destroyed = false
 var aim_point_scale_ref: float = 7.5
 var aim_point_original_scale: Vector2 = Vector2.ONE
 
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	
@@ -40,14 +46,16 @@ func _ready() -> void:
 	tank_rigid.hp_changed.connect(update_AP)
 	tank_rigid.score_changed.connect(update_Score)
 	tank_rigid.velocimeter.connect(update_Velocimeter)
+	tank_rigid.ap_percent.connect(update_AP_Bar)
 	
 	HUD_Death_Screen.visible = false
 	HUD_Victory_Screen.visible = false
+	HUD_Map.visible = false
 	
 	tank_rigid.shoot_recharge.connect(shoot_ready)
 	
-	tank_rigid.max_armor_points = max_armor_points
-	tank_rigid.armor_points = max_armor_points
+	#tank_rigid.max_armor_points = max_armor_points
+	#tank_rigid.armor_points = max_armor_points
 	
 	update_HUD()
 	
@@ -59,9 +67,11 @@ func _ready() -> void:
 	#Node.print_orphan_nodes()
 	
 	pause_menu.game_state.connect(show_HUD)
-	
-	change_HUD_color(color)
+	pause_menu.color_change.connect(change_HUD_color)
+	pause_menu.set_color(color)
+	#change_HUD_color(color)
 	pass # Replace with function body.
+
 
 func color_HUD() -> void:
 		HUD_aim.modulate = color
@@ -70,6 +80,7 @@ func color_HUD() -> void:
 		HUD_AP.modulate = color
 		HUD_Velocimeter.modulate = color
 		HUD_Objectives.modulate = color
+		HUD_AP_Bar.modulate = color
 		HUD_height_line.modulate = color
 	
 
@@ -102,6 +113,7 @@ func _physics_process(delta: float) -> void:
 	#HUD_aim.position = tank_rigid.get_aim_point(get_viewport().get_mouse_position())
 	
 	HUD_height_line.points = [tank_camera.unproject_position(height_ground_pos),HUD_aim.position]
+	
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -136,6 +148,10 @@ func _process(delta: float) -> void:
 	#tank_rigid.rotate_turret_to_point(get_viewport().get_mouse_position())
 	
 	tank_rigid.rotate_turret_to_point_3d(tank_camera.get_mouse_3d_pos())
+	
+	
+	if Input.is_action_just_pressed("Map"):
+		HUD_Map.visible = not HUD_Map.visible
 
 func update_HUD() -> void:
 	update_AP(tank_rigid.armor_points)
@@ -161,6 +177,9 @@ func update_Velocimeter(velocity: float) -> void:
 func update_Objectives(objectives: String) -> void:
 	HUD_Objectives.text = objectives
 
+func update_AP_Bar(percent: float) -> void:
+	HUD_AP_Bar.value = percent
+
 func show_HUD(state: bool) -> void:
 	
 	if is_destroyed or mission_finished:
@@ -172,7 +191,9 @@ func show_HUD(state: bool) -> void:
 	HUD_AP.visible = state
 	HUD_Velocimeter.visible = state
 	HUD_Objectives.visible = state
+	HUD_AP_Bar.visible = state
 	HUD_height_line.visible = state
+	HUD_Map.visible = false
 
 func destruction() -> void:
 		is_destroyed = true

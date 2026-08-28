@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Tank_Data" format=3 uid="uid://cnhuaumeds2e7"]
+
+[ext_resource type="Script" uid="uid://o0qesee4s8dx" path="res://Data/Tanks/Tank_Data.gd" id="1_qwkik"]
+
+[resource]
+script = ExtResource("1_qwkik")
+tank_Name = "MK-1 Goofy"
+max_speed = 10.0
+acceleration = 0.1
+friction = 0.0
+metadata/_custom_type_script = "uid://o0qesee4s8dx"

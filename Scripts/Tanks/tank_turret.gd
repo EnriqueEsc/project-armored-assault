@@ -12,7 +12,7 @@ var turret_pos_2d: Vector2 = Vector2.ZERO
 
 @export var barrel_upper_limit: float = 30
 @export var barrel_lower_limit: float = -10
-
+@export var side_angle_limit: float = 30
 
 signal recoil (dir: Vector3)
 
@@ -72,8 +72,11 @@ func rotate_turret_to_point_3d(point: Vector3) -> void:
 	var target_local_basis = get_parent_node_3d().global_transform.basis.inverse() * target_global_transform.basis
 	var target_rot_euler = target_local_basis.get_euler()
 	
-	var target_y = target_rot_euler.y - (PI/2.0)
-	rotation.y = lerp_angle(rotation.y,target_y, turret_turning_speed)
+	var target_y = lerp_angle(rotation.y, target_rot_euler.y - (PI), turret_turning_speed)
+	if side_angle_limit < 360:
+		target_y = clampf(target_y,deg_to_rad(-side_angle_limit),deg_to_rad(side_angle_limit))
+	rotation.y = target_y
+	
 	
 	var barrel_up = global_transform.basis.y
 	var barrel_target_transform = turret_barrel.global_transform.looking_at(point, barrel_up)
@@ -166,7 +169,9 @@ func shoot() -> void:
 		case_active.push_back(case)
 		case.recoil(global_position, forward)
 	
-	recoil.emit(forward)
+	#rotation.y = lerp_angle(rotation.y,rotation.y+randf_range(deg_to_rad(-10),deg_to_rad(10)),1)
+	
+	recoil.emit(forward,1)
 
 func projectile_to_pool(current_projectile: Projectile) -> void:
 	projectile_active.erase(current_projectile)

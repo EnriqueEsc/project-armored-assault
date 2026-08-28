@@ -59,6 +59,9 @@ func _ready() -> void:
 	
 	if emplacement:
 		emplacement.got_hit.connect(got_hit)
+	
+	if deg_to_rad(turret.side_angle_limit) < max_shoot_angle:
+		max_shoot_angle = deg_to_rad(turret.side_angle_limit)
 
 
 func got_hit(source: Tank_Rigid, impact_point: Vector3) -> void:
@@ -103,7 +106,7 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 func update_detection_meter(delta: float, can_see_player: bool, distance: float) -> void:
 	if can_see_player and distance <= max_vision_distance:
 		var dir_to_player = turret.global_position.direction_to(player_ref.global_position)
-		var turret_forward = -turret.global_basis.x.normalized()
+		var turret_forward = turret.global_basis.z.normalized()
 		var angle = turret_forward.angle_to(dir_to_player)
 		var is_in_cone = angle <= deg_to_rad(vision_cone_degrees)
 		
@@ -134,7 +137,7 @@ func execute_current_state(delta: float, can_see_player: bool) -> void:
 
 func attempt_shoot(aim_pos: Vector3) -> void:
 	var dir_to_target = turret.global_position.direction_to(aim_pos).normalized()
-	var turret_forward = -turret.global_basis.x.normalized()
+	var turret_forward = turret.global_basis.z.normalized()
 	var angle = turret_forward.signed_angle_to(dir_to_target, turret.global_basis.y)
 	
 	if abs(angle) < max_shoot_angle and time_since_last_shot >= fire_rate:

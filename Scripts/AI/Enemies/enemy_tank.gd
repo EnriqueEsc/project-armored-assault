@@ -14,7 +14,7 @@ var last_known_position: Vector3 = Vector3.ZERO
 @export var is_omniscent: bool = false
 @export var max_chase_distance: float = 10.0
 
-@export var aggro_max_time: float = 25.0
+@export var aggro_max_time: float = 65.0
 var current_aggro_time: float = 0.0
 
 @export var fire_rate: float = 1.0
@@ -27,6 +27,11 @@ var detection_meter: float = 0.0
 @export var vision_cone_degrees: float = 60.0
 
 @export var is_enemy: bool = true
+
+
+var left_whisker: RayCast3D = null
+var center_whisker: RayCast3D = null
+var right_whisker: RayCast3D = null
 
 func _ready() -> void:
 	tank_rigid = get_parent() as Tank_Rigid
@@ -47,6 +52,46 @@ func _ready() -> void:
 	fire_rate = tank_rigid.fire_rate_prim
 	
 	tank_rigid.got_hit.connect(got_hit)
+	tank_rigid.gets_disabled.connect(Save_File_Manager.INSTANCE.tank_kills_record)
+	
+	if deg_to_rad(tank_turret.side_angle_limit) < max_shoot_angle:
+		max_shoot_angle = deg_to_rad(tank_turret.side_angle_limit)
+	
+	init_whiskers()
+
+
+func init_whiskers() -> void:
+	left_whisker = RayCast3D.new()
+	center_whisker = RayCast3D.new()
+	right_whisker = RayCast3D.new()
+	
+	
+	left_whisker.target_position = Vector3(1,0,1)
+	center_whisker.target_position = Vector3(0,0,1.5)
+	right_whisker.target_position = Vector3(-1,0,1)
+	
+	tank_rigid.add_child(left_whisker)
+	tank_rigid.add_child(center_whisker)
+	tank_rigid.add_child(right_whisker)
+	
+	left_whisker.global_position = tank_rigid.global_position
+	center_whisker.global_position = tank_rigid.global_position
+	right_whisker.global_position = tank_rigid.global_position
+	
+
+func check_whiskers(delta: float) -> void:
+	var collider = [null, null, null] 
+	
+	if left_whisker.is_colliding():
+		collider[0] = left_whisker.get_collider()
+		tank_rigid.move(Vector2(1,0), delta)
+	if center_whisker.is_colliding():
+		collider[1] = center_whisker.get_collider()
+	if right_whisker.is_colliding():
+		collider[2] = right_whisker.get_collider()
+		tank_rigid.move(Vector2(-1,0), delta)
+	
+	#print(collider)
 
 func got_hit(source: Tank_Rigid, impact_point: Vector3) -> void:
 	current_state = AI_State.ENGAGED
@@ -69,6 +114,9 @@ func _physics_process(delta: float) -> void:
 	
 	update_state_machine(delta, can_see_player)
 	execute_current_state(delta, can_see_player)
+	
+	
+	check_whiskers(delta)
 
 
 func update_state_machine(delta: float, can_see_player: bool) -> void:
@@ -104,7 +152,7 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 func update_detection_meter(delta: float, can_see_player: bool, distance_to_player: float) -> void:
 	if can_see_player and distance_to_player <= max_chase_distance:
 		var dir_to_player = tank_turret.global_position.direction_to(player_ref.global_position)
-		var turret_forward = -tank_turret.global_basis.x.normalized()
+		var turret_forward = tank_turret.global_basis.z.normalized()
 		var angle = turret_forward.angle_to(dir_to_player)
 		var is_in_cone = angle <= deg_to_rad(vision_cone_degrees)
 		
@@ -166,7 +214,7 @@ func handle_turret_and_shooting(aim_pos: Vector3, can_shoot: bool, can_see_playe
 	var current_pos: Vector3 = tank_rigid.global_position
 	var shoot_dir = current_pos.direction_to(aim_pos).normalized()
 	
-	var turret_forward = -tank_turret.global_basis.x.normalized()
+	var turret_forward = tank_turret.global_basis.z.normalized()
 	shoot_angle = turret_forward.signed_angle_to(shoot_dir, tank_turret.global_basis.y)
 	
 	if abs(shoot_angle) < max_shoot_angle and time_since_last_shot >= fire_rate:

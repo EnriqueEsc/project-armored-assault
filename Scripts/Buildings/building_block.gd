@@ -24,6 +24,8 @@ func take_damage(damage: int, source: Tank_Rigid, impact_point: Vector3) -> void
 
 func deactivate() -> void:
 	
+	queue_free()
+	return
 	visible = false
 	use_collision = false
 	
