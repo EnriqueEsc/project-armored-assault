@@ -26,7 +26,7 @@ var score: int = 0
 var direction: Vector3 = Vector3.ZERO
 
 @onready var collision = $CollisionShape3D
-@onready var tank_turret: Tank_turret = $Turret
+@export var tank_turrets: Array[Tank_turret] = []
 
 @export var max_armor_points: int = 40
 var armor_points: int = 40
@@ -41,6 +41,7 @@ var time_passed: float = 0
 signal shoot_recharge(charge: float)
 signal velocimeter(velocity: float)
 signal got_hit(source: Tank_Rigid, impact_point: Vector3)
+signal shoot_signal()
 
 @export var allign_speed: float = 3
 
@@ -54,13 +55,19 @@ var last_building_impact: float = 0
 func _ready() -> void:
 	time_controller = Time_Controller.INSTANCE
 	
-	if tank_Data:
-		tank_Data._apply_values(self)
+	#if tank_Data:
+	#	tank_Data._apply_values(self)
 	
-	tank_turret.recoil.connect(recoil)
+	for t in tank_turrets:
+		t.recoil.connect(recoil)
 	
-	tank_turret.origin = self
-	tank_turret.create_projectiles()
+		t.origin = self
+		await t.create_projectiles()
+		
+		for c in self.get_children():
+			t.ignore.append(c as Node3D)
+		
+		shoot_signal.connect(t.shoot)
 	
 	
 	ap_percent.emit(float(armor_points)/float(max_armor_points) * 100.0)
@@ -175,21 +182,14 @@ func shoot() -> void:
 		return
 	last_shoot_prim = time_controller.running_time
 	
-	tank_turret.shoot()
+	shoot_signal.emit()
 	
 	time_passed = 0
 
-func rotate_turret_to_point_3d(point: Vector3) -> void:
-	tank_turret.rotate_turret_to_point_3d(point)
 
-func rotate_turret_to_point(point: Vector2) -> void:
-	tank_turret.rotate_turret_to_point(point)
 
-func get_aim_point(point: Vector2) -> Vector2:
-	return tank_turret.get_aim_point(point)
-
-func get_aim_point_3d(distance: float) -> Vector3:
-	return tank_turret.get_aim_point_3d(distance)
+func get_aim_point_3d(turret_index: int, distance: float) -> Vector3:
+	return tank_turrets[turret_index].get_aim_point_3d(distance)
 
 
 func take_damage(damage: int, source: Tank_Rigid, impact_point: Vector3) -> void:

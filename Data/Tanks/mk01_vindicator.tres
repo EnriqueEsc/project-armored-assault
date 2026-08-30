@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Tank_Data" format=3 uid="uid://ynjdw8qwu3pn"]
+
+[ext_resource type="Script" uid="uid://o0qesee4s8dx" path="res://Data/Tanks/Tank_Data.gd" id="1_kr22o"]
+
+[resource]
+script = ExtResource("1_kr22o")
+tank_Name = "MK_01 vindicator"
+acceleration = 1.0
+friction = 1.2
+max_armor_points = 500
+metadata/_custom_type_script = "uid://o0qesee4s8dx"

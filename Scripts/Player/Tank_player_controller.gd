@@ -1,13 +1,16 @@
 extends Node
 class_name Tank_player_controller
 
+signal aim_to(point: Vector3)
+
 @onready var tank_rigid: Tank_Rigid = $Tank_Player
 @onready var tank_camera: Tank_camera = $Camera3D
 
 @onready var HUD_mouse: Sprite2D = $HUD/HUD_Player/Icon
-@onready var HUD_aim: Sprite2D = $HUD/HUD_Player/Icon2
+var HUD_aim: Array[Sprite2D] = []
+var HUD_Shoot_Ready: Array[TextureProgressBar] = []
+var HUD_height_line: Array[Line2D] = []
 @onready var HUD_dir: Sprite3D = $Tank_Player/Forward
-@onready var HUD_height_line: Line2D = $HUD/HUD_Player/Height_Line
 
 
 @onready var HUD_AP: RichTextLabel = $HUD/HUD_Player/HUD_AP
@@ -20,7 +23,6 @@ class_name Tank_player_controller
 @onready var HUD_Death_Screen: Control = $HUD/Death_Screen
 @onready var HUD_Victory_Screen: Control = $HUD/Victory
 
-@onready var HUD_Shoot_Ready: TextureProgressBar = $HUD/HUD_Player/Icon2/HUD_Shoot_Ready
 
 @onready var HUD_Map: Map_Visualization = $HUD/HUD_Player/Map
 
@@ -40,6 +42,12 @@ var aim_point_original_scale: Vector2 = Vector2.ONE
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	if Settings_Manager.INSTANCE.current_tank_used_in_game:
+		tank_rigid.tank_Data = Settings_Manager.INSTANCE.current_tank_used_in_game
+	else:
+		tank_rigid.tank_Data = load("res://Data/Tanks/mk-0_test.tres") as Tank_Data
+	
+	tank_rigid.tank_Data._apply_values(tank_rigid)
 	
 	tank_rigid.add_to_group("Player")
 	
@@ -61,31 +69,65 @@ func _ready() -> void:
 	
 	tank_camera.player = tank_rigid
 	
-	aim_point_original_scale = HUD_aim.scale
 	
 	#await get_tree().physics_frame
 	#Node.print_orphan_nodes()
+	#change_HUD_color(color)
+	
+	await get_tree().physics_frame
+	
+	for t in tank_rigid.tank_turrets:
+		aim_to.connect(t.rotate_turret_to_point_3d)
+		var new_aim = Sprite2D.new()
+		new_aim.texture = load("res://Sprites/Test/MousePointer.png")
+		var new_ready = TextureProgressBar.new()
+		new_ready.texture_progress = load("res://Sprites/Test/ShootingPoint.png")
+		var new_line = Line2D.new()
+		new_line.width = 3
+		new_line.points = [Vector2(0,0),Vector2(0,0)]
+		
+		$HUD/HUD_Player.add_child(new_aim)
+		$HUD/HUD_Player.move_child(new_aim,0)
+		$HUD/HUD_Player.add_child(new_line)
+		$HUD/HUD_Player.move_child(new_line,0)
+		new_aim.add_child(new_ready)
+		new_aim.scale = Vector2(0.15,0.15)
+		new_ready.fill_mode = TextureProgressBar.FILL_CLOCKWISE
+		new_ready.scale = Vector2(1.3,1.3)
+		new_ready.position = Vector2(-166.667,-166.667)
+		
+		
+		HUD_aim.append(new_aim)
+		HUD_Shoot_Ready.append(new_ready)
+		HUD_height_line.append(new_line)
+		
+	
+	aim_point_original_scale = HUD_aim[0].scale
 	
 	pause_menu.game_state.connect(show_HUD)
 	pause_menu.color_change.connect(change_HUD_color)
 	pause_menu.set_color(color)
-	#change_HUD_color(color)
-	pass # Replace with function body.
 
 
 func color_HUD() -> void:
-		HUD_aim.modulate = color
+		#HUD_aim.modulate = color
 		HUD_mouse.modulate = color
 		HUD_Score.modulate = color
 		HUD_AP.modulate = color
 		HUD_Velocimeter.modulate = color
 		HUD_Objectives.modulate = color
 		HUD_AP_Bar.modulate = color
-		HUD_height_line.modulate = color
+		
+		for l in HUD_height_line:
+			l.modulate = color
+		
+		for a in HUD_aim:
+			a.modulate = color
 	
 
 func shoot_ready(charge: float) -> void:
-	HUD_Shoot_Ready.value = charge
+	for s in HUD_Shoot_Ready:
+		s.value = charge
 
 func _physics_process(delta: float) -> void:
 	tank_camera.move_cam(tank_rigid.position, delta)
@@ -96,23 +138,28 @@ func _physics_process(delta: float) -> void:
 	
 	#print(tank_camera.get_mouse_3d_pos())
 	HUD_mouse.position = get_viewport().get_mouse_position()
-	
-	var aim_point = tank_rigid.get_aim_point_3d(tank_rigid.tank_turret.global_position.distance_to(tank_camera.get_mouse_3d_pos()))
-	
-	var height_ground_pos = aim_point
-	height_ground_pos.y = tank_rigid.global_position.y
-	
-	#print(tank_camera.global_position.y - (aim_point.y))
-	
-	var aim_new_scale = (aim_point_scale_ref / (tank_camera.global_position.y - (aim_point.y))) * aim_point_original_scale
-	
-	HUD_aim.scale = aim_new_scale
+	#HUD_aim.scale = aim_new_scale
 	
 	#print(tank_rigid.get_aim_point_3d())
-	HUD_aim.position = tank_camera.unproject_position(tank_rigid.get_aim_point_3d(tank_rigid.tank_turret.global_position.distance_to(tank_camera.get_mouse_3d_pos())))
+	var counter: int = 0
+	for a in HUD_aim:
+		
+		var aim_point = tank_rigid.get_aim_point_3d(counter, tank_rigid.tank_turrets[counter].global_position.distance_to(tank_camera.get_mouse_3d_pos()))
+		
+		var height_ground_pos = aim_point
+		height_ground_pos.y = tank_rigid.global_position.y
+		
+		#print(tank_camera.global_position.y - (aim_point.y))
+		
+		var aim_new_scale = (aim_point_scale_ref / (tank_camera.global_position.y - (aim_point.y))) * aim_point_original_scale
+		HUD_aim[counter].scale = aim_new_scale
+		
+		HUD_aim[counter].position = tank_camera.unproject_position(tank_rigid.get_aim_point_3d(counter, tank_rigid.tank_turrets[counter].global_position.distance_to(tank_camera.get_mouse_3d_pos())))
+		HUD_height_line[counter].points = [tank_camera.unproject_position(height_ground_pos),HUD_aim[counter].position]
+		counter += 1
 	#HUD_aim.position = tank_rigid.get_aim_point(get_viewport().get_mouse_position())
 	
-	HUD_height_line.points = [tank_camera.unproject_position(height_ground_pos),HUD_aim.position]
+	#HUD_height_line.points = [tank_camera.unproject_position(height_ground_pos),HUD_aim.position]
 	
 
 
@@ -147,8 +194,8 @@ func _process(delta: float) -> void:
 	
 	#tank_rigid.rotate_turret_to_point(get_viewport().get_mouse_position())
 	
-	tank_rigid.rotate_turret_to_point_3d(tank_camera.get_mouse_3d_pos())
-	
+	#tank_rigid.rotate_turret_to_point_3d(tank_camera.get_mouse_3d_pos())
+	aim_to.emit(tank_camera.get_mouse_3d_pos())
 	
 	if Input.is_action_just_pressed("Map"):
 		HUD_Map.visible = not HUD_Map.visible
@@ -185,15 +232,21 @@ func show_HUD(state: bool) -> void:
 	if is_destroyed or mission_finished:
 		state = false
 	
-	HUD_aim.visible = state
+	#HUD_aim.visible = state
 	HUD_mouse.visible = state
 	HUD_Score.visible = state
 	HUD_AP.visible = state
 	HUD_Velocimeter.visible = state
 	HUD_Objectives.visible = state
 	HUD_AP_Bar.visible = state
-	HUD_height_line.visible = state
+	#HUD_height_line.visible = state
 	HUD_Map.visible = false
+	
+	for l in HUD_height_line:
+		l.visible = state
+	
+	for a in HUD_aim:
+		a.visible = state
 
 func destruction() -> void:
 		is_destroyed = true

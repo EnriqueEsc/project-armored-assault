@@ -10,9 +10,10 @@
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_6blnc"]
 
-[node name="Enemy_tank" type="CharacterBody3D" unique_id=450725569]
+[node name="Enemy_tank" type="CharacterBody3D" unique_id=450725569 node_paths=PackedStringArray("tank_turrets")]
 transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, 0, 0, 0)
 script = ExtResource("1_lfxob")
+tank_turrets = [NodePath("Turret")]
 
 [node name="tanque_V3" parent="." unique_id=1683942184 instance=ExtResource("2_wnkmq")]
 transform = Transform3D(1.002, 0, 0, 0, 1.3, 0, 0, 0, 1.002, 0, -0.28692198, 0)

@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_jj117")
+tank_Name = "MK_-0 Test"
 traction = 2.0
 max_armor_points = 600
 metadata/_custom_type_script = "uid://o0qesee4s8dx"

@@ -8,4 +8,5 @@ tank_Name = "MK-1 Goofy"
 max_speed = 10.0
 acceleration = 0.1
 friction = 0.0
+fire_rate_prim = 0.2
 metadata/_custom_type_script = "uid://o0qesee4s8dx"

@@ -11,9 +11,14 @@ extends Menu
 
 @onready var briefing_window: Control = $Mission_Briefing
 @onready var briefing_text: Typing_Text = $Mission_Briefing/Briefing_text
-@onready var load_demo_button: Button = $"Mission_Briefing/Run demo"
+@onready var to_tank_selection: Button = $Mission_Briefing/Tank_selection
 @onready var back_to_mission_list: Button = $Mission_Briefing/Back
 
+@onready var tank_selection_window: Control = $Tank_selection_menu
+@onready var tank_buttons_grid: GridContainer = $Tank_selection_menu/Tank_selection_container/Tank_button_container
+@onready var tank_info_text: RichTextLabel = $Tank_selection_menu/Tank_info
+@onready var tank_selection_back: Button = $Tank_selection_menu/Buttons/Back
+@onready var start_mission_button: Button = $Tank_selection_menu/Buttons/Start_mission
 
 @onready var settings_window: Control = $Settings_Menu
 @onready var fullscreen_button: CheckButton = $Settings_Menu/Buttons/Fullscreen
@@ -22,9 +27,9 @@ extends Menu
 
 
 var selected_mission: String = ""
+var selected_tank: Tank_Data = null
 
 
-	
 
 func _set_buttons() -> void:
 	#mission_list_button.button_down.connect(show_briefing)
@@ -33,14 +38,19 @@ func _set_buttons() -> void:
 	settings_button.button_down.connect(update_settings_window)
 	quit_game_button.button_down.connect(get_tree().quit)
 	
-	
 	load_mission_button.button_down.connect(select_mission.bind("res://Scenes/test_mission.tscn"))
 	load_mission_button.button_down.connect(show_briefing)
 	back_to_main_menu.button_down.connect(switch_active.bind(mission_list_window))
 	
-	load_demo_button.button_down.connect(load_scene)
+	to_tank_selection.button_down.connect(switch_active.bind(tank_selection_window))
+	to_tank_selection.button_down.connect(check_mission_can_start)
 	back_to_mission_list.button_down.connect(switch_active.bind(briefing_window))
 	back_to_mission_list.button_down.connect(briefing_text.break_typing)
+	
+	restart_tank_selection()
+	tank_selection_back.button_down.connect(switch_active.bind(tank_selection_window))
+	tank_selection_back.button_down.connect(restart_tank_selection)
+	start_mission_button.button_down.connect(load_scene)
 	
 	update_settings_window()
 	
@@ -48,12 +58,17 @@ func _set_buttons() -> void:
 	save_settings_button.button_down.connect(save_settings)
 	settings_back.button_down.connect(switch_active.bind(settings_window))
 	
+	
+	create_tank_selection_buttons()
+	
 	mission_list_window.visible = false
 	briefing_window.visible = false
+	tank_selection_window.visible = false
 	settings_window.visible = false
 
 func load_scene() -> void:
 	if selected_mission != "":
+		Settings_Manager.INSTANCE.current_tank_used_in_game = selected_tank
 		get_tree().change_scene_to_file(selected_mission)
 
 func select_mission(mission: String) -> void:
@@ -64,6 +79,9 @@ func switch_active(window: Control) -> void:
 
 func update_settings_window() -> void:
 	fullscreen_button.button_pressed = Settings_Manager.INSTANCE.fullscreen
+
+func check_mission_can_start() -> void:
+	start_mission_button.visible = selected_mission != "" and selected_tank
 
 func show_briefing() -> void:
 	briefing_window.visible = true
@@ -86,6 +104,58 @@ func show_briefing() -> void:
 ....>> Destroy the outpost's structures.
 ....>> Spread as much chaos as you can.")
 
+
+func create_tank_selection_buttons() -> void:
+	var tanks: Array = []
+	var dir = DirAccess.open("res://Data/Tanks")
+	
+	if dir:
+		print("ola tanke")
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		
+		while file_name != "":
+			if not dir.current_is_dir():
+				if file_name.ends_with(".tres") or file_name.ends_with(".remap"):
+					var clean_name = file_name.trim_suffix(".remap")
+					var path = "res://Data/Tanks".path_join(clean_name)
+					var tank = ResourceLoader.load(path) as Tank_Data
+					if tank:
+						tanks.append(tank)
+			file_name = dir.get_next()
+		dir.list_dir_end()
+	
+	for t in tanks:
+		print(t.tank_Name)
+		var tank_button = Button.new()
+		tank_button.text = t.tank_Name
+		tank_button.custom_minimum_size = Vector2(200,50)
+		$Tank_selection_menu/Tank_selection_container/Tank_button_container.add_child(tank_button)
+		tank_button.button_down.connect(select_tank.bind(t))
+		
+
+func restart_tank_selection() -> void:
+	selected_tank = null
+	tank_info_text.text = ""
+
+func select_tank(tank: Tank_Data) -> void:
+	selected_tank = tank
+	show_tank_info()
+	check_mission_can_start()
+
+func show_tank_info() -> void:
+	var info: String = "[font_size=20]Tank_Data[/font_size]\n\n"
+	
+	info += "> Armor points: " + str(selected_tank.max_armor_points) + "\n\n"
+	info += "> Max speed: " + str(selected_tank.max_speed) + "\n\n"
+	info += "> Acceleration: " + str(selected_tank.acceleration) + "\n\n"
+	info += "> Steering speed: " + str(selected_tank.tank_turn_speed) + "\n\n"
+	info += "> Steering acceleration: " + str(selected_tank.turning_acceleration) + "\n\n"
+	#info += "> Friction: " + str(selected_tank.friction) + "\n\n"
+	info += "> Traction: " + str(selected_tank.traction) + "\n\n"
+	info += "> Firing rate: " + str(selected_tank.fire_rate_prim) + "\n\n"
+	
+	tank_info_text.text = info
 
 func save_settings() -> void:
 	Settings_Manager.INSTANCE.fullscreen = fullscreen_button.button_pressed

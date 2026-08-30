@@ -28,6 +28,8 @@ func _set_objectives() -> void:
 	
 	await get_tree().physics_frame
 	
+	
+	
 	var buildings = get_tree().get_nodes_in_group("Terrain")
 	
 	var blocks: Array[Building_Block] = []

@@ -2,6 +2,7 @@ extends Node
 class_name Save_File_Manager
 
 static var INSTANCE: Save_File_Manager = null
+
 var CURRENT_PATH: String = "user://test.json"
 var current_save_data: Dictionary = {
 	"tank_kills_record": 0

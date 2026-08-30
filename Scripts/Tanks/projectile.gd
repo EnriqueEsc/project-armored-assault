@@ -152,10 +152,14 @@ func detonate() -> void:
 				var raycast = PhysicsRayQueryParameters3D.create(ray_origin, target_center)
 				
 				raycast.exclude = [self.get_rid()]
+				
+				for h in hitted_enemies:
+					raycast.exclude.append(h)
+				
 				raycast.collide_with_areas = true
 				raycast.collide_with_bodies = true
 				
-				raycast.hit_from_inside = false 
+				raycast.hit_from_inside = true 
 				
 				var res = space.intersect_ray(raycast)
 				

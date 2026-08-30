@@ -33,6 +33,8 @@ func _ready() -> void:
 	turret.barrel_upper_limit = barrel_upper_limit
 	turret.turret_turning_speed = 0.05
 	
+	turret.fire_rate_prim = fire_rate
+	
 	var parent_col = get_parent_node_3d()
 	var grand_parent_col = parent_col.get_parent_node_3d()
 	turret.ignore = [parent_col, grand_parent_col]
@@ -140,9 +142,8 @@ func attempt_shoot(aim_pos: Vector3) -> void:
 	var turret_forward = turret.global_basis.z.normalized()
 	var angle = turret_forward.signed_angle_to(dir_to_target, turret.global_basis.y)
 	
-	if abs(angle) < max_shoot_angle and time_since_last_shot >= fire_rate:
+	if abs(angle) < max_shoot_angle and turret.can_shoot():
 		turret.shoot()
-		time_since_last_shot = 0.0
 
 func is_on_sight_range() -> bool:
 	if not is_instance_valid(player_ref) or not player_ref.visible:

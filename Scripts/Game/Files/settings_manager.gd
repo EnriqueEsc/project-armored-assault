@@ -7,6 +7,8 @@ var running_time: float = 0
 const SETTINGS_PATH = "user://settings.cfg"
 var settings_file: ConfigFile = ConfigFile.new()
 
+var current_tank_used_in_game: Tank_Data = null
+
 var fullscreen: bool = false
 
 var current_save: String = "user://test.json"

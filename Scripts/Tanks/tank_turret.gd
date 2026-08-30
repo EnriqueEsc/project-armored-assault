@@ -32,6 +32,15 @@ var projectile_active: Array[Projectile] = []
 var case_pool: Array[Case] = []
 var case_active: Array[Case] = []
 
+
+var time_controller: Time_Controller
+@export var fire_rate_prim: float = 2
+var last_shoot_prim: float = -10
+
+var original_side_angle: float = 0.0
+
+signal aim_point(point: Vector3)
+
 func spawn() -> void:
 	projectile = projectile_prefab.instantiate() as Projectile
 	projectile.deactivate()
@@ -44,10 +53,14 @@ func spawn() -> void:
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	original_side_angle = rotation.y
 	#spawn()
 	ignore.append(self)
 	ignore.append(get_parent_node_3d())
+	
+	time_controller = Time_Controller.INSTANCE
 	pass
+
 
 func rotate_turret(rot: float) -> void:
 	final_rotation = rot
@@ -74,7 +87,12 @@ func rotate_turret_to_point_3d(point: Vector3) -> void:
 	
 	var target_y = lerp_angle(rotation.y, target_rot_euler.y - (PI), turret_turning_speed)
 	if side_angle_limit < 360:
-		target_y = clampf(target_y,deg_to_rad(-side_angle_limit),deg_to_rad(side_angle_limit))
+		
+		# 2. Limitamos esa diferencia con tus variables de ángulo
+		var dif = clampf(angle_difference(original_side_angle, target_y), deg_to_rad(-side_angle_limit), deg_to_rad(side_angle_limit))
+		
+		# 3. Sumamos la diferencia limitada de vuelta a la rotación original
+		target_y = original_side_angle + dif
 	rotation.y = target_y
 	
 	
@@ -117,6 +135,8 @@ func get_aim_point_3d(distance: float) -> Vector3:
 	else:
 		res = from + forward * distance
 	
+	aim_point.emit(res)
+	
 	return res
 
 
@@ -148,6 +168,8 @@ func create_projectiles() -> void:
 
 func shoot() -> void:
 	
+	if not can_shoot():
+		return
 	
 	var projectile: Projectile
 	if projectile_pool.size() <= 0:
@@ -158,6 +180,7 @@ func shoot() -> void:
 	projectile_active.push_back(projectile)
 	projectile.shoot(global_position, Vector2(turret_barrel.global_rotation.x, global_rotation.y))
 	var forward = turret_barrel.global_basis * Vector3.FORWARD * 10
+	
 	
 	
 	var case: Case
@@ -171,6 +194,8 @@ func shoot() -> void:
 	
 	#rotation.y = lerp_angle(rotation.y,rotation.y+randf_range(deg_to_rad(-10),deg_to_rad(10)),1)
 	
+	last_shoot_prim = time_controller.running_time
+	
 	recoil.emit(forward,1)
 
 func projectile_to_pool(current_projectile: Projectile) -> void:
@@ -183,4 +208,6 @@ func case_to_pool(current_case: Case) -> void:
 	case_active.erase(current_case)
 	case_pool.push_back(current_case)
 	#current_projectile.deactivate()
-	
+
+func can_shoot() -> bool:
+	return last_shoot_prim + fire_rate_prim < time_controller.running_time
