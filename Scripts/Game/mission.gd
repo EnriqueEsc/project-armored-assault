@@ -2,11 +2,14 @@ extends Node
 class_name Mission
 
 @export var player_spawn: Node3D = null
+@export var exfil_zone: Area3D = null
 
 var player: Tank_player_controller = null
 var objectives_text: String = ""
 
 var briefing_text: String = "Sample_text"
+
+var player_is_in_exfil_zone = false
 
 signal mission_finished(result: bool)
 signal update_objectives(objectives: String)
@@ -48,6 +51,8 @@ func _link_player() -> void:
 	player.call_deferred("set_global_position", player_spawn.global_position)
 	player.call_deferred("set_global_rotation", player_spawn.global_rotation)
 	
+	exfil_zone.body_entered.connect(_object_enters_exfil_zone)
+	exfil_zone.body_exited.connect(_object_exits_exfil_zone)
 	
 	update_objectives.connect(player.update_Objectives)
 	mission_finished.connect(player.finish_mission)
@@ -56,11 +61,16 @@ func _check_success_conditions() -> void:
 	pass
 
 func _spawn_player() -> void:
-	var tank_load = load("res://Prefabs/Player/tank_test.tscn")
+	var tank_load = load("res://Prefabs/Player/player_controller.tscn")
 	
-	if Settings_Manager.INSTANCE.current_tank_used_in_game and Settings_Manager.INSTANCE.current_tank_used_in_game.tank_Name == "MK_01 vindicator":
-		tank_load = load("res://Prefabs/Player/endavour.tscn")
-		
 	player = tank_load.instantiate() as Tank_player_controller
 	
 	get_tree().current_scene.add_child(player)
+
+func _object_enters_exfil_zone(object: Node3D) -> void:
+	if player.tank_rigid == (object as Tank_Rigid):
+		player_is_in_exfil_zone = true
+
+func _object_exits_exfil_zone(object: Node3D) -> void:
+	if player.tank_rigid == (object as Tank_Rigid):
+		player_is_in_exfil_zone = false

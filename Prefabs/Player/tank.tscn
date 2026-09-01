@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://dqrg7mgefod65"]
+
+[ext_resource type="Script" uid="uid://bykhssfaytcmi" path="res://Scripts/Tanks/tank_rigidbody.gd" id="3_1b8ge"]
+[ext_resource type="Resource" uid="uid://c58osll0nlitx" path="res://Data/Tanks/mk-0_test.tres" id="4_t3xhq"]
+[ext_resource type="PackedScene" uid="uid://cm2gr8at5r6c0" path="res://Models/Test/Tank_Test/tanque_V3.fbx" id="5_f1itp"]
+[ext_resource type="PackedScene" uid="uid://bf7d7fljdkdcy" path="res://Models/Test/tanque_V2.fbx" id="6_c3mcr"]
+[ext_resource type="PackedScene" uid="uid://cr2e151pg0ro6" path="res://Models/Test/Minor.fbx" id="7_26ka3"]
+[ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Tanks/tank_turret.gd" id="8_m1iq8"]
+[ext_resource type="PackedScene" uid="uid://b82jytfr4l81p" path="res://Prefabs/Test/projectile_he.tscn" id="9_2wkin"]
+[ext_resource type="PackedScene" uid="uid://caqoxtxta5muo" path="res://Models/Test/Tank_Test/turret_V3.fbx" id="10_3kpeb"]
+[ext_resource type="PackedScene" uid="uid://b8u4pylde5yu4" path="res://Models/Test/torreta_V2.fbx" id="11_kqa3r"]
+[ext_resource type="PackedScene" uid="uid://koxj0b8ls2xa" path="res://Models/Test/Gun.fbx" id="12_g54sa"]
+[ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="13_jxxtf"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_6blnc"]
+
+[node name="Tank_Player" type="CharacterBody3D" unique_id=975234286 node_paths=PackedStringArray("tank_turrets")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
+script = ExtResource("3_1b8ge")
+tank_turrets = [NodePath("Turret")]
+tank_Data = ExtResource("4_t3xhq")
+
+[node name="tanque_V3" parent="." unique_id=1683942184 instance=ExtResource("5_f1itp")]
+transform = Transform3D(1.002, 0, 0, 0, 1.3, 0, 0, 0, 1.002, 0, -0.28692198, 0)
+
+[node name="tanque_V2" parent="." unique_id=2003364869 instance=ExtResource("6_c3mcr")]
+transform = Transform3D(0.07866464, 0, 0, 0, 0.1365011, 0, 0, 0, 0.075632125, 0, -0.29108393, 0.040996313)
+visible = false
+
+[node name="Minor" parent="." unique_id=60055419 instance=ExtResource("7_26ka3")]
+transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
+visible = false
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1155456926]
+shape = SubResource("BoxShape3D_6blnc")
+debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
+
+[node name="Turret" type="Node3D" parent="." unique_id=1627339079]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04852271, 0)
+script = ExtResource("8_m1iq8")
+side_angle_limit = 360.0
+projectile_prefab = ExtResource("9_2wkin")
+
+[node name="turret_V3" parent="Turret" unique_id=1331242705 instance=ExtResource("10_3kpeb")]
+transform = Transform3D(1.6391772e-07, 0, 1.25, 0, 1.25, 0, -1.25, 0, 1.6391772e-07, 0, -0.29506743, 0)
+
+[node name="torreta_V2" parent="Turret" unique_id=29810314 instance=ExtResource("11_kqa3r")]
+transform = Transform3D(0.12, 0, -2.0981473e-08, 0, 0.12, 0, 2.0981473e-08, 0, 0.12, 0, -0.2802639, 0)
+visible = false
+
+[node name="Gun" parent="Turret" unique_id=51241174 instance=ExtResource("12_g54sa")]
+transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0, 0)
+
+[node name="Forward" type="Sprite3D" parent="." unique_id=1585055350]
+transform = Transform3D(0.4, 0, 0, 0, -1.7484556e-08, -0.4, 0, 0.4, -1.7484556e-08, 0, -0.45413375, 1)
+modulate = Color(1, 1, 1, 0.2509804)
+texture = ExtResource("13_jxxtf")

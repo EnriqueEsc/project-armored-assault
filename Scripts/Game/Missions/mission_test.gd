@@ -45,13 +45,21 @@ func _set_objectives() -> void:
 
 
 func _update_current_objectives() -> void:
-	objectives_text = ^"[font_size=28]Objectives:[/font_size]
 	
-	> Destroy tanks [{ctk}/{mtk}]
-	> Destroy emplacements [{cek}/{mek}]
-	> Spread chaos [{cd}/{md}]"
+	if not (current_tank_kills >= min_tank_kills and current_emplacement_kills >= min_emplacement_kills and current_desmadre >= min_desmadre):
 	
-	objectives_text = objectives_text.format({"ctk": current_tank_kills, "mtk": min_tank_kills, "cek": current_emplacement_kills, "mek": min_emplacement_kills, "cd": current_desmadre, "md": min_desmadre})
+		objectives_text = ^"[font_size=28]Objectives:[/font_size]
+		
+		> Destroy tanks [{ctk}/{mtk}]
+		> Destroy emplacements [{cek}/{mek}]
+		> Spread chaos [{cd}/{md}]"
+		
+		objectives_text = objectives_text.format({"ctk": current_tank_kills, "mtk": min_tank_kills, "cek": current_emplacement_kills, "mek": min_emplacement_kills, "cd": current_desmadre, "md": min_desmadre})
+	
+	else:
+		objectives_text = ^"[font_size=28]Objectives:[/font_size]
+		
+		>>> Go to Exfil (Blue zone on the map)"
 	
 	_check_success_conditions()
 	
@@ -78,7 +86,13 @@ func desmadre_count(block: Building_Block) -> void:
 	
 	_update_current_objectives()
 
+
+func _object_enters_exfil_zone(object: Node3D) -> void:
+	if player.tank_rigid == (object as Tank_Rigid):
+		player_is_in_exfil_zone = true
+		_check_success_conditions()
+
 func _check_success_conditions() -> void:
 	
-	if current_tank_kills >= min_tank_kills and current_emplacement_kills >= min_emplacement_kills and current_desmadre >= min_desmadre:
+	if current_tank_kills >= min_tank_kills and current_emplacement_kills >= min_emplacement_kills and current_desmadre >= min_desmadre and player_is_in_exfil_zone:
 		_mission_succeeded()

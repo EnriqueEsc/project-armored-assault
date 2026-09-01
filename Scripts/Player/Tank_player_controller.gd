@@ -3,14 +3,13 @@ class_name Tank_player_controller
 
 signal aim_to(point: Vector3)
 
-@onready var tank_rigid: Tank_Rigid = $Tank_Player
+@onready var tank_rigid: Tank_Rigid = null
 @onready var tank_camera: Tank_camera = $Camera3D
 
 @onready var HUD_mouse: Sprite2D = $HUD/HUD_Player/Icon
 var HUD_aim: Array[Sprite2D] = []
 var HUD_Shoot_Ready: Array[TextureProgressBar] = []
 var HUD_height_line: Array[Line2D] = []
-@onready var HUD_dir: Sprite3D = $Tank_Player/Forward
 
 
 @onready var HUD_AP: RichTextLabel = $HUD/HUD_Player/HUD_AP
@@ -42,11 +41,27 @@ var aim_point_original_scale: Vector2 = Vector2.ONE
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	var tank_load
+	var tank_data
 	if Settings_Manager.INSTANCE.current_tank_used_in_game:
-		tank_rigid.tank_Data = Settings_Manager.INSTANCE.current_tank_used_in_game
+		tank_data = Settings_Manager.INSTANCE.current_tank_used_in_game
+		if tank_data.tank_Name != "MK_01 vindicator":
+			tank_load = load("res://Prefabs/Player/tank.tscn")
+		else:
+			tank_load = load("res://Prefabs/Player/endavour.tscn")
 	else:
-		tank_rigid.tank_Data = load("res://Data/Tanks/mk-0_test.tres") as Tank_Data
+		tank_load = load("res://Prefabs/Player/endavour.tscn")
+		tank_data = load("res://Data/Tanks/mk-0_test.tres") as Tank_Data
 	
+	tank_rigid = tank_load.instantiate() as Tank_Rigid
+	
+	
+	add_child(tank_rigid)
+	
+	#tank_rigid.global_rotation = Vector3.ZERO
+	print(" POSITION TANK ",rad_to_deg(tank_rigid.global_rotation.y))
+	
+	tank_rigid.tank_Data = tank_data
 	tank_rigid.tank_Data._apply_values(tank_rigid)
 	
 	tank_rigid.add_to_group("Player")
