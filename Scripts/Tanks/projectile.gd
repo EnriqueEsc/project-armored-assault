@@ -19,12 +19,19 @@ var detonated: bool = false
 
 @export var blast_det_max_entities = 32
 
+var effects_manager: Effects_Manager = null
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	body_entered.connect(_on_area_entered)
-	area_entered.connect(_on_area_entered)
+	body_entered.connect(_on_body_entered)
+	#area_entered.connect(_on_body_entered)
 	base_speed = speed
+	
 	deactivate()
+	
+	await get_tree().physics_frame
+	
+	effects_manager = Effects_Manager.INSTANCE
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -68,7 +75,7 @@ func move(delta: float) -> void:
 	var current_pos_2d: Vector2 = (Vector2(0,1).rotated(-rotation.y))
 	global_position += global_basis.z * speed * delta
 
-func _on_area_entered(body):
+func _on_body_entered(body):
 	#print(body.collider.get_parent.name)
 	
 	#print(body == origin)
@@ -113,6 +120,9 @@ func detonate() -> void:
 	
 	if not is_explosive:
 		return
+	
+	if effects_manager:
+		effects_manager.explosion_from_pool(global_position)
 	
 	var explosion = SphereShape3D.new()
 	explosion.radius = blast_rad

@@ -15,6 +15,9 @@
 [ext_resource type="Script" uid="uid://cxxlffo81ypm" path="res://Scripts/AI/Enemies/enemy_tank.gd" id="14_kuf18"]
 [ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="15_vpf1r"]
 [ext_resource type="PackedScene" uid="uid://cyt63xjcvvdgs" path="res://Prefabs/Player/endavour.tscn" id="16_wojap"]
+[ext_resource type="PackedScene" uid="uid://cn6jg5bpbcufr" path="res://Prefabs/Effects/explosion.tscn" id="19_q8sys"]
+[ext_resource type="PackedScene" uid="uid://12uh8de27pag" path="res://Prefabs/Effects/collapse.tscn" id="20_n0wup"]
+[ext_resource type="PackedScene" uid="uid://g8rdo1gh0l1i" path="res://Prefabs/Effects/fire.tscn" id="20_wojap"]
 [ext_resource type="Shader" uid="uid://c5r6qc4s673e8" path="res://Shaders/see_tank.gdshader" id="21_wojap"]
 [ext_resource type="Script" uid="uid://cgp8hd1nxjt5u" path="res://Scripts/Buildings/building.gd" id="22_copon"]
 [ext_resource type="Script" uid="uid://d054fnyrmgj2k" path="res://Scripts/Terrain/nav_region.gd" id="22_kxtw2"]
@@ -1646,3 +1649,12 @@ shape = SubResource("BoxShape3D_bhunq")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="NavigationRegion3D/Ground" unique_id=1860959951]
 mesh = SubResource("BoxMesh_sn0t7")
+
+[node name="Explosion" parent="." unique_id=447795717 instance=ExtResource("19_q8sys")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0660223, 0)
+
+[node name="Fire" parent="." unique_id=1829018680 instance=ExtResource("20_wojap")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0660223, 0)
+
+[node name="Collapse" parent="." unique_id=1813737619 instance=ExtResource("20_n0wup")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0660223, 0)

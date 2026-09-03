@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b44xtts1goeo7" path="res://Scripts/Player/Tank_player_controller.gd" id="1_uaa60"]
 [ext_resource type="Script" uid="uid://dgldqtulm4ymj" path="res://Scripts/Player/Tank_camera.gd" id="2_emxqw"]
+[ext_resource type="Script" uid="uid://c1amjgu5fo0td" path="res://Scripts/Player/HUD_boss_info.gd" id="3_7k3ju"]
 [ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="13_yfrtn"]
 [ext_resource type="Texture2D" uid="uid://yqsnwiuau3g7" path="res://Sprites/Test/ShootingPoint.png" id="14_rjqdq"]
 [ext_resource type="Script" uid="uid://hg6l1epqoto0" path="res://Scripts/Player/HUD_Map.gd" id="15_6grxy"]
@@ -34,6 +35,35 @@ offset_right = 576.0
 offset_bottom = 324.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="HUD_Boss_Info" type="Control" parent="HUD/HUD_Player" unique_id=166122214]
+anchors_preset = 0
+script = ExtResource("3_7k3ju")
+
+[node name="HUD_Boss_AP_Bar" type="ProgressBar" parent="HUD/HUD_Player/HUD_Boss_Info" unique_id=1849356095]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 123.0
+offset_top = 61.0
+offset_right = 1023.0
+offset_bottom = 71.0
+grow_horizontal = 2
+value = 100.0
+show_percentage = false
+
+[node name="HUD_Boss_Name" type="RichTextLabel" parent="HUD/HUD_Player/HUD_Boss_Info" unique_id=1003184683]
+layout_mode = 0
+offset_left = 123.0
+offset_top = 24.0
+offset_right = 1023.0
+offset_bottom = 61.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 20
+text = "Boss [1200/1200]"
+scroll_active = false
 
 [node name="Icon" type="Sprite2D" parent="HUD/HUD_Player" unique_id=1942774347]
 position = Vector2(631, 333)
@@ -114,12 +144,29 @@ size = 100.0
 [node name="HUD_Objectives" type="RichTextLabel" parent="HUD/HUD_Player" unique_id=616542815]
 layout_mode = 0
 offset_left = 25.0
-offset_top = 25.0
+offset_top = 73.0
 offset_right = 425.0
-offset_bottom = 425.0
+offset_bottom = 473.0
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/normal_font_size = 20
 bbcode_enabled = true
+text = "[font_size=28]Objectives:[/font_size]
+		
+		> Destroy tanks [{ctk}/{mtk}]
+		> Destroy emplacements [{cek}/{mek}]
+		> Spread chaos [{cd}/{md}]"
+
+[node name="HUD_Score" type="RichTextLabel" parent="HUD/HUD_Player/HUD_Objectives" unique_id=1365303483]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 601.0
+offset_right = 174.0
+offset_bottom = 638.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 20
+text = "Score: 2000000"
+horizontal_alignment = 1
 
 [node name="Death_Screen" type="Control" parent="HUD" unique_id=1385155183]
 layout_mode = 3
@@ -221,7 +268,7 @@ offset_top = 75.0
 offset_right = 100.0
 offset_bottom = 125.0
 grow_horizontal = 2
-text = "Restart"
+text = "Restart_mission"
 
 [node name="Main_menu" type="Button" parent="Pause_menu/Buttons" unique_id=1320576536]
 layout_mode = 1

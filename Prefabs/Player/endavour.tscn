@@ -11,7 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://koxj0b8ls2xa" path="res://Models/Test/Gun.fbx" id="12_gdeoh"]
 [ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="13_bks5b"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_6blnc"]
+[sub_resource type="BoxShape3D" id="BoxShape3D_wojap"]
 
 [node name="Tank_Player" type="CharacterBody3D" unique_id=452991697 node_paths=PackedStringArray("tank_turrets")]
 transform = Transform3D(-4.3711395e-08, 0, -1, 0, 1, 0, 1, 0, -4.3711395e-08, 0, 0, 0)
@@ -31,7 +31,7 @@ transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.
 visible = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=121602495]
-shape = SubResource("BoxShape3D_6blnc")
+shape = SubResource("BoxShape3D_wojap")
 debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 
 [node name="Turret" type="Node3D" parent="." unique_id=1547171519]

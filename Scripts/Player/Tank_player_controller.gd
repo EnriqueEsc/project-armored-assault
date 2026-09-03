@@ -19,6 +19,8 @@ var HUD_height_line: Array[Line2D] = []
 
 @onready var HUD_AP_Bar: ProgressBar = $HUD/HUD_Player/HUD_AP_Bar
 
+@onready var HUD_Boss_info: HUD_Boss_Info = $HUD/HUD_Player/HUD_Boss_Info
+
 @onready var HUD_Death_Screen: Control = $HUD/Death_Screen
 @onready var HUD_Victory_Screen: Control = $HUD/Victory
 
@@ -74,6 +76,7 @@ func _ready() -> void:
 	HUD_Death_Screen.visible = false
 	HUD_Victory_Screen.visible = false
 	HUD_Map.visible = false
+	HUD_Boss_info.show_boss_info()
 	
 	tank_rigid.shoot_recharge.connect(shoot_ready)
 	
@@ -132,6 +135,7 @@ func color_HUD() -> void:
 		HUD_Velocimeter.modulate = color
 		HUD_Objectives.modulate = color
 		HUD_AP_Bar.modulate = color
+		HUD_Boss_info.color_boss_info(color)
 		
 		for l in HUD_height_line:
 			l.modulate = color
@@ -246,6 +250,7 @@ func show_HUD(state: bool) -> void:
 	
 	if is_destroyed or mission_finished:
 		state = false
+		HUD_Boss_info.update_boss_active(state)
 	
 	#HUD_aim.visible = state
 	HUD_mouse.visible = state
@@ -254,6 +259,7 @@ func show_HUD(state: bool) -> void:
 	HUD_Velocimeter.visible = state
 	HUD_Objectives.visible = state
 	HUD_AP_Bar.visible = state
+	HUD_Boss_info.show_boss_info()
 	#HUD_height_line.visible = state
 	HUD_Map.visible = false
 	

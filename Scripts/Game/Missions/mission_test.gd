@@ -23,7 +23,7 @@ func _set_objectives() -> void:
 			e.gets_disabled.connect(tanks_kill_count)
 			tanks.append(e)
 	
-	min_tank_kills = tanks.size()
+	min_tank_kills = tanks.size() - 1
 	min_emplacement_kills = emplacements.size()
 	
 	await get_tree().physics_frame
@@ -41,6 +41,8 @@ func _set_objectives() -> void:
 	for b in blocks:
 		b.got_destroyed.connect(desmadre_count)
 	
+	exfil_zone.visible = false
+	
 	_update_current_objectives()
 
 
@@ -57,6 +59,10 @@ func _update_current_objectives() -> void:
 		objectives_text = objectives_text.format({"ctk": current_tank_kills, "mtk": min_tank_kills, "cek": current_emplacement_kills, "mek": min_emplacement_kills, "cd": current_desmadre, "md": min_desmadre})
 	
 	else:
+		
+		if not exfil_zone.visible:
+			exfil_zone.visible = true
+		
 		objectives_text = ^"[font_size=28]Objectives:[/font_size]
 		
 		>>> Go to Exfil (Blue zone on the map)"

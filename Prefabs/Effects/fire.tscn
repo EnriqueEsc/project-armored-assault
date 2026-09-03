@@ -1,0 +1,51 @@
+[gd_scene format=3 uid="uid://g8rdo1gh0l1i"]
+
+[sub_resource type="Gradient" id="Gradient_2mh7v"]
+colors = PackedColorArray(1, 1, 0, 1, 0, 0, 0, 0.69803923)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_f4l6q"]
+gradient = SubResource("Gradient_2mh7v")
+
+[sub_resource type="Curve" id="Curve_j1ewg"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.99999, 0.38392866), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_2ucng"]
+curve = SubResource("Curve_j1ewg")
+
+[sub_resource type="Curve" id="Curve_vunn8"]
+_limits = [0.0, 3.0, 0.0, 1.0]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.80645156, 0.80357146), 0.0, 0.0, 0, 0, Vector2(1, 2.169643), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_2lhqt"]
+curve = SubResource("Curve_vunn8")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_w5yva"]
+emission_shape = 1
+emission_sphere_radius = 1.0
+gravity = Vector3(0, 2, 0)
+scale_min = 0.0
+scale_curve = SubResource("CurveTexture_2ucng")
+scale_over_velocity_curve = SubResource("CurveTexture_2lhqt")
+color = Color(0.9490196, 0.76862746, 0, 1)
+color_ramp = SubResource("GradientTexture1D_f4l6q")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kuf18"]
+transparency = 1
+vertex_color_use_as_albedo = true
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_kuf18"]
+material = SubResource("StandardMaterial3D_kuf18")
+
+[node name="Fire" type="GPUParticles3D" unique_id=1829018680]
+amount = 10
+lifetime = 1.5
+randomness = 0.7
+collision_base_size = 1.0
+process_material = SubResource("ParticleProcessMaterial_w5yva")
+draw_pass_1 = SubResource("QuadMesh_kuf18")

@@ -27,7 +27,8 @@ var detection_meter: float = 0.0
 @export var vision_cone_degrees: float = 60.0
 
 @export var is_enemy: bool = true
-
+@export var is_boss: bool = false
+var HUD_boss_info: HUD_Boss_Info = null
 
 var left_whisker: RayCast3D = null
 var center_whisker: RayCast3D = null
@@ -65,6 +66,18 @@ func _ready() -> void:
 		max_shoot_angle = deg_to_rad(tank_turrets[0].side_angle_limit)
 	
 	init_whiskers()
+	
+	if is_boss:
+		var boss_bar = get_tree().root.find_child("HUD_Boss_Info", true, false)
+		if not boss_bar:
+			return
+		HUD_boss_info = boss_bar as HUD_Boss_Info
+		tank_rigid.ap_percent.connect(HUD_boss_info.update_AP_Bar)
+		HUD_boss_info.update_boss_name(tank_rigid.tank_Data.tank_Name)
+		HUD_boss_info.update_boss_max_ap(tank_rigid.max_armor_points)
+		tank_rigid.hp_changed.connect(HUD_boss_info.update_boss_current_ap)
+		HUD_boss_info.update_boss_current_ap(tank_rigid.armor_points)
+		
 
 
 func init_whiskers() -> void:
@@ -135,6 +148,8 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 			
 			if detection_meter >= 1.0:
 				current_state = AI_State.ENGAGED
+				if is_boss:
+					HUD_boss_info.update_boss_active(true)
 				
 		AI_State.ENGAGED:
 			detection_meter = 1.0
@@ -150,10 +165,14 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 			
 			if detection_meter >= 1.0:
 				current_state = AI_State.ENGAGED
+				if is_boss:
+					HUD_boss_info.update_boss_active(true)
 			else: 
 				current_aggro_time -= delta
 				if current_aggro_time <= 0:
 					current_state = AI_State.IDLE
+					if is_boss:
+						HUD_boss_info.update_boss_active(false)
 
 
 func update_detection_meter(delta: float, can_see_player: bool, distance_to_player: float) -> void:

@@ -23,6 +23,13 @@ var damage_zone: ShapeCast3D = null
 var building_half_extents: Vector3 = Vector3.ZERO
 var building_max_radius: float = 0
 
+var effects_manager: Effects_Manager = null
+
+var physics_tick_counter: int = 6
+@export var crush_update_frequency: int = 5
+
+const BLOCK_SCRIPT = preload("res://Scripts/Buildings/building_block.gd")
+
 signal got_destroyed
 
 func _ready() -> void:
@@ -31,8 +38,7 @@ func _ready() -> void:
 	
 	for b in get_children():
 		if b is CSGShape3D and b.visible:
-			var block_script = load("res://Scripts/Buildings/building_block.gd")
-			b.set_script(block_script)
+			b.set_script(BLOCK_SCRIPT)
 			
 			var new_block = b as Building_Block
 			
@@ -63,6 +69,10 @@ func _ready() -> void:
 	building_half_extents = damage_zone.shape.size / 2.0
 	building_max_radius = building_half_extents.length()
 	#global_position.y = 10
+	
+	await get_tree().physics_frame
+	
+	effects_manager = Effects_Manager.INSTANCE
 
 func set_shape_cast() -> void:
 	damage_zone = ShapeCast3D.new()
@@ -86,7 +96,7 @@ func crush_below() -> void:
 		var collider = damage_zone.get_collider(i)
 		if collider:
 			if collider.has_method("take_damage"):
-				collider.take_damage(1,null,collider.global_position)
+				collider.take_damage(10,null,collider.global_position)
 			if collider.has_method("detonate"):
 				collider.detonate
 
@@ -97,7 +107,10 @@ func _physics_process(delta: float) -> void:
 	
 	global_position -= global_basis.y * delta * 2
 	
-	destruction()
+	physics_tick_counter += 1
+	if physics_tick_counter >= crush_update_frequency:
+		physics_tick_counter = 0
+		destruction()
 
 
 func calculate_closest_block(damage:int, source: Tank_Rigid, impact_point: Vector3) -> void:
@@ -115,32 +128,81 @@ func calculate_closest_block(damage:int, source: Tank_Rigid, impact_point: Vecto
 	
 
 func destruction() -> void:
-	#Caotico
+	var emmit_collapse_effect: bool = false
 	
+	'''
+	#Caotico
 	for b in blocks:
 		if b.global_position.y < lowest_height:
+			emmit_collapse_effect = true
 			b.got_destroyed.emit(b)
 			b.deactivate()
-			crush_below()
 	
+	if emmit_collapse_effect:
+		crush_below()
+	
+	'''
 	
 	#Organizado
-	'''
 	
 	var chunk: Array[Building_Block] = []
 	for b in blocks:
-		if b.global_position.y < lowest_height:
+		if b.global_position.y <= lowest_height + 0.1:
 			#b.got_destroyed.emit(b)
 			#b.deactivate()
 			#crush_below()
+			emmit_collapse_effect = true
 			chunk.append(b)
+	
+	if chunk.is_empty():
+		return
 	
 	for c in chunk:
 		c.got_destroyed.emit(c)
 		c.deactivate()
-		crush_below()
 	
-	'''
+	
+	crush_below()
+	
+	if emmit_collapse_effect and effects_manager:
+		effects_manager.collapse_from_pool(damage_zone.global_position)
+
+func calculate_impact_chunk(damage: int, source: Tank_Rigid, impact_point: Vector3) -> void:
+	if not source:
+		return
+	
+	var affected_blocks: Array[Building_Block] = []
+	var tank_transform = source.global_transform
+	var tank_size = (source.collision_shape.size / 2.0) * 1.2 
+	
+	var basis_inv = tank_transform.basis.inverse()
+	
+	var affine_inv = tank_transform.affine_inverse()
+	
+	for b in blocks:
+		var block_extents = b.size / 2.0
+		var block_pos = b.global_position
+		
+		if block_pos.distance_to(tank_transform.origin) > (tank_size.length() + block_extents.length() + 1.0):
+			continue
+		
+		var local_block_center = affine_inv * block_pos 
+		
+		var local_block_extents = Vector3(
+			abs(basis_inv.x.x) * block_extents.x + abs(basis_inv.y.x) * block_extents.y + abs(basis_inv.z.x) * block_extents.z,
+			abs(basis_inv.x.y) * block_extents.x + abs(basis_inv.y.y) * block_extents.y + abs(basis_inv.z.y) * block_extents.z,
+			abs(basis_inv.x.z) * block_extents.x + abs(basis_inv.y.z) * block_extents.y + abs(basis_inv.z.z) * block_extents.z
+		)
+		
+		var limit = tank_size + local_block_extents
+		
+		if abs(local_block_center.x) <= limit.x and \
+		   abs(local_block_center.y) <= limit.y and \
+		   abs(local_block_center.z) <= limit.z:
+			affected_blocks.append(b)
+			
+	for a in affected_blocks:
+		a.take_damage(damage, source, impact_point)
 
 func block_destroyed(block: Building_Block) -> void:
 	blocks.erase(block)
@@ -196,6 +258,7 @@ func take_damage(damage: int, source: Tank_Rigid, impact_point: Vector3) -> void
 		#if is_player:
 			#self.get_parent().get_parent().death_screen.visible = true
 		deactivate() 
+
 
 
 func activate() -> void:

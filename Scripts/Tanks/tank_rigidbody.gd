@@ -9,6 +9,8 @@ signal hp_changed (hp: int)
 signal score_changed (score: int)
 signal ap_percent (ap: float)
 
+var damage_effect: GPUParticles3D = null
+
 @export var max_speed: float = 3.0
 @export var acceleration: float = 5.0
 @export var tank_turn_speed: float = 1.0
@@ -51,6 +53,8 @@ var last_building_impact: float = 0
 
 @export var traction: float = 5.0
 
+var collision_shape: BoxShape3D = null
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	time_controller = Time_Controller.INSTANCE
@@ -69,11 +73,32 @@ func _ready() -> void:
 		
 		shoot_signal.connect(t.shoot)
 	
+	initialize_effects()
 	
 	ap_percent.emit(float(armor_points)/float(max_armor_points) * 100.0)
 	
 	time_passed = fire_rate_prim
 	
+	for c in get_children():
+		if c is CollisionShape3D and c.shape is BoxShape3D:
+			collision_shape = c.shape
+			return
+
+func initialize_effects() -> void:
+	var damage_prefab = load("res://Prefabs/Effects/fire.tscn")
+	if damage_prefab:
+		damage_effect = damage_prefab.instantiate() as GPUParticles3D
+		add_child(damage_effect)
+		damage_effect.one_shot = false
+		damage_effect.emitting = false
+		damage_effect.amount = 1
+		damage_effect.hide()
+		damage_effect.process_mode = Node.PROCESS_MODE_DISABLED
+	
+	
+	armor_points = max_armor_points
+	
+	ap_percent.connect(show_visual_damage)
 
 func calculate_charge(delta: float) -> void:
 	time_passed += delta
@@ -150,19 +175,24 @@ func _physics_process(delta: float) -> void:
 			if collider is RigidBody3D:
 				var push = -normal * impact
 				collider.apply_central_force(push)
-				
+			
 			#if collider is Building:
-			if collider.has_method("take_damage"):
+			if collider.has_method("calculate_impact_chunk"):
+				var impact_damage = (armor_points/20.0) * impact
+				collider.calculate_impact_chunk(impact_damage, self, global_position)
+		
+			
+			elif collider.has_method("take_damage"):
 				var impact_damage = (armor_points/20.0) * impact
 				collider.take_damage(impact_damage, self, global_position)
-		
+			
 		#print(last_building_impact)
 		if last_building_impact < 1:
 			return
 		
 		#Para seguir desgastando las estructuras si se sigue avanzando
 		if collider is Building:
-			collider.take_damage(5 ,self, global_position)
+			collider.calculate_impact_chunk(5 ,self, global_position)
 			last_building_impact = 0
 
 
@@ -210,8 +240,24 @@ func take_damage(damage: int, source: Tank_Rigid, impact_point: Vector3) -> void
 		deactivate() 
 		return
 	
+	
 	got_hit.emit(source, impact_point)
 
+func show_visual_damage(ap: float) -> void:
+	if not damage_effect:
+		return
+	
+	if ap <= 50.0:
+		if not damage_effect.emitting:
+			damage_effect.emitting = true
+			damage_effect.show()
+			damage_effect.process_mode = Node.PROCESS_MODE_ALWAYS
+		
+		var particles_ammount:float = remap(ap, 50.0, 10.0, 1.0, 10)
+		var final_particles: int = clampi(roundi(particles_ammount),1,10)
+		#print("OLAAAAAA ",final_particles)
+		if damage_effect.amount != final_particles:
+			damage_effect.amount = final_particles
 
 func activate() -> void:
 	visible = true
@@ -228,6 +274,8 @@ func deactivate() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
+	
+	Effects_Manager.INSTANCE.explosion_from_pool(global_position)
 	
 	gets_disabled.emit()
 

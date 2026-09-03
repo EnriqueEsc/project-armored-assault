@@ -11,13 +11,18 @@ var briefing_text: String = "Sample_text"
 
 var player_is_in_exfil_zone = false
 
+var effects_manager: Effects_Manager = Effects_Manager.new()
+
 signal mission_finished(result: bool)
 signal update_objectives(objectives: String)
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	
+	add_child(effects_manager)
+	
 	await get_tree().physics_frame
+	
 	
 	_spawn_player()
 	
@@ -46,13 +51,19 @@ func _link_player() -> void:
 	if not player:
 		return
 	
-	
 	player.tank_rigid.call_deferred("add_to_group","Player")
-	player.call_deferred("set_global_position", player_spawn.global_position)
-	player.call_deferred("set_global_rotation", player_spawn.global_rotation)
 	
-	exfil_zone.body_entered.connect(_object_enters_exfil_zone)
-	exfil_zone.body_exited.connect(_object_exits_exfil_zone)
+	if player_spawn:
+		player.call_deferred("set_global_position", player_spawn.global_position)
+		player.call_deferred("set_global_rotation", player_spawn.global_rotation)
+	else:
+		player.call_deferred("set_global_position", Vector3(0,10,0))
+		
+		player.call_deferred("set_global_rotation", Vector3(0,0,0))
+	
+	if exfil_zone:
+		exfil_zone.body_entered.connect(_object_enters_exfil_zone)
+		exfil_zone.body_exited.connect(_object_exits_exfil_zone)
 	
 	update_objectives.connect(player.update_Objectives)
 	mission_finished.connect(player.finish_mission)
