@@ -94,7 +94,7 @@ func _ready() -> void:
 	
 	await get_tree().physics_frame
 	
-	for t in tank_rigid.tank_turrets:
+	for t in tank_rigid.vehicle_turrets:
 		aim_to.connect(t.rotate_turret_to_point_3d)
 		var new_aim = Sprite2D.new()
 		new_aim.texture = load("res://Sprites/Test/MousePointer.png")
@@ -163,7 +163,7 @@ func _physics_process(delta: float) -> void:
 	var counter: int = 0
 	for a in HUD_aim:
 		
-		var aim_point = tank_rigid.get_aim_point_3d(counter, tank_rigid.tank_turrets[counter].global_position.distance_to(tank_camera.get_mouse_3d_pos()))
+		var aim_point = tank_rigid.get_aim_point_3d(counter, tank_rigid.vehicle_turrets[counter].global_position.distance_to(tank_camera.get_mouse_3d_pos()))
 		
 		var height_ground_pos = aim_point
 		height_ground_pos.y = tank_rigid.global_position.y
@@ -173,7 +173,7 @@ func _physics_process(delta: float) -> void:
 		var aim_new_scale = (aim_point_scale_ref / (tank_camera.global_position.y - (aim_point.y))) * aim_point_original_scale
 		HUD_aim[counter].scale = aim_new_scale
 		
-		HUD_aim[counter].position = tank_camera.unproject_position(tank_rigid.get_aim_point_3d(counter, tank_rigid.tank_turrets[counter].global_position.distance_to(tank_camera.get_mouse_3d_pos())))
+		HUD_aim[counter].position = tank_camera.unproject_position(tank_rigid.get_aim_point_3d(counter, tank_rigid.vehicle_turrets[counter].global_position.distance_to(tank_camera.get_mouse_3d_pos())))
 		HUD_height_line[counter].points = [tank_camera.unproject_position(height_ground_pos),HUD_aim[counter].position]
 		counter += 1
 	#HUD_aim.position = tank_rigid.get_aim_point(get_viewport().get_mouse_position())
@@ -208,6 +208,9 @@ func _process(delta: float) -> void:
 	
 	if Input.is_action_just_pressed("Shoot"):
 		tank_rigid.shoot()
+	
+	if Input.is_action_just_pressed("Attachment"):
+		tank_rigid.use_attachment()
 	
 	tank_rigid.move(input_dir, delta)
 	

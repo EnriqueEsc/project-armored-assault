@@ -6,7 +6,7 @@ var is_player: bool = true
 @export var speed: float = 10
 @export var base_speed: float = 0.5
 var direction: Vector3 = Vector3(1,0,0)
-var origin: Tank_Rigid
+var origin: Vehicle_Rigid
 @export var damage: int = 10
 @export var is_explosive: bool = true
 @export var blast_rad: float = 2
@@ -38,8 +38,8 @@ func _process(delta: float) -> void:
 	move(delta)
 
 
-func set_origin(tank: Tank_Rigid) -> void:
-	origin = tank
+func set_origin(vehicle: Vehicle_Rigid) -> void:
+	origin = vehicle
 	is_player = origin.is_player
 
 func shoot(pos: Vector3, rot: Vector2) -> void:
@@ -53,7 +53,7 @@ func shoot(pos: Vector3, rot: Vector2) -> void:
 
 func activate() -> void:
 	visible = true
-	process_mode = Node.PROCESS_MODE_INHERIT
+	set_deferred("process_mode", Node.PROCESS_MODE_INHERIT)
 	set_deferred("monitoring", true)
 	set_deferred("monitorable", true)
 	
@@ -62,7 +62,7 @@ func activate() -> void:
 
 func deactivate() -> void:
 	visible = false
-	#process_mode = Node.PROCESS_MODE_DISABLED
+	set_deferred("process_mode", Node.PROCESS_MODE_DISABLED)
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
 	

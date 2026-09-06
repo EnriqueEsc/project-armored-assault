@@ -4,9 +4,12 @@ class_name Save_File_Manager
 static var INSTANCE: Save_File_Manager = null
 
 var CURRENT_PATH: String = "user://test.json"
-var current_save_data: Dictionary = {
-	"tank_kills_record": 0
+const DEFAULT_SAVE_DATA: Dictionary = {
+	"tank_kills_record": 0,
+	"total_score" : 0
 }
+
+var current_save_data: Dictionary = DEFAULT_SAVE_DATA.duplicate(true)
 
 func _ready() -> void:
 	singleton()
@@ -34,13 +37,24 @@ func load_game() -> bool:
 		var result = json.parse(json_tring)
 		
 		if result == OK:
-			current_save_data = json.get_data()
-			print("EXISTE SAVE FILE --- TANK KILLS: ",current_save_data["tank_kills_record"])
+			var loaded_data = json.get_data()
+			current_save_data = DEFAULT_SAVE_DATA.duplicate(true)
+			current_save_data.merge(loaded_data,true)
+			print("EXISTE SAVE FILE --- TANK KILLS: ",current_save_data["tank_kills_record"]," --- SCORE: ",current_save_data["total_score"])
 			return true
+		else:
+			var loaded_data = json.get_data()
+			current_save_data = DEFAULT_SAVE_DATA.duplicate(true)
+			current_save_data.merge(loaded_data,true)
+			
 	
 	print("NO EXISTE")
 	return false
 
 func tank_kills_record() -> void:
 	current_save_data["tank_kills_record"] += 1
+	save_game()
+
+func score_record(score: int) -> void:
+	current_save_data["total_score"] += score
 	save_game()

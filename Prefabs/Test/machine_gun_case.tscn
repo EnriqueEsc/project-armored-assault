@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://beujs68wn2iv0"]
 
-[ext_resource type="Script" uid="uid://ctnohbd026y3g" path="res://Scripts/Tanks/case.gd" id="1_810yj"]
+[ext_resource type="Script" uid="uid://ctnohbd026y3g" path="res://Scripts/Vehicles/case.gd" id="1_810yj"]
 [ext_resource type="PackedScene" uid="uid://ee3mlqoac8ay" path="res://Models/Test/case.fbx" id="2_11oco"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_810yj"]

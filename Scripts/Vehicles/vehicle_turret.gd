@@ -1,5 +1,5 @@
 extends Node3D
-class_name Tank_turret
+class_name Vehicle_turret
 
 @onready var turret_barrel: Node3D = $Gun
 
@@ -19,12 +19,15 @@ signal recoil (dir: Vector3)
 var ignore = []
 
 
-@export var projectile_prefab = preload("res://Prefabs/Test/projectile.tscn")
-@export var case_prefab = preload("res://Prefabs/Test/case.tscn")
+enum Projectile_Type {HE, AP, MachineGun, Nuke}
+
+@export var projectile_type: Projectile_Type = Projectile_Type.AP
+var projectile_prefab = preload("res://Prefabs/Test/projectile.tscn")
+var case_prefab = preload("res://Prefabs/Test/case.tscn")
 var projectile: Projectile
 var case: Case
 
-var origin: Tank_Rigid
+var origin: Vehicle_Rigid
 
 var projectile_pool: Array[Projectile] = []
 var projectile_active: Array[Projectile] = []
@@ -53,6 +56,19 @@ func spawn() -> void:
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	case_prefab = load("res://Prefabs/Test/case.tscn")
+	
+	match projectile_type:
+		Projectile_Type.HE:
+			projectile_prefab = load("res://Prefabs/Test/projectile_he.tscn")
+		Projectile_Type.AP:
+			projectile_prefab = load("res://Prefabs/Test/projectile.tscn")
+		Projectile_Type.MachineGun:
+			projectile_prefab = load("res://Prefabs/Test/machine_gun_bullet.tscn")
+			case_prefab = load("res://Prefabs/Test/machine_gun_case.tscn")
+		Projectile_Type.Nuke:
+			projectile_prefab = load("res://Prefabs/Test/nuke.tscn")
+		
 	original_side_angle = rotation.y
 	#spawn()
 	ignore.append(self)
@@ -123,7 +139,7 @@ func get_aim_point_3d(distance: float) -> Vector3:
 	var space = get_world_3d().direct_space_state
 	var query = PhysicsRayQueryParameters3D.create(from,to)
 	
-	query.collide_with_areas = true
+	query.collide_with_areas = false
 	#query.exclude = [self, get_parent_node_3d(), projectile]
 	
 	query.exclude = (ignore)

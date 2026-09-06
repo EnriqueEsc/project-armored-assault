@@ -41,7 +41,8 @@ func _set_objectives() -> void:
 	for b in blocks:
 		b.got_destroyed.connect(desmadre_count)
 	
-	exfil_zone.visible = false
+	if exfil_zone:
+		exfil_zone.visible = false
 	
 	_update_current_objectives()
 

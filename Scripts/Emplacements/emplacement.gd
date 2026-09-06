@@ -18,7 +18,7 @@ func _ready() -> void:
 		self.add_to_group("Enemy")
 	initialize_effects()
 
-func take_damage(damage: int, source: Tank_Rigid, impact_point: Vector3) -> void:
+func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> void:
 	armor_points -= damage
 	armor_points = clamp(armor_points,0,max_armor_points)
 	
@@ -79,6 +79,7 @@ func deactivate() -> void:
 	gets_disabled.emit()
 	
 	visible = false
+	Effects_Manager.INSTANCE.explosion_from_pool(global_position)
 	process_mode = Node.PROCESS_MODE_DISABLED
 	var collision = $CollisionShape3D
 	collision.set_deferred("disabled",true)

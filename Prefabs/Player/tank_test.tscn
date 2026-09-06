@@ -2,14 +2,12 @@
 
 [ext_resource type="Script" uid="uid://b44xtts1goeo7" path="res://Scripts/Player/Tank_player_controller.gd" id="1_cxhj6"]
 [ext_resource type="Script" uid="uid://dgldqtulm4ymj" path="res://Scripts/Player/Tank_camera.gd" id="2_cyoa3"]
-[ext_resource type="Script" uid="uid://bykhssfaytcmi" path="res://Scripts/Tanks/tank_rigidbody.gd" id="3_q50ch"]
+[ext_resource type="Script" uid="uid://bykhssfaytcmi" path="res://Scripts/Vehicles/tank_rigidbody.gd" id="3_q50ch"]
 [ext_resource type="PackedScene" uid="uid://cm2gr8at5r6c0" path="res://Models/Test/Tank_Test/tanque_V3.fbx" id="4_6le8y"]
-[ext_resource type="Resource" uid="uid://c58osll0nlitx" path="res://Data/Tanks/mk-0_test.tres" id="4_q50ch"]
 [ext_resource type="PackedScene" uid="uid://bf7d7fljdkdcy" path="res://Models/Test/tanque_V2.fbx" id="5_gbcfg"]
 [ext_resource type="PackedScene" uid="uid://cr2e151pg0ro6" path="res://Models/Test/Minor.fbx" id="6_e6v2v"]
-[ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Tanks/tank_turret.gd" id="7_8emn8"]
+[ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Vehicles/vehicle_turret.gd" id="7_8emn8"]
 [ext_resource type="PackedScene" uid="uid://caqoxtxta5muo" path="res://Models/Test/Tank_Test/turret_V3.fbx" id="8_cenlj"]
-[ext_resource type="PackedScene" uid="uid://b82jytfr4l81p" path="res://Prefabs/Test/projectile_he.tscn" id="8_cyoa3"]
 [ext_resource type="PackedScene" uid="uid://b8u4pylde5yu4" path="res://Models/Test/torreta_V2.fbx" id="9_025iw"]
 [ext_resource type="PackedScene" uid="uid://koxj0b8ls2xa" path="res://Models/Test/Gun.fbx" id="10_bxt5p"]
 [ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="11_esq4c"]
@@ -32,11 +30,9 @@ size = 10.0
 script = ExtResource("2_cyoa3")
 camera_offset = Vector3(0, 7.034, -2.98)
 
-[node name="Tank_Player" type="CharacterBody3D" parent="." unique_id=1248634669 node_paths=PackedStringArray("tank_turrets")]
+[node name="Tank_Player" type="CharacterBody3D" parent="." unique_id=1248634669]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 1.1436653, 0)
 script = ExtResource("3_q50ch")
-tank_turrets = [NodePath("Turret")]
-tank_Data = ExtResource("4_q50ch")
 
 [node name="tanque_V3" parent="Tank_Player" unique_id=1683942184 instance=ExtResource("4_6le8y")]
 transform = Transform3D(1.002, 0, 0, 0, 1.3, 0, 0, 0, 1.002, 0, -0.28692198, 0)
@@ -57,7 +53,6 @@ debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04852271, 0)
 script = ExtResource("7_8emn8")
 side_angle_limit = 360.0
-projectile_prefab = ExtResource("8_cyoa3")
 
 [node name="turret_V3" parent="Tank_Player/Turret" unique_id=1331242705 instance=ExtResource("8_cenlj")]
 transform = Transform3D(1.6391772e-07, 0, 1.25, 0, 1.25, 0, -1.25, 0, 1.6391772e-07, 0, -0.29506743, 0)

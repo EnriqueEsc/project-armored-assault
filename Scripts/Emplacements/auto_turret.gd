@@ -5,7 +5,7 @@ signal gets_disabled
 enum AI_State {IDLE, ENGAGED, SCANNING}
 var current_state: AI_State = AI_State.IDLE
 
-@onready var turret: Tank_turret = $Turret
+@onready var turret: Vehicle_turret = $Turret
 var player_ref: Node3D = null
 var last_known_position: Vector3 = Vector3.ZERO
 
@@ -66,7 +66,7 @@ func _ready() -> void:
 		max_shoot_angle = deg_to_rad(turret.side_angle_limit)
 
 
-func got_hit(source: Tank_Rigid, impact_point: Vector3) -> void:
+func got_hit(source: Vehicle_Rigid, impact_point: Vector3) -> void:
 	current_state = AI_State.ENGAGED
 	detection_meter = 1.0
 

@@ -1,7 +1,7 @@
 extends CharacterBody3D
-class_name  Tank_Rigid
+class_name  Vehicle_Rigid
 
-
+@export var vehicle_pilot_name: String = "Default_Name (Change it)"
 
 signal gets_enabled
 signal gets_disabled
@@ -13,7 +13,7 @@ var damage_effect: GPUParticles3D = null
 
 @export var max_speed: float = 3.0
 @export var acceleration: float = 5.0
-@export var tank_turn_speed: float = 1.0
+@export var turn_speed: float = 1.0
 
 
 @export var turning_velocity: float = 0
@@ -28,7 +28,7 @@ var score: int = 0
 var direction: Vector3 = Vector3.ZERO
 
 @onready var collision = $CollisionShape3D
-@export var tank_turrets: Array[Tank_turret] = []
+@export var vehicle_turrets: Array[Vehicle_turret] = []
 
 @export var max_armor_points: int = 40
 var armor_points: int = 40
@@ -42,18 +42,17 @@ var time_passed: float = 0
 
 signal shoot_recharge(charge: float)
 signal velocimeter(velocity: float)
-signal got_hit(source: Tank_Rigid, impact_point: Vector3)
+signal got_hit(source: Vehicle_Rigid, impact_point: Vector3)
 signal shoot_signal()
 
 @export var allign_speed: float = 3
 
 var last_building_impact: float = 0
 
-@export var tank_Data: Tank_Data = null
-
-@export var traction: float = 5.0
 
 var collision_shape: BoxShape3D = null
+
+@export var attachment: Attachment = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -62,7 +61,7 @@ func _ready() -> void:
 	#if tank_Data:
 	#	tank_Data._apply_values(self)
 	
-	for t in tank_turrets:
+	for t in vehicle_turrets:
 		t.recoil.connect(recoil)
 	
 		t.origin = self
@@ -134,8 +133,6 @@ func _physics_process(delta: float) -> void:
 	
 	allign_with_floor(delta)
 	
-	calculate_charge(delta)
-	
 	if direction:
 		velocity.x = lerpf(velocity.x, direction.x * current_speed, acceleration * delta)
 		velocity.z = lerpf(velocity.z, direction.z * current_speed, acceleration * delta)
@@ -149,9 +146,6 @@ func _physics_process(delta: float) -> void:
 	rotate_y(turning_velocity)
 	
 	var pre_impact_vel: Vector3 = velocity
-	
-	var lat_vel = transform.basis.x * velocity.dot(transform.basis.x)
-	velocity -= lat_vel * (traction * delta)
 	
 	move_and_slide()
 	
@@ -197,9 +191,9 @@ func _physics_process(delta: float) -> void:
 
 
 func move(move: Vector2, delta: float) -> void:
-	#rotate_y(-move.x * tank_turn_speed * delta)
+	#rotate_y(-move.x * turn_speed * delta)
 	
-	turning_velocity = lerpf(turning_velocity, -move.x * tank_turn_speed, turning_acceleration * delta)
+	turning_velocity = lerpf(turning_velocity, -move.x * turn_speed, turning_acceleration * delta)
 	
 	direction = transform.basis.z * move.y
 	
@@ -219,10 +213,10 @@ func shoot() -> void:
 
 
 func get_aim_point_3d(turret_index: int, distance: float) -> Vector3:
-	return tank_turrets[turret_index].get_aim_point_3d(distance)
+	return vehicle_turrets[turret_index].get_aim_point_3d(distance)
 
 
-func take_damage(damage: int, source: Tank_Rigid, impact_point: Vector3) -> void:
+func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> void:
 	armor_points -= damage
 	armor_points = clamp(armor_points,0,max_armor_points)
 	
@@ -279,6 +273,10 @@ func deactivate() -> void:
 	
 	gets_disabled.emit()
 
+func use_attachment() -> void:
+	if attachment:
+		attachment.objective = get_aim_point_3d(0,100)
+		attachment._use_attachment()
 
 func get_score(score: int) -> void:
 	self.score += score

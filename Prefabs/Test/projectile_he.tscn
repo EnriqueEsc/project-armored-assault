@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b82jytfr4l81p"]
 
-[ext_resource type="Script" uid="uid://d0krsqofvg78i" path="res://Scripts/Tanks/projectile.gd" id="1_2mg2s"]
+[ext_resource type="Script" uid="uid://d0krsqofvg78i" path="res://Scripts/Vehicles/projectile.gd" id="1_2mg2s"]
 [ext_resource type="PackedScene" uid="uid://dk2ejhum7dj0e" path="res://Models/Test/Projectile.fbx" id="2_7cjv4"]
 [ext_resource type="PackedScene" uid="uid://koxj0b8ls2xa" path="res://Models/Test/Gun.fbx" id="3_u7uku"]
 
@@ -9,9 +9,6 @@ size = Vector3(0.2, 0.2, 0.5)
 
 [node name="Projectile" type="Area3D" unique_id=1973506426]
 script = ExtResource("1_2mg2s")
-damage = 30
-blast_rad = 3.0
-blast_damage = 20.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1897963084]
 shape = SubResource("BoxShape3D_sn0t7")

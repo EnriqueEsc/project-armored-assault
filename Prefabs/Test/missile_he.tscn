@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://dlyf4xc1lvr2"]
+
+[ext_resource type="Script" uid="uid://dumgslihv4uuc" path="res://Scripts/Vehicles/missile.gd" id="1_8iqrr"]
+[ext_resource type="PackedScene" uid="uid://dk2ejhum7dj0e" path="res://Models/Test/Projectile.fbx" id="2_pkkxs"]
+[ext_resource type="PackedScene" uid="uid://koxj0b8ls2xa" path="res://Models/Test/Gun.fbx" id="3_opgor"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_sn0t7"]
+size = Vector3(0.2, 0.2, 0.5)
+
+[node name="Projectile" type="Area3D" unique_id=1973506426]
+script = ExtResource("1_8iqrr")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1897963084]
+shape = SubResource("BoxShape3D_sn0t7")
+debug_color = Color(0, 0.6485492, 0.20114565, 0.41960785)
+
+[node name="Projectile" parent="CollisionShape3D" unique_id=379440040 instance=ExtResource("2_pkkxs")]
+transform = Transform3D(4, 0, 0, 0, -4, -3.496911e-07, 0, 3.496911e-07, -4, 0, 0, 0)
+
+[node name="Gun" parent="CollisionShape3D" unique_id=51241174 instance=ExtResource("3_opgor")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.23016813, 0, 0)
+visible = false

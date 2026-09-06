@@ -35,6 +35,7 @@ func _mission_failed() -> void:
 
 func _mission_succeeded() -> void:
 	mission_finished.emit(true)
+	_add_score_to_player()
 
 func _update_current_objectives() -> void:
 	pass
@@ -85,3 +86,6 @@ func _object_enters_exfil_zone(object: Node3D) -> void:
 func _object_exits_exfil_zone(object: Node3D) -> void:
 	if player.tank_rigid == (object as Tank_Rigid):
 		player_is_in_exfil_zone = false
+
+func _add_score_to_player() -> void:
+	Save_File_Manager.INSTANCE.score_record(player.tank_rigid.score)

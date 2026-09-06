@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cicxbmls2mh5h"]
 
-[ext_resource type="Script" uid="uid://d0krsqofvg78i" path="res://Scripts/Tanks/projectile.gd" id="1_k3eec"]
+[ext_resource type="Script" uid="uid://d0krsqofvg78i" path="res://Scripts/Vehicles/projectile.gd" id="1_k3eec"]
 [ext_resource type="PackedScene" uid="uid://dk2ejhum7dj0e" path="res://Models/Test/Projectile.fbx" id="2_v0p7y"]
 [ext_resource type="PackedScene" uid="uid://koxj0b8ls2xa" path="res://Models/Test/Gun.fbx" id="3_baltg"]
 

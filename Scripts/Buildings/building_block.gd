@@ -7,7 +7,7 @@ var armor_points: int = 40
 signal got_destroyed(building_block: Building_Block)
 
 
-func take_damage(damage: int, source: Tank_Rigid, impact_point: Vector3) -> void:
+func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> void:
 	armor_points -= damage
 	armor_points = clamp(armor_points,0,max_armor_points)
 	

@@ -80,7 +80,7 @@ func get_mouse_3d_pos() -> Vector3:
 	var space = get_world_3d().direct_space_state
 	var query = PhysicsRayQueryParameters3D.create(from,to)
 	
-	query.collide_with_areas = true
+	#query.collide_with_areas = true
 	
 	
 	

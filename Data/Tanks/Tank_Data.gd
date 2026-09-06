@@ -5,7 +5,7 @@ class_name Tank_Data
 @export var cost: int = 1
 @export var max_speed: float = 3.0
 @export var acceleration: float = 5.0
-@export var tank_turn_speed: float = 1.0
+@export var turn_speed: float = 1.0
 @export var turning_velocity: float = 0
 @export var turning_acceleration: float = 0.2
 @export var friction: float = 1
@@ -18,7 +18,7 @@ func _apply_values(tank: Tank_Rigid) -> void:
 	tank.max_speed = max_speed
 	tank.current_speed = max_speed
 	tank.acceleration = acceleration
-	tank.tank_turn_speed = tank_turn_speed
+	tank.turn_speed = turn_speed
 	tank.turning_velocity = turning_velocity
 	tank.turning_acceleration = turning_acceleration
 	tank.friction = friction

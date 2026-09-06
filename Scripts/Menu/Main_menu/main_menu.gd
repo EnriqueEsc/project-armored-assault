@@ -149,7 +149,7 @@ func show_tank_info() -> void:
 	info += "> Armor points: " + str(selected_tank.max_armor_points) + "\n\n"
 	info += "> Max speed: " + str(selected_tank.max_speed) + "\n\n"
 	info += "> Acceleration: " + str(selected_tank.acceleration) + "\n\n"
-	info += "> Steering speed: " + str(selected_tank.tank_turn_speed) + "\n\n"
+	info += "> Steering speed: " + str(selected_tank.turn_speed) + "\n\n"
 	info += "> Steering acceleration: " + str(selected_tank.turning_acceleration) + "\n\n"
 	#info += "> Friction: " + str(selected_tank.friction) + "\n\n"
 	info += "> Traction: " + str(selected_tank.traction) + "\n\n"

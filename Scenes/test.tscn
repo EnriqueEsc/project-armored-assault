@@ -1,26 +1,28 @@
 [gd_scene format=3 uid="uid://dqqp0g2xuoagd"]
 
 [ext_resource type="Script" uid="uid://38tlr0ygyp1t" path="res://Scripts/Game/Time_controller.gd" id="1_0qy5o"]
-[ext_resource type="Script" uid="uid://bykhssfaytcmi" path="res://Scripts/Tanks/tank_rigidbody.gd" id="1_lc1oi"]
+[ext_resource type="Script" uid="uid://bykhssfaytcmi" path="res://Scripts/Vehicles/tank_rigidbody.gd" id="1_lc1oi"]
 [ext_resource type="Script" uid="uid://cr1p5ljg6rrir" path="res://Scripts/Game/Missions/mission_test.gd" id="1_pgu05"]
 [ext_resource type="PackedScene" uid="uid://koxj0b8ls2xa" path="res://Models/Test/Gun.fbx" id="2_qc4db"]
 [ext_resource type="PackedScene" uid="uid://cr2e151pg0ro6" path="res://Models/Test/Minor.fbx" id="4_ys1qc"]
-[ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Tanks/tank_turret.gd" id="5_i3aeo"]
-[ext_resource type="Resource" uid="uid://c58osll0nlitx" path="res://Data/Tanks/mk-0_test.tres" id="6_kxtw2"]
+[ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Vehicles/vehicle_turret.gd" id="5_i3aeo"]
 [ext_resource type="PackedScene" uid="uid://cm2gr8at5r6c0" path="res://Models/Test/Tank_Test/tanque_V3.fbx" id="7_rhq6j"]
 [ext_resource type="Script" uid="uid://coflapngtlfyb" path="res://Scripts/Emplacements/emplacement.gd" id="8_n0wup"]
 [ext_resource type="PackedScene" uid="uid://bf7d7fljdkdcy" path="res://Models/Test/tanque_V2.fbx" id="8_pgu05"]
 [ext_resource type="PackedScene" uid="uid://b8u4pylde5yu4" path="res://Models/Test/torreta_V2.fbx" id="11_0qy5o"]
-[ext_resource type="PackedScene" uid="uid://b82jytfr4l81p" path="res://Prefabs/Test/projectile_he.tscn" id="11_3nkef"]
 [ext_resource type="Script" uid="uid://cxxlffo81ypm" path="res://Scripts/AI/Enemies/enemy_tank.gd" id="14_kuf18"]
 [ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="15_vpf1r"]
 [ext_resource type="PackedScene" uid="uid://cyt63xjcvvdgs" path="res://Prefabs/Player/endavour.tscn" id="16_wojap"]
 [ext_resource type="PackedScene" uid="uid://cn6jg5bpbcufr" path="res://Prefabs/Effects/explosion.tscn" id="19_q8sys"]
 [ext_resource type="PackedScene" uid="uid://12uh8de27pag" path="res://Prefabs/Effects/collapse.tscn" id="20_n0wup"]
+[ext_resource type="Script" uid="uid://b02j404uo38ap" path="res://Scripts/Vehicles/drone_rigidbody.gd" id="20_wjyqs"]
 [ext_resource type="PackedScene" uid="uid://g8rdo1gh0l1i" path="res://Prefabs/Effects/fire.tscn" id="20_wojap"]
+[ext_resource type="PackedScene" uid="uid://bj2x481gi1yu3" path="res://Models/Test/Healer.fbx" id="21_kxtw2"]
 [ext_resource type="Shader" uid="uid://c5r6qc4s673e8" path="res://Shaders/see_tank.gdshader" id="21_wojap"]
 [ext_resource type="Script" uid="uid://cgp8hd1nxjt5u" path="res://Scripts/Buildings/building.gd" id="22_copon"]
 [ext_resource type="Script" uid="uid://d054fnyrmgj2k" path="res://Scripts/Terrain/nav_region.gd" id="22_kxtw2"]
+[ext_resource type="PackedScene" uid="uid://caqoxtxta5muo" path="res://Models/Test/Tank_Test/turret_V3.fbx" id="22_rhq6j"]
+[ext_resource type="Script" uid="uid://bs827ehppdp8e" path="res://Scripts/AI/Enemies/enemy_drone.gd" id="23_pgu05"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_qc4db"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -103,6 +105,8 @@ albedo_color = Color(0.2, 0.18431373, 0.19215687, 1)
 material = SubResource("StandardMaterial3D_55gk5")
 size = Vector3(100, 1, 100)
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_3nkef"]
+
 [node name="Node3D" type="Node3D" unique_id=1260353081]
 
 [node name="Mission_Control" type="Node3D" parent="." unique_id=1450836206]
@@ -121,11 +125,10 @@ shadow_enabled = true
 [node name="TankTest" parent="." unique_id=500798403 instance=ExtResource("16_wojap")]
 transform = Transform3D(-1, 0, 1.509958e-07, 0, 1, 0, -1.509958e-07, 0, -1, 0, 0, 0)
 
-[node name="Tank_Player" type="CharacterBody3D" parent="." unique_id=1808603428 node_paths=PackedStringArray("tank_turrets")]
+[node name="Tank_Player" type="CharacterBody3D" parent="." unique_id=1808603428 node_paths=PackedStringArray("vehicle_turrets")]
 transform = Transform3D(1.9470718e-07, 0, 1, 0, 1, 0, -1, 0, 1.9470718e-07, -5.5780706, 1.1436653, 0)
 script = ExtResource("1_lc1oi")
-tank_turrets = [NodePath("Turret"), NodePath("Turret2")]
-tank_Data = ExtResource("6_kxtw2")
+vehicle_turrets = [NodePath("Turret"), NodePath("Turret2")]
 
 [node name="tanque_V3" parent="Tank_Player" unique_id=1683942184 instance=ExtResource("7_rhq6j")]
 transform = Transform3D(1.002, 0, 0, 0, 1.3, 0, 0, 0, 1.002, 0, -0.28692198, 0)
@@ -146,7 +149,6 @@ debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 transform = Transform3D(-4.371138e-08, 0, 1, 0, 1, 0, -1, 0, -4.371138e-08, 0.65, -0.217, 0)
 script = ExtResource("5_i3aeo")
 side_angle_limit = 90.0
-projectile_prefab = ExtResource("11_3nkef")
 
 [node name="torreta_V2" parent="Tank_Player/Turret" unique_id=29810314 instance=ExtResource("11_0qy5o")]
 transform = Transform3D(0.12, 0, -2.0981473e-08, 0, 0.12, 0, 2.0981473e-08, 0, 0.12, 0, -0.2802639, 0)
@@ -159,7 +161,6 @@ transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0
 transform = Transform3D(-4.3711395e-08, 0, -1, 0, 1, 0, 1, 0, -4.3711395e-08, -0.65, -0.217, 0)
 script = ExtResource("5_i3aeo")
 side_angle_limit = 90.0
-projectile_prefab = ExtResource("11_3nkef")
 
 [node name="torreta_V2" parent="Tank_Player/Turret2" unique_id=158534396 instance=ExtResource("11_0qy5o")]
 transform = Transform3D(0.12, 0, -2.0981473e-08, 0, 0.12, 0, 2.0981473e-08, 0, 0.12, 0, -0.2802639, 0)
@@ -1658,3 +1659,33 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0660223, 0)
 
 [node name="Collapse" parent="." unique_id=1813737619 instance=ExtResource("20_n0wup")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0660223, 0)
+
+[node name="Enemy_drone" type="CharacterBody3D" parent="." unique_id=1946676816 node_paths=PackedStringArray("vehicle_turrets")]
+transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, -11.538233, 1.1107659, -14.640114)
+script = ExtResource("20_wjyqs")
+vehicle_turrets = [NodePath("Turret")]
+max_armor_points = 400
+
+[node name="Healer" parent="Enemy_drone" unique_id=1173875726 instance=ExtResource("21_kxtw2")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Enemy_drone" unique_id=700257981]
+shape = SubResource("BoxShape3D_3nkef")
+debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
+
+[node name="Turret" type="Node3D" parent="Enemy_drone" unique_id=419068007]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5295446, 0)
+script = ExtResource("5_i3aeo")
+side_angle_limit = 90.0
+
+[node name="turret_V3" parent="Enemy_drone/Turret" unique_id=1331242705 instance=ExtResource("22_rhq6j")]
+transform = Transform3D(1.6391772e-07, 0, 1.25, 0, 1.25, 0, -1.25, 0, 1.6391772e-07, 0, -0.29506743, 0)
+visible = false
+
+[node name="Gun" parent="Enemy_drone/Turret" unique_id=1312123674 instance=ExtResource("2_qc4db")]
+transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0, 0)
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="Enemy_drone" unique_id=2137806129]
+avoidance_enabled = true
+radius = 1.0
+script = ExtResource("23_pgu05")
+max_chase_distance = 100.0

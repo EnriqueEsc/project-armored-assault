@@ -113,7 +113,7 @@ func _physics_process(delta: float) -> void:
 		destruction()
 
 
-func calculate_closest_block(damage:int, source: Tank_Rigid, impact_point: Vector3) -> void:
+func calculate_closest_block(damage:int, source: Vehicle_Rigid, impact_point: Vector3) -> void:
 	var closest_block: CSGShape3D = null
 	var min_distance: float = INF
 	
@@ -167,7 +167,7 @@ func destruction() -> void:
 	if emmit_collapse_effect and effects_manager:
 		effects_manager.collapse_from_pool(damage_zone.global_position)
 
-func calculate_impact_chunk(damage: int, source: Tank_Rigid, impact_point: Vector3) -> void:
+func calculate_impact_chunk(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> void:
 	if not source:
 		return
 	
@@ -221,7 +221,7 @@ func block_destroyed(block: Building_Block) -> void:
 		return
 		deactivate()
 
-func take_explosion(damage: int, source: Tank_Rigid, impact_point: Vector3, radius: float) -> void:
+func take_explosion(damage: int, source: Vehicle_Rigid, impact_point: Vector3, radius: float) -> void:
 	if destroyed:
 		return
 	
@@ -244,7 +244,7 @@ func take_explosion(damage: int, source: Tank_Rigid, impact_point: Vector3, radi
 	for a in affected_blocks:
 		a.call_deferred("take_damage",damage, source, impact_point)
 
-func take_damage(damage: int, source: Tank_Rigid, impact_point: Vector3) -> void:
+func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> void:
 	armor_points -= damage
 	armor_points = clamp(armor_points,0,max_armor_points)
 	

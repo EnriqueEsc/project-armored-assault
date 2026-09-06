@@ -3,7 +3,7 @@ extends NavigationAgent3D
 enum AI_State {IDLE, ENGAGED, INVESTIGATING}
 var current_state: AI_State = AI_State.IDLE
 
-var tank_rigid: Tank_Rigid = null
+var tank_rigid: Drone_Rigid = null
 var tank_turrets: Array[Vehicle_turret] = []
 
 var player_ref: Node3D = null
@@ -36,8 +36,11 @@ var right_whisker: RayCast3D = null
 
 signal aim_to
 
+@export var is_kamikaze: bool = false
+
+
 func _ready() -> void:
-	tank_rigid = get_parent() as Tank_Rigid
+	tank_rigid = get_parent() as Drone_Rigid
 	tank_rigid.current_speed /= 2
 	tank_rigid.turn_speed /= 2
 	
@@ -56,17 +59,21 @@ func _ready() -> void:
 	for t in tank_turrets:
 		aim_to.connect(t.rotate_turret_to_point_3d)
 	
+	
 	if not tank_turrets.is_empty():
 		tank_turrets[0].turret_turning_speed /= 2
-	fire_rate = tank_rigid.fire_rate_prim
+		fire_rate = tank_rigid.fire_rate_prim
 	
-	tank_rigid.got_hit.connect(got_hit)
-	tank_rigid.gets_disabled.connect(Save_File_Manager.INSTANCE.tank_kills_record)
+		tank_rigid.got_hit.connect(got_hit)
+		tank_rigid.gets_disabled.connect(Save_File_Manager.INSTANCE.tank_kills_record)
 	
-	if deg_to_rad(tank_turrets[0].side_angle_limit) < max_shoot_angle:
-		max_shoot_angle = deg_to_rad(tank_turrets[0].side_angle_limit)
+		if deg_to_rad(tank_turrets[0].side_angle_limit) < max_shoot_angle:
+			max_shoot_angle = deg_to_rad(tank_turrets[0].side_angle_limit)
 	
 	init_whiskers()
+	
+	tank_rigid.is_kamikaze = is_kamikaze
+	#tank_rigid.is_armed = is_kamikaze
 	
 	if is_boss:
 		var boss_bar = get_tree().root.find_child("HUD_Boss_Info", true, false)
@@ -117,7 +124,6 @@ func get_whisker_steering() -> float:
 		
 	return steering_offset
 
-
 func got_hit(source: Vehicle_Rigid, impact_point: Vector3) -> void:
 	if source and source.is_in_group("Player"):
 		current_state = AI_State.ENGAGED
@@ -141,6 +147,7 @@ func _physics_process(delta: float) -> void:
 	update_state_machine(delta, can_see_player)
 	execute_current_state(delta, can_see_player)
 	
+	#print("Done state | Can see p. ",can_see_player," | ",current_state," | ",is_navigation_finished()," | ",get_next_path_position())
 	
 
 
@@ -223,29 +230,62 @@ func execute_current_state(delta: float, can_see_player: bool) -> void:
 
 func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 	target_position = target_pos
+	target_position.y = tank_rigid.global_position.y
+	#path_height_offset = -3
 	
-	if is_navigation_finished():
+	
+	
+	var dir_to_path := target_position - tank_rigid.global_position
+	
+	if dir_to_path.length_squared() < 1:
 		tank_rigid.move(Vector2.ZERO, delta)
 		return
 	
-	var current_pos: Vector3 = tank_rigid.global_position
-	var next_pos: Vector3 = get_next_path_position()
-	
-	var dir_to_path = current_pos.direction_to(next_pos)
-	dir_to_path.y = 0.0
+	var distance_to_target = dir_to_path.length()
 	dir_to_path = dir_to_path.normalized()
 	
-	var forward = tank_rigid.global_transform.basis.z.normalized()
-	var angle = forward.signed_angle_to(dir_to_path, tank_rigid.global_basis.y)
+	var forward = tank_rigid.global_transform.basis.z
+	forward = forward.normalized()
+	
+	var angle = forward.signed_angle_to(dir_to_path, Vector3.UP)
+	
+	'''
+	#Posible mejora
+	
+	var angle = forward.signed_angle_to(dir_to_path, Vector3.UP)
+	
+	var navigation_steering = -clamp(angle, -1.0, 1.0)
+	var obstacle_steering := get_whisker_steering()
+
+	var input_x = navigation_steering
+
+	if abs(obstacle_steering) > 0.01:
+		input_x = obstacle_steering
+	'''
 	
 	var input_x: float = -clamp(angle, -1.0, 1.0)
 	
 	input_x += get_whisker_steering()
 	input_x = clamp(input_x, -1.0, 1.0)
 	
+	
+	
+	if distance_to_target < 5:
+		tank_rigid.move(Vector2(input_x,0.0), delta)
+		if is_kamikaze and current_state == AI_State.ENGAGED:
+			shoot_angle = forward.angle_to(target_pos)
+			if abs(shoot_angle) < max_shoot_angle:
+				#print(abs(shoot_angle)," | ",max_shoot_angle)
+				tank_rigid.is_armed = true
+				tank_rigid.objective = target_pos
+			#tank_rigid.set_distance_to_ground(-3.0,delta)
+		return
+	
 	var input_y: float = 1.0 if abs(angle) < 1.8 else 0.0
 	
 	tank_rigid.move(Vector2(input_x, input_y), delta)
+	
+	#print("Inputs: ",Vector2(input_x, input_y))
 
 
 func handle_turret_and_shooting(aim_pos: Vector3, can_shoot: bool, can_see_player: bool) -> void:
@@ -261,6 +301,7 @@ func handle_turret_and_shooting(aim_pos: Vector3, can_shoot: bool, can_see_playe
 		var turret_forward = t.global_basis.z.normalized()
 		shoot_angle = turret_forward.signed_angle_to(shoot_dir, t.global_basis.y)
 		
+		#print(abs(shoot_angle)," | ",max_shoot_angle)
 		if abs(shoot_angle) < max_shoot_angle and t.can_shoot():
 			if can_see_player: 
 				#tank_rigid.shoot()
@@ -279,7 +320,11 @@ func is_on_sight_range() -> bool:
 		return true
 	
 	var space = tank_rigid.get_world_3d().direct_space_state
-	var origin = tank_turrets[0].global_position
+	
+	var origin = tank_rigid.global_position
+	if not tank_turrets.is_empty():
+		origin = tank_turrets[0].global_position
+	
 	var end = player_ref.global_position
 	
 	var query = PhysicsRayQueryParameters3D.create(origin, end)
