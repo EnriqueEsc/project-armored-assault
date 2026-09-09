@@ -11,9 +11,11 @@ var origin: Vehicle_Rigid
 @export var is_explosive: bool = true
 @export var blast_rad: float = 2
 @export var blast_damage: float = 10
+@export var recoil_force: float = 1
 var ignore = []
 
 signal deactivated(projectile: Projectile)
+signal explodes(pos: Vector3, blast_rad: float, blast_damage: float)
 
 var detonated: bool = false
 
@@ -27,11 +29,17 @@ func _ready() -> void:
 	#area_entered.connect(_on_body_entered)
 	base_speed = speed
 	
+	
 	deactivate()
 	
 	await get_tree().physics_frame
 	
 	effects_manager = Effects_Manager.INSTANCE
+	
+	_additional_setup()
+
+func _additional_setup() -> void:
+	pass
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -124,6 +132,8 @@ func detonate() -> void:
 	if effects_manager:
 		effects_manager.explosion_from_pool(global_position)
 	
+	explodes.emit(global_position,blast_rad,blast_damage)
+	
 	var explosion = SphereShape3D.new()
 	explosion.radius = blast_rad
 	
@@ -194,5 +204,5 @@ func detonate() -> void:
 		
 		if t.has_method("recoil"):
 			#print(t)
-			t.call_deferred("recoil",global_position.direction_to(t.global_position),blast_rad)
+			t.call_deferred("recoil",global_position.direction_to(t.global_position),blast_rad * blast_damage)
 	deactivate()

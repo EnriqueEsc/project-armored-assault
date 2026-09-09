@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://ookjvio67ulk"]
+
+[ext_resource type="Script" uid="uid://6jhbrtxdsfth" path="res://Scripts/Terrain/Tree_data.gd" id="1_pomt6"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_6f8o3"]
+
+[node name="Tree" type="MeshInstance3D" unique_id=866331357]
+mesh = SubResource("QuadMesh_6f8o3")
+script = ExtResource("1_pomt6")

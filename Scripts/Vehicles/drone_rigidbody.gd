@@ -10,6 +10,8 @@ var detonated: bool = false
 @export var blast_rad: float = 3.0
 @export var blast_damage: int = 20
 
+signal explodes(pos: Vector3, blast_rad: float, blast_damage: float)
+
 var objective: Vector3 = Vector3.ZERO
 
 func _physics_process(delta: float) -> void:
@@ -125,6 +127,9 @@ func detonate() -> void:
 	
 	detonated = true
 	var effects_manager = Effects_Manager.INSTANCE
+	
+	
+	explodes.emit(global_position,blast_rad,blast_damage)
 	
 	if effects_manager:
 		effects_manager.explosion_from_pool(global_position)

@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cgxpvyap3nce3"]
 
 [ext_resource type="Script" uid="uid://b44xtts1goeo7" path="res://Scripts/Player/Tank_player_controller.gd" id="1_uaa60"]
+[ext_resource type="Shader" uid="uid://dbujcyghmjix6" path="res://Shaders/viewport.gdshader" id="2_2yfgf"]
 [ext_resource type="Script" uid="uid://dgldqtulm4ymj" path="res://Scripts/Player/Tank_camera.gd" id="2_emxqw"]
 [ext_resource type="Script" uid="uid://c1amjgu5fo0td" path="res://Scripts/Player/HUD_boss_info.gd" id="3_7k3ju"]
 [ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="13_yfrtn"]
@@ -8,14 +9,71 @@
 [ext_resource type="Script" uid="uid://hg6l1epqoto0" path="res://Scripts/Player/HUD_Map.gd" id="15_6grxy"]
 [ext_resource type="Script" uid="uid://b4qtvehq7gqo6" path="res://Scripts/Menu/Utilities_menus/pause_menu.gd" id="16_u0f3t"]
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pomt6"]
+shader = ExtResource("2_2yfgf")
+shader_parameter/outline_color = Color(0, 1, 0, 1)
+shader_parameter/thickness = 2.0
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_x6g45"]
+viewport_path = NodePath("Outline_Rect/SubViewport")
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_2yfgf"]
+viewport_path = NodePath("UI_3D_Rect/SubViewport")
+
 [sub_resource type="ViewportTexture" id="ViewportTexture_q50ch"]
 viewport_path = NodePath("HUD/HUD_Player/Map/SubViewport")
 
 [node name="TankTest2" type="Node3D" unique_id=1212598530]
 script = ExtResource("1_uaa60")
 
+[node name="Outline_Rect" type="TextureRect" parent="." unique_id=34830810]
+visible = false
+material = SubResource("ShaderMaterial_pomt6")
+offset_right = 1152.0
+offset_bottom = 648.0
+texture = SubResource("ViewportTexture_x6g45")
+
+[node name="SubViewport" type="SubViewport" parent="Outline_Rect" unique_id=2130657184]
+transparent_bg = true
+handle_input_locally = false
+anisotropic_filtering_level = 0
+gui_disable_input = true
+positional_shadow_atlas_size = 0
+positional_shadow_atlas_16_bits = false
+positional_shadow_atlas_quad_0 = 0
+positional_shadow_atlas_quad_1 = 0
+positional_shadow_atlas_quad_2 = 0
+positional_shadow_atlas_quad_3 = 0
+size = Vector2i(576, 324)
+
+[node name="Camera3D" type="Camera3D" parent="Outline_Rect/SubViewport" unique_id=1830301078]
+cull_mask = 512
+
+[node name="UI_3D_Rect" type="TextureRect" parent="." unique_id=893155381]
+visible = false
+offset_right = 1152.0
+offset_bottom = 648.0
+texture = SubResource("ViewportTexture_2yfgf")
+
+[node name="SubViewport" type="SubViewport" parent="UI_3D_Rect" unique_id=1550995524]
+transparent_bg = true
+handle_input_locally = false
+anisotropic_filtering_level = 0
+gui_disable_input = true
+positional_shadow_atlas_size = 0
+positional_shadow_atlas_16_bits = false
+positional_shadow_atlas_quad_0 = 0
+positional_shadow_atlas_quad_1 = 0
+positional_shadow_atlas_quad_2 = 0
+positional_shadow_atlas_quad_3 = 0
+size = Vector2i(576, 324)
+
+[node name="Camera3D" type="Camera3D" parent="UI_3D_Rect/SubViewport" unique_id=883374921]
+cull_mask = 1024
+
 [node name="Camera3D" type="Camera3D" parent="." unique_id=857435729]
 transform = Transform3D(-1, 1.3429813e-07, -6.901985e-08, 0, 0.45709783, 0.88941634, 1.509958e-07, 0.88941634, -0.45709783, 0, 7.033662, -2.980245)
+cull_mask = 1
 size = 10.0
 script = ExtResource("2_emxqw")
 camera_offset = Vector3(0, 7.034, -2.98)

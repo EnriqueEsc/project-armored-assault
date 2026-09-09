@@ -19,9 +19,12 @@ signal recoil (dir: Vector3)
 var ignore = []
 
 
-enum Projectile_Type {HE, AP, MachineGun, Nuke}
+enum Projectile_Type {HE, AP, MachineGun, Nuke, Flamethrower}
+enum Fire_Mode {Semi, Auto}
+
 
 @export var projectile_type: Projectile_Type = Projectile_Type.AP
+@export var fire_mode: Fire_Mode = Fire_Mode.Semi
 var projectile_prefab = preload("res://Prefabs/Test/projectile.tscn")
 var case_prefab = preload("res://Prefabs/Test/case.tscn")
 var projectile: Projectile
@@ -43,6 +46,11 @@ var last_shoot_prim: float = -10
 var original_side_angle: float = 0.0
 
 signal aim_point(point: Vector3)
+
+var aim_point_normal: Vector3 = Vector3.ZERO
+var aim_limited: bool = false
+
+var recoil_force: float = 1.0
 
 func spawn() -> void:
 	projectile = projectile_prefab.instantiate() as Projectile
@@ -68,6 +76,8 @@ func _ready() -> void:
 			case_prefab = load("res://Prefabs/Test/machine_gun_case.tscn")
 		Projectile_Type.Nuke:
 			projectile_prefab = load("res://Prefabs/Test/nuke.tscn")
+		Projectile_Type.Flamethrower:
+			projectile_prefab = load("res://Prefabs/Test/flamethrower.tscn")
 		
 	original_side_angle = rotation.y
 	#spawn()
@@ -75,6 +85,10 @@ func _ready() -> void:
 	ignore.append(get_parent_node_3d())
 	
 	time_controller = Time_Controller.INSTANCE
+	
+	
+	aim_limited = Settings_Manager.INSTANCE.aim_limited
+	
 	pass
 
 
@@ -132,6 +146,8 @@ func get_aim_point_3d(distance: float) -> Vector3:
 	var res: Vector3 = Vector3.ZERO
 	
 	var ray_range = 12
+	if aim_limited:
+		ray_range = distance
 	var from = turret_barrel.global_position
 	var forward = turret_barrel.global_basis * -Vector3.FORWARD
 	var to = from + forward * ray_range
@@ -148,8 +164,11 @@ func get_aim_point_3d(distance: float) -> Vector3:
 	
 	if point:
 		res = point.position
+		aim_point_normal = point.normal
 	else:
 		res = from + forward * distance
+		aim_point_normal = global_basis.z
+	
 	
 	aim_point.emit(res)
 	
@@ -172,7 +191,14 @@ func create_projectiles() -> void:
 		#get_tree().current_scene.add_child(projectile)
 		projectile_pool.append(projectile)
 		ignore.append(projectile)
-		
+	
+	if not projectile_pool.is_empty():
+		recoil_force = projectile_pool[0].recoil_force
+	
+	if projectile_type == Projectile_Type.Flamethrower:
+		return
+	
+	for i in Settings_Manager.INSTANCE.max_effects:
 		
 		case = case_prefab.instantiate() as Case
 		case.deactivate()
@@ -212,7 +238,7 @@ func shoot() -> void:
 	
 	last_shoot_prim = time_controller.running_time
 	
-	recoil.emit(forward,1)
+	recoil.emit(forward,recoil_force)
 
 func projectile_to_pool(current_projectile: Projectile) -> void:
 	projectile_active.erase(current_projectile)

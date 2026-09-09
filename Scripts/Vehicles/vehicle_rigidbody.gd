@@ -214,6 +214,9 @@ func shoot() -> void:
 
 func get_aim_point_3d(turret_index: int, distance: float) -> Vector3:
 	return vehicle_turrets[turret_index].get_aim_point_3d(distance)
+	
+func get_aim_point_3d_normal(turret_index: int) -> Vector3:
+	return vehicle_turrets[turret_index].aim_point_normal
 
 
 func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> void:

@@ -1,8 +1,9 @@
-extends CSGCombiner3D
-class_name Building
+extends StaticBody3D
+class_name Building_Chunk
 
-var blocks: Array[Building_Block] = []
-var key_blocks: Array[Building_Block] = []
+
+var blocks: Array[Building_Block_V2] = []
+var key_blocks: Array[Building_Block_V2] = []
 
 var building_bounds: Vector2 = Vector2.ZERO
 
@@ -28,7 +29,10 @@ var effects_manager: Effects_Manager = null
 var physics_tick_counter: int = 6
 @export var crush_update_frequency: int = 5
 
-const BLOCK_SCRIPT = preload("res://Scripts/Buildings/building_block.gd")
+const BLOCK_SCRIPT = preload("res://Scripts/Buildings/building_block_v2.gd")
+
+var block_matrix: Dictionary = {}
+var grid_size: float = 1.0
 
 signal got_destroyed
 
@@ -37,36 +41,38 @@ func _ready() -> void:
 	max_armor_points = randi_range(1,5)
 	
 	for b in get_children():
-		if b is CSGShape3D and b.visible:
+		
+		if b is CollisionShape3D and b.visible:
 			b.set_script(BLOCK_SCRIPT)
 			
-			var new_block = b as Building_Block
-			
+			var new_block = b as Building_Block_V2
+			b.initialize()
 			new_block.max_armor_points = max_armor_points
 			new_block.armor_points = max_armor_points
 			
 			new_block.got_destroyed.connect(block_destroyed)
 			
 			blocks.append(new_block)
+			
 			if new_block.global_position.y < lowest_height:
 				lowest_height = new_block.global_position.y
-			if abs(new_block.position.x + (new_block.size.x / 0.5)) > building_bounds.x:
-				building_bounds.x = abs(new_block.position.x + (new_block.size.x / 0.5))
-			if abs(new_block.position.z + (new_block.size.z / 0.5)) > building_bounds.y:
-				building_bounds.y = abs(new_block.position.z + (new_block.size.z / 0.5))
-	
+			if abs(new_block.position.x + (new_block.shape.size.x / 0.5)) > building_bounds.x:
+				building_bounds.x = abs(new_block.position.x + (new_block.shape.size.x / 0.5))
+			if abs(new_block.position.z + (new_block.shape.size.z / 0.5)) > building_bounds.y:
+				building_bounds.y = abs(new_block.position.z + (new_block.shape.size.z / 0.5))
+	var counter: int = 0
 	for b in blocks:
 		if b.global_position.y == lowest_height:
 			key_blocks.append(b)
+			print(counter," | ",b)
+			counter += 1
 	
 	total_blocks = blocks.size()
 	min_blocks = total_blocks/2
 	
 	print(building_bounds)
-	
-	set_shape_cast()
-	
-	building_half_extents = damage_zone.shape.size / 2.0
+	print(total_blocks," | ",blocks.size()," | ",key_blocks.size())
+	#building_half_extents = damage_zone.shape.size / 2.0
 	building_max_radius = building_half_extents.length()
 	#global_position.y = 10
 	
@@ -76,47 +82,9 @@ func _ready() -> void:
 	
 	effects_manager = Effects_Manager.INSTANCE
 
-func set_shape_cast() -> void:
-	damage_zone = ShapeCast3D.new()
-	
-	var cube = BoxShape3D.new()
-	damage_zone.shape = cube
-	
-	#damage_zone.collide_with_areas = true
-	
-	damage_zone.shape.size = Vector3(building_bounds.x,5,building_bounds.y)
-	
-	get_tree().current_scene.call_deferred("add_child",damage_zone)
-	damage_zone.call_deferred("set_global_position", global_position)
-	#damage_zone.global_position = global_position
-	
-
-func crush_below() -> void:
-	damage_zone.force_shapecast_update()
-	
-	for i in damage_zone.get_collision_count():
-		var collider = damage_zone.get_collider(i)
-		if collider:
-			if collider.has_method("take_damage"):
-				collider.take_damage(10,null,collider.global_position)
-			if collider.has_method("detonate"):
-				collider.detonate()
-
-func _physics_process(delta: float) -> void:
-	
-	if not destroyed:
-		return
-	
-	global_position -= global_basis.y * delta * 2
-	
-	physics_tick_counter += 1
-	if physics_tick_counter >= crush_update_frequency:
-		physics_tick_counter = 0
-		destruction()
-
 
 func calculate_closest_block(damage:int, source: Vehicle_Rigid, impact_point: Vector3) -> void:
-	var closest_block: CSGShape3D = null
+	var closest_block: CollisionShape3D = null
 	var min_distance: float = INF
 	
 	for b in blocks:
@@ -129,51 +97,11 @@ func calculate_closest_block(damage:int, source: Vehicle_Rigid, impact_point: Ve
 		closest_block.take_damage(damage,source,impact_point)
 	
 
-func destruction() -> void:
-	var emmit_collapse_effect: bool = false
-	
-	'''
-	#Caotico
-	for b in blocks:
-		if b.global_position.y < lowest_height:
-			emmit_collapse_effect = true
-			b.got_destroyed.emit(b)
-			b.deactivate()
-	
-	if emmit_collapse_effect:
-		crush_below()
-	
-	'''
-	
-	#Organizado
-	
-	var chunk: Array[Building_Block] = []
-	for b in blocks:
-		if b.global_position.y <= lowest_height + 0.1:
-			#b.got_destroyed.emit(b)
-			#b.deactivate()
-			#crush_below()
-			emmit_collapse_effect = true
-			chunk.append(b)
-	
-	if chunk.is_empty():
-		return
-	
-	for c in chunk:
-		c.got_destroyed.emit(c)
-		c.deactivate()
-	
-	
-	crush_below()
-	
-	if emmit_collapse_effect and effects_manager:
-		effects_manager.collapse_from_pool(damage_zone.global_position)
-
 func calculate_impact_chunk(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> void:
 	if not source:
 		return
 	
-	var affected_blocks: Array[Building_Block] = []
+	var affected_blocks: Array[Building_Block_V2] = []
 	var tank_transform = source.global_transform
 	var tank_size = (source.collision_shape.size / 2.0) * 1.2 
 	
@@ -182,7 +110,7 @@ func calculate_impact_chunk(damage: int, source: Vehicle_Rigid, impact_point: Ve
 	var affine_inv = tank_transform.affine_inverse()
 	
 	for b in blocks:
-		var block_extents = b.size / 2.0
+		var block_extents = b.shape.size / 2.0
 		var block_pos = b.global_position
 		
 		if block_pos.distance_to(tank_transform.origin) > (tank_size.length() + block_extents.length() + 1.0):
@@ -206,7 +134,8 @@ func calculate_impact_chunk(damage: int, source: Vehicle_Rigid, impact_point: Ve
 	for a in affected_blocks:
 		a.take_damage(damage, source, impact_point)
 
-func block_destroyed(block: Building_Block) -> void:
+func block_destroyed(block: Building_Block_V2) -> void:
+	#print("Antes -> ",blocks.size())
 	blocks.erase(block)
 	if key_blocks.has(block):
 		key_blocks.erase(block)
@@ -214,11 +143,16 @@ func block_destroyed(block: Building_Block) -> void:
 	if blocks.is_empty():
 		deactivate()
 	
+	#print(total_blocks," | ",blocks.size()," | ",key_blocks.size())
+	#print("HOLA W",key_blocks.size()," | ",blocks.size())
+	
 	if key_blocks.is_empty():
+		print("BASIO W")
 		destroyed = true
-		use_collision = false
-		set_physics_process(true)
-		#deactivate()
+		#use_collision = false
+		#set_physics_process(true)
+		deactivate()
+	#print("Despues -> ",blocks.size())
 	
 	if blocks.size() < min_blocks:
 		return
@@ -237,7 +171,7 @@ func take_explosion(damage: int, source: Vehicle_Rigid, impact_point: Vector3, r
 	
 	var radius_squared: float = radius * radius
 	
-	var affected_blocks: Array[Building_Block] = []
+	var affected_blocks: Array[Building_Block_V2] = []
 	for b in blocks:
 		var dist_squared = b.global_position.distance_squared_to(impact_point)
 		if dist_squared <= radius_squared:
@@ -274,8 +208,8 @@ func activate() -> void:
 
 func deactivate() -> void:
 	got_destroyed.emit()
-	print("siuuuuuuu")
-	damage_zone	.queue_free()
+	print("siuuuuuuu V2")
+	#damage_zone	.queue_free()
 	queue_free()
 	visible = false
 	process_mode = Node.PROCESS_MODE_DISABLED
@@ -286,7 +220,12 @@ func deactivate() -> void:
 	for c in get_children():
 		if c.has_method("deactivate"):
 			c.deactivate()
-	
+
+func deactivate_collisions() -> void:
+	collision_layer = 0
+	collision_mask = 0
+	for b in blocks:
+		b.disabled = true
 
 
 func get_score(score: int) -> void:

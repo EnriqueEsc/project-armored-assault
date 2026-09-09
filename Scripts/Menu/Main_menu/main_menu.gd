@@ -22,6 +22,14 @@ extends Menu
 
 @onready var settings_window: Control = $Settings_Menu
 @onready var fullscreen_button: CheckButton = $Settings_Menu/Buttons/Fullscreen
+
+@onready var aim_3d_button: CheckButton = $"Settings_Menu/Buttons/3D_Aim"
+@onready var aim_guideline_button: CheckButton = $Settings_Menu/Buttons/Aim_guideline
+@onready var aim_limited_button: CheckButton = $Settings_Menu/Buttons/Aim_limited
+@onready var third_person_button: CheckButton = $Settings_Menu/Buttons/Third_person
+@onready var max_effects_text: RichTextLabel = $Settings_Menu/Buttons/Max_effects_text
+@onready var max_effects_bar: HScrollBar = $Settings_Menu/Buttons/Max_effects_bar
+
 @onready var save_settings_button: Button = $Settings_Menu/Buttons/Save
 @onready var settings_back: Button = $Settings_Menu/Buttons/Back
 
@@ -55,6 +63,7 @@ func _set_buttons() -> void:
 	update_settings_window()
 	
 	#fullscreen_button.button_down.connect(set_fullscreen)
+	max_effects_bar.value_changed.connect(update_max_effects_text)
 	save_settings_button.button_down.connect(save_settings)
 	settings_back.button_down.connect(switch_active.bind(settings_window))
 	
@@ -79,6 +88,12 @@ func switch_active(window: Control) -> void:
 
 func update_settings_window() -> void:
 	fullscreen_button.button_pressed = Settings_Manager.INSTANCE.fullscreen
+	aim_3d_button.button_pressed = Settings_Manager.INSTANCE.aim_3d
+	aim_guideline_button.button_pressed = Settings_Manager.INSTANCE.aim_guideline
+	aim_limited_button.button_pressed = Settings_Manager.INSTANCE.aim_limited
+	third_person_button.button_pressed = Settings_Manager.INSTANCE.third_person
+	max_effects_bar.value = Settings_Manager.INSTANCE.max_effects
+	update_max_effects_text(max_effects_bar.value)
 
 func check_mission_can_start() -> void:
 	start_mission_button.visible = selected_mission != "" and selected_tank
@@ -140,6 +155,7 @@ func restart_tank_selection() -> void:
 
 func select_tank(tank: Tank_Data) -> void:
 	selected_tank = tank
+	print(tank.tank_Name)
 	show_tank_info()
 	check_mission_can_start()
 
@@ -157,6 +173,14 @@ func show_tank_info() -> void:
 	
 	tank_info_text.text = info
 
+func update_max_effects_text(i: int) -> void:
+	max_effects_text.text = "Max particle effects ("+str(i)+")"
+
 func save_settings() -> void:
 	Settings_Manager.INSTANCE.fullscreen = fullscreen_button.button_pressed
+	Settings_Manager.INSTANCE.aim_3d = aim_3d_button.button_pressed
+	Settings_Manager.INSTANCE.aim_guideline = aim_guideline_button.button_pressed
+	Settings_Manager.INSTANCE.aim_limited = aim_limited_button.button_pressed
+	Settings_Manager.INSTANCE.third_person = third_person_button.button_pressed
+	Settings_Manager.INSTANCE.max_effects = max_effects_bar.value
 	Settings_Manager.INSTANCE.save_settings()

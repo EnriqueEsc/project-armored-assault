@@ -71,6 +71,6 @@ func _physics_process(delta: float) -> void:
 			return
 		
 		#Para seguir desgastando las estructuras si se sigue avanzando
-		if collider is Building:
+		if collider is Building or collider is Building_Chunk:
 			collider.calculate_impact_chunk(5 ,self, global_position)
 			last_building_impact = 0

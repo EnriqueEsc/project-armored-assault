@@ -34,6 +34,8 @@ func check_visibility() -> void:
 	if not is_instance_valid(player):
 		return
 	
+	objects_in_between.append(player)
+	
 	vision_cast.target_position = to_local(player.global_position)
 	vision_cast.force_shapecast_update()
 	
@@ -83,7 +85,6 @@ func get_mouse_3d_pos() -> Vector3:
 	#query.collide_with_areas = true
 	
 	
-	
 	if not objects_in_between.is_empty():
 		query.exclude = objects_in_between
 	
@@ -92,5 +93,7 @@ func get_mouse_3d_pos() -> Vector3:
 	
 	if point:
 		res = point.position
-	
+	else:
+		res = from + project_ray_normal(mouse_2d_pos) * 10
+	#print(res)
 	return res

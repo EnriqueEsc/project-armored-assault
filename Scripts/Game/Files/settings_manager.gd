@@ -10,6 +10,11 @@ var settings_file: ConfigFile = ConfigFile.new()
 var current_tank_used_in_game: Tank_Data = null
 
 var fullscreen: bool = false
+var aim_3d: bool = false
+var aim_guideline: bool = false
+var aim_limited: bool = false
+var third_person: bool = false
+var max_effects: int = 30
 
 var current_save: String = "user://test.json"
 
@@ -34,6 +39,11 @@ func singleton() -> void:
 
 func save_settings() -> void:
 	settings_file.set_value("Video","fullscreen",fullscreen)
+	settings_file.set_value("Game","aim_3d",aim_3d)
+	settings_file.set_value("Game","aim_guideline",aim_guideline)
+	settings_file.set_value("Game","aim_limited",aim_limited)
+	settings_file.set_value("Game","third_person",third_person)
+	settings_file.set_value("Game","max_effects",max_effects)
 	settings_file.save(SETTINGS_PATH)
 	print("SETTINGS GUARDADOS")
 	print(settings_file,settings_file.get_value("Video","fullscreen",fullscreen))
@@ -43,6 +53,11 @@ func load_settings() -> void:
 	if settings_file.load(SETTINGS_PATH) == OK:
 		print("existe")
 		fullscreen = settings_file.get_value("Video","fullscreen",fullscreen)
+		aim_3d = settings_file.get_value("Game","aim_3d",aim_3d)
+		aim_guideline = settings_file.get_value("Game","aim_guideline",aim_guideline)
+		aim_limited = settings_file.get_value("Game","aim_limited",aim_limited)
+		third_person = settings_file.get_value("Game","third_person",third_person)
+		max_effects = settings_file.get_value("Game","max_effects",max_effects)
 		apply_settings()
 	else:
 		print("no existe")

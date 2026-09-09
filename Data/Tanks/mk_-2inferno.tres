@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Tank_Data" format=3 uid="uid://dmeg0mqxplyrw"]
+
+[ext_resource type="Script" uid="uid://o0qesee4s8dx" path="res://Data/Tanks/Tank_Data.gd" id="1_p4jfd"]
+
+[resource]
+script = ExtResource("1_p4jfd")
+tank_Name = "mk_-2inferno"
+traction = 2.0
+max_armor_points = 600
+metadata/_custom_type_script = "uid://o0qesee4s8dx"
