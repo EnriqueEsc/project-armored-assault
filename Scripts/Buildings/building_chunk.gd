@@ -64,14 +64,14 @@ func _ready() -> void:
 	for b in blocks:
 		if b.global_position.y == lowest_height:
 			key_blocks.append(b)
-			print(counter," | ",b)
+			#print(counter," | ",b)
 			counter += 1
 	
 	total_blocks = blocks.size()
 	min_blocks = total_blocks/2
 	
-	print(building_bounds)
-	print(total_blocks," | ",blocks.size()," | ",key_blocks.size())
+	#print(building_bounds)
+	#print(total_blocks," | ",blocks.size()," | ",key_blocks.size())
 	#building_half_extents = damage_zone.shape.size / 2.0
 	building_max_radius = building_half_extents.length()
 	#global_position.y = 10
@@ -147,7 +147,7 @@ func block_destroyed(block: Building_Block_V2) -> void:
 	#print("HOLA W",key_blocks.size()," | ",blocks.size())
 	
 	if key_blocks.is_empty():
-		print("BASIO W")
+		#print("BASIO W")
 		destroyed = true
 		#use_collision = false
 		#set_physics_process(true)
@@ -225,6 +225,7 @@ func deactivate_collisions() -> void:
 	collision_layer = 0
 	collision_mask = 0
 	for b in blocks:
+		#print("PENEEEEEE")
 		b.disabled = true
 
 

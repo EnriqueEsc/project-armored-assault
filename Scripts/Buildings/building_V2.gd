@@ -26,9 +26,20 @@ var col_size_z: int = 0
 
 var lowest_height: float = INF
 
+var combiner: CSGCombiner3D = null
+
+@export var material: Material = null
+
+var csg_active: bool = true
+
 func _ready() -> void:
-	multimesh_instance = MultiMeshInstance3D.new()
-	add_child(multimesh_instance)
+	if csg_active:
+		combiner = CSGCombiner3D.new()
+		add_child(combiner)
+		combiner.use_collision = false
+	else:
+		multimesh_instance = MultiMeshInstance3D.new()
+		add_child(multimesh_instance)
 	
 	for c in get_children():
 		if c is Building_Chunk:
@@ -60,7 +71,7 @@ func init_grid() -> void:
 	multimesh = MultiMesh.new()
 	multimesh.transform_format = MultiMesh.TRANSFORM_3D
 	multimesh.mesh = pref_mesh
-	multimesh.instance_count = col_size_x * col_size_y * col_size_z 
+	multimesh.instance_count = levels.size() * levels[0].blocks.size()
 
 	var start_x = -col_size_x * 0.5 + 1 * 0.5
 	var start_y = 1 * 0.0
@@ -77,10 +88,19 @@ func init_grid() -> void:
 			#transform = transform.rotated(Vector3.UP,randf_range(0.0, TAU))
 
 			transform.origin = pos
-
-			multimesh.set_instance_transform(counter, transform)
-			b.id = counter
-			b.got_destroyed.connect(destroy_block.bind(counter))
+			
+			if csg_active:
+				var blok: CSGBox3D = CSGBox3D.new()
+				blok.size = Vector3(2,2,1)
+				blok.material = material
+				combiner.add_child(blok)
+				blok.position = pos
+				b.got_destroyed.connect(destroy_b.bind(blok))
+			else:
+				multimesh.set_instance_transform(counter, transform)
+				b.id = counter
+				b.got_destroyed.connect(destroy_block.bind(counter))
+			#b.queue_free()
 			#var tree: Tree_data = Tree_data.new(1,counter, multimesh_instance.to_global(transform.origin) ,Vector2i(x,z))
 			#tree.got_destroyed.connect(destroy_tree)
 			#tree.got_burnt.connect(burn_tree)
@@ -91,7 +111,8 @@ func init_grid() -> void:
 	
 	
 	#active_count = counter
-	multimesh_instance.multimesh = multimesh
+	if not csg_active:
+		multimesh_instance.multimesh = multimesh
 
 
 func set_shape_cast() -> void:
@@ -111,6 +132,7 @@ func set_shape_cast() -> void:
 		damage_zone.call_deferred("set_global_position", global_position)
 	#print(damage_zone.global_position)
 	#damage_zone.global_position = global_position
+	damage_zone.enabled = false
 
 
 
@@ -179,9 +201,12 @@ func destroy_chunk(chunk: Building_Chunk) -> void:
 	if levels.is_empty():
 		for l in levels:
 			l.deactivate_collisions()
+		#damage_zone.enabled = true
 		deactivate()
 	
 func destroy_basement() -> void:
+	for l in levels:
+		l.deactivate_collisions()
 	destroyed = true
 	set_physics_process(true)
 
@@ -207,6 +232,9 @@ func destroy_block(bld:Building_Block_V2, id: int) -> void:
 	var t: Transform3D = mm.get_instance_transform(id)
 	t.basis = Basis.from_scale(Vector3.ZERO)
 	mm.set_instance_transform(id,t)
+
+func destroy_b(bld:Building_Block_V2, b: CSGBox3D) -> void:
+	b.queue_free()
 
 func get_score(score: int) -> void:
 	self.score += score

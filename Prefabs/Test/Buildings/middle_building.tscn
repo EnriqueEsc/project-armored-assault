@@ -1,309 +1,214 @@
 [gd_scene format=3 uid="uid://bto62usa87vu1"]
 
-[ext_resource type="Script" uid="uid://cgp8hd1nxjt5u" path="res://Scripts/Buildings/building.gd" id="1_tqhgt"]
+[ext_resource type="Script" uid="uid://c28exai5skfwk" path="res://Scripts/Buildings/building_V2.gd" id="1_tqhgt"]
 [ext_resource type="Shader" uid="uid://c5r6qc4s673e8" path="res://Shaders/see_tank.gdshader" id="2_pni4c"]
+[ext_resource type="Script" uid="uid://66okse7w7mtd" path="res://Scripts/Buildings/building_chunk.gd" id="3_pni4c"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_wqk5q"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6f8o3"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_sn0t7"]
+material = SubResource("ShaderMaterial_6f8o3")
+size = Vector3(2, 2, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fwjrd"]
 render_priority = 0
 shader = ExtResource("2_pni4c")
 shader_parameter/albedo = Color(1, 1, 1, 1)
 shader_parameter/cutout_radius = 2.0
 shader_parameter/cutout_feather = 1.0
 
-[node name="CSGCombiner3D5" type="CSGCombiner3D" unique_id=1039376190]
-use_collision = true
+[sub_resource type="BoxShape3D" id="BoxShape3D_bhunq"]
+size = Vector3(2, 2, 1)
+
+[node name="CSGCombiner3D5" type="Node3D" unique_id=743646543]
 script = ExtResource("1_tqhgt")
+pref_mesh = SubResource("BoxMesh_sn0t7")
+material = SubResource("ShaderMaterial_fwjrd")
 
-[node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=121064674]
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=2011865426]
+script = ExtResource("3_pni4c")
 
-[node name="CSGBox3D2" type="CSGBox3D" parent="." unique_id=1130923459]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1383523364]
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D3" type="CSGBox3D" parent="." unique_id=165189020]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D4" type="CSGBox3D" parent="." unique_id=2012499707]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D5" type="CSGBox3D" parent="." unique_id=281354755]
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="StaticBody3D" unique_id=1914373870]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D6" type="CSGBox3D" parent="." unique_id=40358199]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D7" type="CSGBox3D" parent="." unique_id=1071633666]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D8" type="CSGBox3D" parent="." unique_id=1144219444]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D9" type="CSGBox3D" parent="." unique_id=1536141678]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D10" type="CSGBox3D" parent="." unique_id=1511797686]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D11" type="CSGBox3D" parent="." unique_id=1887064279]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D12" type="CSGBox3D" parent="." unique_id=586703553]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D13" type="CSGBox3D" parent="." unique_id=1578948461]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D14" type="CSGBox3D" parent="." unique_id=720299028]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D15" type="CSGBox3D" parent="." unique_id=135310062]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D16" type="CSGBox3D" parent="." unique_id=873590202]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D17" type="CSGBox3D" parent="." unique_id=22545347]
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="StaticBody3D" unique_id=283675710]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D18" type="CSGBox3D" parent="." unique_id=456245330]
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="StaticBody3D" unique_id=1819509029]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+shape = SubResource("BoxShape3D_bhunq")
+
+[node name="CollisionShape3D5" type="CollisionShape3D" parent="StaticBody3D" unique_id=38092411]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+shape = SubResource("BoxShape3D_bhunq")
+
+[node name="CollisionShape3D6" type="CollisionShape3D" parent="StaticBody3D" unique_id=1078438396]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+shape = SubResource("BoxShape3D_bhunq")
+
+[node name="CollisionShape3D7" type="CollisionShape3D" parent="StaticBody3D" unique_id=1970555416]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1)
+shape = SubResource("BoxShape3D_bhunq")
+
+[node name="CollisionShape3D8" type="CollisionShape3D" parent="StaticBody3D" unique_id=603410156]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D19" type="CSGBox3D" parent="." unique_id=643620759]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D9" type="CollisionShape3D" parent="StaticBody3D" unique_id=979772149]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D20" type="CSGBox3D" parent="." unique_id=351473429]
+[node name="CollisionShape3D10" type="CollisionShape3D" parent="StaticBody3D" unique_id=1092802310]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
+shape = SubResource("BoxShape3D_bhunq")
+
+[node name="CollisionShape3D11" type="CollisionShape3D" parent="StaticBody3D" unique_id=587868304]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
+shape = SubResource("BoxShape3D_bhunq")
+
+[node name="CollisionShape3D12" type="CollisionShape3D" parent="StaticBody3D" unique_id=1139428021]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1)
+shape = SubResource("BoxShape3D_bhunq")
+
+[node name="CollisionShape3D13" type="CollisionShape3D" parent="StaticBody3D" unique_id=1059378483]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D21" type="CSGBox3D" parent="." unique_id=1219869086]
+[node name="CollisionShape3D14" type="CollisionShape3D" parent="StaticBody3D" unique_id=740602806]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 1)
+shape = SubResource("BoxShape3D_bhunq")
+
+[node name="CollisionShape3D15" type="CollisionShape3D" parent="StaticBody3D" unique_id=1711565559]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
+shape = SubResource("BoxShape3D_bhunq")
+
+[node name="StaticBody3D2" type="StaticBody3D" parent="." unique_id=408157099]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+script = ExtResource("3_pni4c")
 
-[node name="CSGBox3D22" type="CSGBox3D" parent="." unique_id=161117685]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D2" unique_id=815417121]
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D23" type="CSGBox3D" parent="." unique_id=818574032]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 0)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="StaticBody3D2" unique_id=1307972215]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D24" type="CSGBox3D" parent="." unique_id=2069357123]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 0)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="StaticBody3D2" unique_id=21661309]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D25" type="CSGBox3D" parent="." unique_id=973424596]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="StaticBody3D2" unique_id=89341219]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D26" type="CSGBox3D" parent="." unique_id=1696069663]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D5" type="CollisionShape3D" parent="StaticBody3D2" unique_id=1054540502]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D27" type="CSGBox3D" parent="." unique_id=2043761651]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D6" type="CollisionShape3D" parent="StaticBody3D2" unique_id=499195526]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D28" type="CSGBox3D" parent="." unique_id=97952524]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, -1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D7" type="CollisionShape3D" parent="StaticBody3D2" unique_id=2023969032]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D29" type="CSGBox3D" parent="." unique_id=297982734]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D8" type="CollisionShape3D" parent="StaticBody3D2" unique_id=1381871925]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D30" type="CSGBox3D" parent="." unique_id=1083250631]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D9" type="CollisionShape3D" parent="StaticBody3D2" unique_id=763084296]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D31" type="CSGBox3D" parent="." unique_id=1521419045]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D10" type="CollisionShape3D" parent="StaticBody3D2" unique_id=403340249]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D32" type="CSGBox3D" parent="." unique_id=121311881]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D11" type="CollisionShape3D" parent="StaticBody3D2" unique_id=1699947854]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D33" type="CSGBox3D" parent="." unique_id=1621479987]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D12" type="CollisionShape3D" parent="StaticBody3D2" unique_id=2142147187]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D34" type="CSGBox3D" parent="." unique_id=1818124575]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D13" type="CollisionShape3D" parent="StaticBody3D2" unique_id=1313507891]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D35" type="CSGBox3D" parent="." unique_id=1971765613]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, 2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D14" type="CollisionShape3D" parent="StaticBody3D2" unique_id=1493014730]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 1)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D36" type="CSGBox3D" parent="." unique_id=676165347]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, 2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D15" type="CollisionShape3D" parent="StaticBody3D2" unique_id=505143346]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D37" type="CSGBox3D" parent="." unique_id=1185145479]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D38" type="CSGBox3D" parent="." unique_id=1061035742]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D39" type="CSGBox3D" parent="." unique_id=1470622420]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2, -2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D40" type="CSGBox3D" parent="." unique_id=1955598017]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2, -2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D41" type="CSGBox3D" parent="." unique_id=794341091]
+[node name="StaticBody3D3" type="StaticBody3D" parent="." unique_id=100157063]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 0)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+script = ExtResource("3_pni4c")
 
-[node name="CSGBox3D42" type="CSGBox3D" parent="." unique_id=1630270227]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 0)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D3" unique_id=223714125]
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D43" type="CSGBox3D" parent="." unique_id=1551667390]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 0)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="StaticBody3D3" unique_id=540177747]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D44" type="CSGBox3D" parent="." unique_id=1679518808]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4, 0)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="StaticBody3D3" unique_id=1096849452]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D45" type="CSGBox3D" parent="." unique_id=1090112307]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="StaticBody3D3" unique_id=2105064396]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D46" type="CSGBox3D" parent="." unique_id=2037420590]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, -1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D5" type="CollisionShape3D" parent="StaticBody3D3" unique_id=1265609898]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D47" type="CSGBox3D" parent="." unique_id=2130653829]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, -1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D6" type="CollisionShape3D" parent="StaticBody3D3" unique_id=706147605]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 0)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D48" type="CSGBox3D" parent="." unique_id=1280338258]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4, -1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D7" type="CollisionShape3D" parent="StaticBody3D3" unique_id=1186969187]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -1)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D49" type="CSGBox3D" parent="." unique_id=1934711950]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D8" type="CollisionShape3D" parent="StaticBody3D3" unique_id=744096520]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -2)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D50" type="CSGBox3D" parent="." unique_id=1911489062]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D9" type="CollisionShape3D" parent="StaticBody3D3" unique_id=1220030360]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D51" type="CSGBox3D" parent="." unique_id=1327190528]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D10" type="CollisionShape3D" parent="StaticBody3D3" unique_id=1767675078]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D52" type="CSGBox3D" parent="." unique_id=1787587341]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4, 1)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D11" type="CollisionShape3D" parent="StaticBody3D3" unique_id=279802634]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 0)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D53" type="CSGBox3D" parent="." unique_id=212102627]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D12" type="CollisionShape3D" parent="StaticBody3D3" unique_id=1412512987]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -1)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D54" type="CSGBox3D" parent="." unique_id=1627513945]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D13" type="CollisionShape3D" parent="StaticBody3D3" unique_id=1391962304]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D55" type="CSGBox3D" parent="." unique_id=191423570]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, 2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D14" type="CollisionShape3D" parent="StaticBody3D3" unique_id=1626458219]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 1)
+shape = SubResource("BoxShape3D_bhunq")
 
-[node name="CSGBox3D56" type="CSGBox3D" parent="." unique_id=753929154]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4, 2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D57" type="CSGBox3D" parent="." unique_id=1824886377]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, -2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D59" type="CSGBox3D" parent="." unique_id=1481858545]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 4, -2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
-
-[node name="CSGBox3D58" type="CSGBox3D" parent="." unique_id=1315051032]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 4, -2)
-size = Vector3(2, 2, 1)
-material = SubResource("ShaderMaterial_wqk5q")
+[node name="CollisionShape3D15" type="CollisionShape3D" parent="StaticBody3D3" unique_id=1438581573]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, 2)
+shape = SubResource("BoxShape3D_bhunq")

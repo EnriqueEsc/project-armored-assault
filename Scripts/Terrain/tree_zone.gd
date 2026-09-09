@@ -18,6 +18,7 @@ var vehicles_within: Array[Vehicle_Rigid] = []
 var active_count: int = 0
 
 func _ready() -> void:
+	
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exit)
 	area_entered.connect(_on_area_entered)

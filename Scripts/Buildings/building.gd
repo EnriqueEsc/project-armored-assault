@@ -89,6 +89,7 @@ func set_shape_cast() -> void:
 	get_tree().current_scene.call_deferred("add_child",damage_zone)
 	damage_zone.call_deferred("set_global_position", global_position)
 	#damage_zone.global_position = global_position
+	damage_zone.enabled = false
 	
 
 func crush_below() -> void:
