@@ -10,6 +10,14 @@ var objects_in_between: Array[RID] = []
 
 var vision_cast: ShapeCast3D
 
+var shake_time: float = 0.0
+var time_since_shaking: float = 1.0
+var base_position: Vector3 = Vector3.ZERO
+
+@export var max_shake_strength: float = 0.2
+
+var intens: float = 1.0
+
 func _ready() -> void:
 	vision_cast = ShapeCast3D.new()
 	var sphere = SphereShape3D.new()
@@ -20,14 +28,21 @@ func _ready() -> void:
 	vision_cast.collide_with_areas = true
 	
 	add_child(vision_cast)
+	
+	max_shake_strength = Settings_Manager.INSTANCE.max_shake_strength
 
 func move_cam(move: Vector3, delta: float) -> void:
-	position = lerp(position, move + camera_offset, camera_follow_speed * delta)
+	base_position = base_position.lerp(move + camera_offset, camera_follow_speed * delta)
+	var current_shake_offset = get_shake_offset()
+	position = base_position + current_shake_offset
 
 func _process(delta: float) -> void:
 	check_visibility()
+	if time_since_shaking <= shake_time:
+		time_since_shaking += delta
 
 func check_visibility() -> void:
+	
 	objects_in_between.clear()
 	
 	
@@ -71,6 +86,20 @@ func check_visibility() -> void:
 	
 	'''
 
+func get_shake_offset() -> Vector3:
+	if time_since_shaking > shake_time or shake_time == 0.0:
+		return Vector3.ZERO
+	
+	var intensity: float = 1.0 - (time_since_shaking / shake_time)
+	var current_strength: float = max_shake_strength * intensity * intens
+	
+	return Vector3(randf_range(-current_strength, current_strength),0.0,randf_range(-current_strength, current_strength))
+
+func start_shake(shake: float, intensity: float) -> void:
+	shake_time = shake
+	intens = intensity
+	time_since_shaking = 0.0
+
 func get_mouse_3d_pos() -> Vector3:
 	var res: Vector3 = Vector3.ZERO
 	
@@ -97,3 +126,39 @@ func get_mouse_3d_pos() -> Vector3:
 		res = from + project_ray_normal(mouse_2d_pos) * 10
 	#print(res)
 	return res
+
+func get_closest_enemy_to_mouse(mouse_3d: Vector3) -> Vehicle_Rigid:
+	
+	var closest: Vehicle_Rigid = null
+	
+	var enemies = get_tree().get_nodes_in_group("Enemy")
+	if enemies.is_empty():
+		return closest
+	var min_dist: float = INF
+	
+	for e in enemies:
+		if e is Vehicle_Rigid and e.armor_points > 0:
+			var dist = mouse_3d.distance_to(e.global_position)
+			if dist < min_dist:
+				min_dist = dist
+				closest = e
+	#print(closest)
+	return closest
+
+func get_closest_enemy_to_pivot(pivot: Vehicle_Rigid) -> Vehicle_Rigid:
+	
+	var closest: Vehicle_Rigid = null
+	
+	var enemies = get_tree().get_nodes_in_group("Enemy")
+	if enemies.is_empty():
+		return closest
+	var min_dist: float = INF
+	
+	for e in enemies:
+		if e != pivot and e is Vehicle_Rigid and e.armor_points > 0:
+			var dist = pivot.global_position.distance_to(e.global_position)
+			if dist < min_dist:
+				min_dist = dist
+				closest = e
+	#print(closest)
+	return closest

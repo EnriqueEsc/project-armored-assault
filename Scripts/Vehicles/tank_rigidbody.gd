@@ -36,6 +36,7 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	
 	
+	
 	for i in get_slide_collision_count():
 		var collision = get_slide_collision(i)
 		var collider = collision.get_collider()
@@ -52,6 +53,8 @@ func _physics_process(delta: float) -> void:
 		var impact = pre_impact_vel.dot(-normal)
 		
 		if impact > 2.0:
+			shakes.emit(0.5,0.2)
+			
 			if collider is RigidBody3D:
 				var push = -normal * impact
 				collider.apply_central_force(push)
@@ -72,5 +75,6 @@ func _physics_process(delta: float) -> void:
 		
 		#Para seguir desgastando las estructuras si se sigue avanzando
 		if collider is Building or collider is Building_Chunk:
+			shakes.emit(0.2,0.2)
 			collider.calculate_impact_chunk(5 ,self, global_position)
 			last_building_impact = 0

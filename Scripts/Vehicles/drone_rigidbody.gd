@@ -204,6 +204,7 @@ func detonate() -> void:
 		
 		if t.has_method("recoil"):
 			#print(t)
+			t.shakes.emit(0.5,0.8)
 			t.call_deferred("recoil",global_position.direction_to(t.global_position),blast_rad)
 	deactivate()
 

@@ -4,8 +4,11 @@ class_name Typing_Text
 var text_to_type: String = ""
 var current_text: String = ""
 var buffer = []
+var additional_tags: String = "[color=green]"
 
 var timer = Timer.new()
+
+signal finished_typing()
 
 func _ready() -> void:
 	current_text = ""
@@ -15,6 +18,8 @@ func _ready() -> void:
 	timer.one_shot = false
 	timer.timeout.connect(type_text)
 	add_child(timer)
+	
+	set_process(false)
 	
 
 func show_text(activated: bool) -> void:
@@ -37,7 +42,7 @@ func break_typing() -> void:
 
 func stop_typing() -> void:
 	timer.stop()
-	text = "[color=green]" + text_to_type
+	text = additional_tags + text_to_type
 
 func start_typing() -> void:
 	timer.start()
@@ -45,15 +50,19 @@ func start_typing() -> void:
 func set_text_to_type(s: String) -> void:
 	text_to_type = s
 	buffer = Array(s.split())
+	text = ""
 	current_text = ""
 	start_typing()
 
 func type_text() -> void:
 	if buffer.is_empty():
-		text = "[color=green]" + current_text
+		text = additional_tags + current_text
 		return
 	
 	var next_letter = buffer.pop_front()
 	current_text += next_letter
 	
-	text = "[color=green]" + current_text + "_"
+	text = additional_tags + current_text + "_"
+	
+	if buffer.is_empty():
+		finished_typing.emit()

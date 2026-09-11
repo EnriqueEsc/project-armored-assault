@@ -52,6 +52,8 @@ var aim_limited: bool = false
 
 var recoil_force: float = 1.0
 
+signal target(node: Node3D)
+
 func spawn() -> void:
 	projectile = projectile_prefab.instantiate() as Projectile
 	projectile.deactivate()
@@ -165,9 +167,14 @@ func get_aim_point_3d(distance: float) -> Vector3:
 	if point:
 		res = point.position
 		aim_point_normal = point.normal
+		if point.collider is Vehicle_Rigid:
+			target.emit(point.collider)
+		else:
+			target.emit(null)
 	else:
 		res = from + forward * distance
 		aim_point_normal = global_basis.z
+		target.emit(null)
 	
 	
 	aim_point.emit(res)

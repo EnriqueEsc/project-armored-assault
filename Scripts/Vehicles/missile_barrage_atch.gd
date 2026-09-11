@@ -36,7 +36,7 @@ func _use_attachment() -> void:
 func create_projectiles() -> void:
 	for i in 10:
 		case = case_prefab.instantiate() as Missile
-		case.origin = get_parent_node_3d() as Vehicle_Rigid
+		case.set_origin(get_parent_node_3d() as Vehicle_Rigid)
 		case.deactivate()
 		case.deactivated.connect(case_to_pool)
 		get_tree().current_scene.call_deferred("add_child",case)

@@ -13,6 +13,8 @@ var player_is_in_exfil_zone = false
 
 var effects_manager: Effects_Manager = Effects_Manager.new()
 
+var dialog_manager: Dialog_Manager = null
+
 signal mission_finished(result: bool)
 signal update_objectives(objectives: String)
 
@@ -68,6 +70,9 @@ func _link_player() -> void:
 	
 	update_objectives.connect(player.update_Objectives)
 	mission_finished.connect(player.finish_mission)
+	
+	dialog_manager = Dialog_Manager.INSTANCE
+	dialog_manager.player = player
 
 func _check_success_conditions() -> void:
 	pass

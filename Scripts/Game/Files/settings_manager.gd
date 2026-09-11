@@ -14,8 +14,10 @@ var aim_3d: bool = false
 var aim_guideline: bool = false
 var aim_limited: bool = false
 var third_person: bool = false
+var use_csg: bool = false
+var see_trough_buildings: bool = false
 var max_effects: int = 30
-
+var max_shake_strength: float = 0.2
 var current_save: String = "user://test.json"
 
 # Called when the node enters the scene tree for the first time.
@@ -43,6 +45,9 @@ func save_settings() -> void:
 	settings_file.set_value("Game","aim_guideline",aim_guideline)
 	settings_file.set_value("Game","aim_limited",aim_limited)
 	settings_file.set_value("Game","third_person",third_person)
+	settings_file.set_value("Game","use_csg",use_csg)
+	settings_file.set_value("Game","see_trough_buildings",see_trough_buildings)
+	settings_file.set_value("Game","max_shake_strength",max_shake_strength)
 	settings_file.set_value("Game","max_effects",max_effects)
 	settings_file.save(SETTINGS_PATH)
 	print("SETTINGS GUARDADOS")
@@ -57,6 +62,9 @@ func load_settings() -> void:
 		aim_guideline = settings_file.get_value("Game","aim_guideline",aim_guideline)
 		aim_limited = settings_file.get_value("Game","aim_limited",aim_limited)
 		third_person = settings_file.get_value("Game","third_person",third_person)
+		use_csg = settings_file.get_value("Game","use_csg",use_csg)
+		see_trough_buildings = settings_file.get_value("Game","see_trough_buildings",see_trough_buildings)
+		max_shake_strength = settings_file.get_value("Game","max_shake_strength",max_shake_strength)
 		max_effects = settings_file.get_value("Game","max_effects",max_effects)
 		apply_settings()
 	else:

@@ -154,6 +154,8 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 			if detection_meter >= 1.0:
 				current_state = AI_State.ENGAGED
 				if is_boss:
+					Dialog_Manager.INSTANCE.add_dialog_to_buffer(Dialog_data.new(tank_rigid.vehicle_pilot_name,"I see you, sucker.",Color.RED))
+					
 					HUD_boss_info.update_boss_active(true)
 				
 		AI_State.ENGAGED:
@@ -177,6 +179,8 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 				if current_aggro_time <= 0:
 					current_state = AI_State.IDLE
 					if is_boss:
+						Dialog_Manager.INSTANCE.add_dialog_to_buffer(Dialog_data.new(tank_rigid.vehicle_pilot_name,"Nah, nevermind.",Color.RED))
+					
 						HUD_boss_info.update_boss_active(false)
 
 
@@ -265,7 +269,26 @@ func handle_turret_and_shooting(aim_pos: Vector3, can_shoot: bool, can_see_playe
 			if can_see_player: 
 				#tank_rigid.shoot()
 				t.shoot()
+				if t.projectile_type == 4:
+					break
+				var rng = randi_range(1,20)
+				var rng2 = randi_range(1,4)
+				if rng == 2:
+					
+					match rng2:
+						1:
+							Dialog_Manager.INSTANCE.add_dialog_to_buffer(Dialog_data.new(tank_rigid.vehicle_pilot_name,"Die, die, die.",Color.RED))
+					
+						2:
+							Dialog_Manager.INSTANCE.add_dialog_to_buffer(Dialog_data.new(tank_rigid.vehicle_pilot_name,"I hate this job.",Color.RED))
+					
+						3:
+							Dialog_Manager.INSTANCE.add_dialog_to_buffer(Dialog_data.new(tank_rigid.vehicle_pilot_name,"Openning fire.",Color.RED))
+					
 	
+						4:
+							Dialog_Manager.INSTANCE.add_dialog_to_buffer(Dialog_data.new(tank_rigid.vehicle_pilot_name,"LA CEBOLLA.",Color.RED))
+					
 	
 
 func is_on_sight_range() -> bool:

@@ -6,6 +6,7 @@ var active_tracking: bool = false
 #var accuracy: float = 1.0
 
 func move(delta: float) -> void:
+	
 	var target_direction = global_position.direction_to(objective)
 	
 	if global_position.distance_to(objective) < 1.0:

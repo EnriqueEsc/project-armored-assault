@@ -37,6 +37,10 @@ var HUD_height_line: Array[Line2D] = []
 @onready var HUD_Outline_SubViewport: SubViewport = $Outline_Rect/SubViewport
 @onready var HUD_3D_SubViewport: SubViewport = $UI_3D_Rect/SubViewport
 
+@onready var HUD_Hitmarker: RichTextLabel = $HUD/HUD_Player/Icon/HUD_Hitmarker
+
+@onready var HUD_dialog: HUD_Dialog = $HUD/HUD_Player/HUD_Dialog
+
 var mission_finished = false
 var is_destroyed = false
 
@@ -46,6 +50,20 @@ var aim_point_original_scale: Vector2 = Vector2.ONE
 var aim_guideline: bool = false
 var aim_3d: bool = false
 var third_person: bool = false
+
+var last_time_hit_shown: float = 0
+@export var hit_marker_time: float = 2.0
+
+var targeted_enemies: Array[Vehicle_Rigid] = []
+
+var lock_on: bool = false
+var enemy_locked: Vehicle_Rigid = null
+
+var bellow_75: bool = true
+var bellow_50: bool = true
+var bellow_25: bool = true
+var bellow_15: bool = true
+var bellow_5: bool = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -86,7 +104,13 @@ func _ready() -> void:
 	HUD_Map.visible = false
 	HUD_Boss_info.show_boss_info()
 	
+	
+	HUD_Hitmarker.visible = false
+	last_time_hit_shown = hit_marker_time
+	
 	tank_rigid.shoot_recharge.connect(shoot_ready)
+	
+	tank_rigid.shakes.connect(tank_camera.start_shake)
 	
 	#tank_rigid.max_armor_points = max_armor_points
 	#tank_rigid.armor_points = max_armor_points
@@ -116,6 +140,9 @@ func _ready() -> void:
 	third_person = Settings_Manager.INSTANCE.third_person
 	
 	for t in tank_rigid.vehicle_turrets:
+		
+		t.target.connect(target_enemy)
+		
 		aim_to.connect(t.rotate_turret_to_point_3d)
 		var new_aim = Sprite2D.new()
 		new_aim.texture = load("res://Sprites/Test/MousePointer.png")
@@ -176,6 +203,10 @@ func _ready() -> void:
 		tank_camera.position = Vector3(0,0.328,-1)
 		tank_camera.rotation_degrees = Vector3(0,180,0)
 
+	tank_rigid.hits_enemy.connect(hits_enemy)
+	
+	await get_tree().process_frame
+	HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","Activating combat mode.",color))
 
 func color_HUD() -> void:
 		#HUD_aim.modulate = color
@@ -185,6 +216,7 @@ func color_HUD() -> void:
 		HUD_Velocimeter.modulate = color
 		HUD_Objectives.modulate = color
 		HUD_AP_Bar.modulate = color
+		HUD_Hitmarker.modulate = color
 		HUD_Boss_info.color_boss_info(color)
 		
 		for l in HUD_height_line:
@@ -214,14 +246,23 @@ func _physics_process(delta: float) -> void:
 		return
 	
 	#print(tank_camera.get_mouse_3d_pos())
-	HUD_mouse.position = get_viewport().get_mouse_position()
+	
+	var pointer_pos: Vector3 = Vector3.ZERO
+	
+	if lock_on:
+		#print(enemy_locked)
+		pointer_pos = enemy_locked.global_position
+		HUD_mouse.position = tank_camera.unproject_position(pointer_pos)
+	else:
+		pointer_pos = tank_camera.get_mouse_3d_pos()
+		HUD_mouse.position = get_viewport().get_mouse_position()
 	#HUD_aim.scale = aim_new_scale
 	
 	#print(tank_rigid.get_aim_point_3d())
 	var counter: int = 0
 	for a in HUD_aim:
 		
-		var aim_point = tank_rigid.get_aim_point_3d(counter, tank_rigid.vehicle_turrets[counter].global_position.distance_to(tank_camera.get_mouse_3d_pos()))
+		var aim_point = tank_rigid.get_aim_point_3d(counter, tank_rigid.vehicle_turrets[counter].global_position.distance_to(pointer_pos))
 		
 		var height_ground_pos = aim_point
 		height_ground_pos.y = tank_rigid.global_position.y
@@ -231,7 +272,7 @@ func _physics_process(delta: float) -> void:
 		var aim_new_scale = (aim_point_scale_ref / (tank_camera.global_position.y - (aim_point.y))) * aim_point_original_scale
 		HUD_aim[counter].scale = aim_new_scale
 		
-		HUD_aim[counter].position = tank_camera.unproject_position(tank_rigid.get_aim_point_3d(counter, tank_rigid.vehicle_turrets[counter].global_position.distance_to(tank_camera.get_mouse_3d_pos())))
+		HUD_aim[counter].position = tank_camera.unproject_position(tank_rigid.get_aim_point_3d(counter, tank_rigid.vehicle_turrets[counter].global_position.distance_to(pointer_pos)))
 		
 		if aim_guideline:
 			HUD_height_line[counter].points = [tank_camera.unproject_position(tank_rigid.vehicle_turrets[counter].global_position),HUD_aim[counter].position,tank_camera.unproject_position(height_ground_pos)]
@@ -239,7 +280,7 @@ func _physics_process(delta: float) -> void:
 			HUD_height_line[counter].points = [tank_camera.unproject_position(height_ground_pos),HUD_aim[counter].position]
 		
 		
-		var point = tank_rigid.get_aim_point_3d(counter, tank_rigid.vehicle_turrets[counter].global_position.distance_to(tank_camera.get_mouse_3d_pos()))
+		var point = tank_rigid.get_aim_point_3d(counter, tank_rigid.vehicle_turrets[counter].global_position.distance_to(pointer_pos))
 		var normal = tank_rigid.get_aim_point_3d_normal(counter)
 		HUD_aim_3D[counter].position = point
 		
@@ -257,6 +298,20 @@ func _physics_process(delta: float) -> void:
 	#HUD_height_line.points = [tank_camera.unproject_position(height_ground_pos),HUD_aim.position]
 	
 
+func add_text_to_buffer(name: String, dialog: String):
+	var new_dialog = Dialog_data.new(name,dialog,color)
+	HUD_dialog.add_to_buffer(new_dialog)
+
+
+func display_text(name: String, dialog: String):
+	var new_dialog = Dialog_data.new(name,dialog,color)
+	HUD_dialog.display_dialog(new_dialog)
+
+func add_dialog_to_buffer(dialog: Dialog_data):
+	HUD_dialog.add_to_buffer(dialog)
+
+func display_dialog(dialog: Dialog_data):
+	HUD_dialog.display_dialog(dialog)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -297,10 +352,32 @@ func _process(delta: float) -> void:
 	#tank_rigid.rotate_turret_to_point(get_viewport().get_mouse_position())
 	
 	#tank_rigid.rotate_turret_to_point_3d(tank_camera.get_mouse_3d_pos())
-	aim_to.emit(tank_camera.get_mouse_3d_pos())
+	if lock_on:
+		aim_to.emit(enemy_locked.global_position)
+	else:
+		aim_to.emit(tank_camera.get_mouse_3d_pos())
 	
 	if Input.is_action_just_pressed("Map"):
 		HUD_Map.visible = not HUD_Map.visible
+	
+	if Input.is_action_just_pressed("LockOn"):
+		lock_on = !lock_on
+		if not lock_on:
+			enemy_locked = null
+			return
+		var lock = tank_camera.get_closest_enemy_to_mouse(tank_camera.get_mouse_3d_pos())
+		if lock:
+			enemy_locked = lock
+			enemy_locked.gets_disabled.connect(untarget_enemy.bind(enemy_locked))
+			lock_on = true
+		else:
+			lock_on = false
+			enemy_locked = null
+
+	if last_time_hit_shown <= hit_marker_time:
+		last_time_hit_shown += delta
+		if last_time_hit_shown >= hit_marker_time:
+			HUD_Hitmarker.visible = false
 
 func update_HUD() -> void:
 	update_AP(tank_rigid.armor_points)
@@ -328,6 +405,33 @@ func update_Objectives(objectives: String) -> void:
 
 func update_AP_Bar(percent: float) -> void:
 	HUD_AP_Bar.value = percent
+	
+	if percent <= 75 and bellow_75:
+		HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","Armor integrity at "+str(int(percent))+"%",color))
+		bellow_75 = false
+	
+	if percent <= 50 and bellow_50:
+		HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","Armor integrity at "+str(int(percent))+"%",color))
+		bellow_50 = false
+	
+	if percent <= 25 and bellow_25:
+		HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","Armor integrity at "+str(int(percent))+"%
+Take evasive action",color))
+		bellow_25 = false
+	
+	if percent <= 15 and bellow_15:
+		HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","WARNING Armor integrity at "+str(int(percent))+"%",color))
+		bellow_15 = false
+	
+	if percent <= 5 and bellow_5:
+		HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","WARNING WARNING WARNING
+Armor integrity at "+str(int(percent))+"% CRITICAL",color))
+		bellow_5 = false
+		
+	if percent <= 0:
+		HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","WARNING WARNING WARNING
+Critcal system failiure",color))
+	#HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","Armor integrity at "+str(int(percent))+" percent",color))
 
 func show_HUD(state: bool) -> void:
 	
@@ -379,3 +483,39 @@ func finish_mission(result: bool) -> void:
 		destruction()
 		return
 	
+
+func hits_enemy() -> void:
+	last_time_hit_shown = 0.0
+	HUD_Hitmarker.visible = true
+
+func target_enemy(e: Node3D) -> void:
+	if not e:
+		return
+	e = e as Vehicle_Rigid
+	e.update_stencil(1)
+
+func untarget_enemy(e: Node3D) -> void:
+	if not e:
+		return
+	e = e as Vehicle_Rigid
+	if e == enemy_locked:
+		enemy_locked.gets_disabled.disconnect(untarget_enemy)
+		
+		var lock = tank_camera.get_closest_enemy_to_mouse(enemy_locked.global_position)
+		if lock:
+			if enemy_locked == lock:
+				lock_on = false
+				enemy_locked = null
+				return
+				
+			enemy_locked = lock
+			enemy_locked.gets_disabled.connect(untarget_enemy.bind(enemy_locked))
+			lock_on = true
+		else:
+			lock_on = false
+			enemy_locked = null
+		
+		return
+		
+		lock_on = false
+		enemy_locked = null

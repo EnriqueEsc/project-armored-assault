@@ -16,6 +16,7 @@ var ignore = []
 
 signal deactivated(projectile: Projectile)
 signal explodes(pos: Vector3, blast_rad: float, blast_damage: float)
+signal hits_enemy()
 
 var detonated: bool = false
 
@@ -48,6 +49,7 @@ func _process(delta: float) -> void:
 
 func set_origin(vehicle: Vehicle_Rigid) -> void:
 	origin = vehicle
+	hits_enemy.connect(origin.send_hit_signal)
 	is_player = origin.is_player
 
 func shoot(pos: Vector3, rot: Vector2) -> void:
@@ -96,6 +98,12 @@ func _on_body_entered(body):
 	
 	#print(body)
 	
+	if body is Vehicle_Rigid or body is Emplacement:
+		hits_enemy.emit()
+	
+	if body is Vehicle_Rigid:
+		body.shakes.emit(0.1,0.2)
+	
 	if body.has_method("take_damage"):
 		direction = Vector3.ZERO
 		#origin.projectile_to_pool(self)
@@ -129,10 +137,12 @@ func detonate() -> void:
 	if not is_explosive:
 		return
 	
+	
 	if effects_manager:
 		effects_manager.explosion_from_pool(global_position)
 	
 	explodes.emit(global_position,blast_rad,blast_damage)
+	
 	
 	var explosion = SphereShape3D.new()
 	explosion.radius = blast_rad
@@ -159,6 +169,7 @@ func detonate() -> void:
 		
 		if current_collider and not hitted_enemies.has(current_collider):
 			
+			#print("boom ",current_collider)
 			
 			if current_collider.has_method("take_explosion") or current_collider.has_method("detonate"):
 				#current_collider.take_explosion(blast_damage, origin, global_position, blast_rad)
@@ -166,7 +177,6 @@ func detonate() -> void:
 				continue
 			
 			if current_collider.has_method("take_damage"):
-				
 				
 				var target_center = current_collider.global_position + Vector3(0.0, 0.5, 0.0)
 				var raycast = PhysicsRayQueryParameters3D.create(ray_origin, target_center)
@@ -176,12 +186,14 @@ func detonate() -> void:
 				for h in hitted_enemies:
 					raycast.exclude.append(h)
 				
-				raycast.collide_with_areas = true
+				#raycast.collide_with_areas = true
+				raycast.collide_with_areas = false
 				raycast.collide_with_bodies = true
 				
 				raycast.hit_from_inside = true 
 				
 				var res = space.intersect_ray(raycast)
+				
 				
 				if res and res.collider == current_collider:
 					hitted_enemies.append(current_collider)
@@ -191,6 +203,11 @@ func detonate() -> void:
 						#current_collider.take_damage(blast_damage, origin, global_position)
 				
 	for t in hitted_enemies:
+		if (t is Vehicle_Rigid and t != origin) or t is Emplacement:
+			hits_enemy.emit()
+			
+		
+		#print("olaaaa ",t," | ",hits_enemy.is_connected(origin.send_hit_signal))
 		if t.has_method("take_explosion"):
 			t.call_deferred("take_explosion", blast_damage, origin, global_position, blast_rad)
 			continue
@@ -201,8 +218,9 @@ func detonate() -> void:
 	
 		if t.has_method("take_damage"):
 			t.call_deferred("take_damage", blast_damage, origin, global_position)
-		
+			
 		if t.has_method("recoil"):
 			#print(t)
+			t.shakes.emit(0.4,0.6)
 			t.call_deferred("recoil",global_position.direction_to(t.global_position),blast_rad * blast_damage)
 	deactivate()

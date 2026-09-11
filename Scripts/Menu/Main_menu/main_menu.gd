@@ -27,6 +27,8 @@ extends Menu
 @onready var aim_guideline_button: CheckButton = $Settings_Menu/Buttons/Aim_guideline
 @onready var aim_limited_button: CheckButton = $Settings_Menu/Buttons/Aim_limited
 @onready var third_person_button: CheckButton = $Settings_Menu/Buttons/Third_person
+@onready var use_csg_button: CheckButton = $Settings_Menu/Buttons/Use_CSG
+@onready var see_trough: CheckButton = $Settings_Menu/Buttons/See_trough
 @onready var max_effects_text: RichTextLabel = $Settings_Menu/Buttons/Max_effects_text
 @onready var max_effects_bar: HScrollBar = $Settings_Menu/Buttons/Max_effects_bar
 
@@ -74,6 +76,8 @@ func _set_buttons() -> void:
 	briefing_window.visible = false
 	tank_selection_window.visible = false
 	settings_window.visible = false
+	
+	briefing_text.set_process(true)
 
 func load_scene() -> void:
 	if selected_mission != "":
@@ -92,6 +96,8 @@ func update_settings_window() -> void:
 	aim_guideline_button.button_pressed = Settings_Manager.INSTANCE.aim_guideline
 	aim_limited_button.button_pressed = Settings_Manager.INSTANCE.aim_limited
 	third_person_button.button_pressed = Settings_Manager.INSTANCE.third_person
+	use_csg_button.button_pressed = Settings_Manager.INSTANCE.use_csg
+	see_trough.button_pressed = Settings_Manager.INSTANCE.see_trough_buildings
 	max_effects_bar.value = Settings_Manager.INSTANCE.max_effects
 	update_max_effects_text(max_effects_bar.value)
 
@@ -182,5 +188,7 @@ func save_settings() -> void:
 	Settings_Manager.INSTANCE.aim_guideline = aim_guideline_button.button_pressed
 	Settings_Manager.INSTANCE.aim_limited = aim_limited_button.button_pressed
 	Settings_Manager.INSTANCE.third_person = third_person_button.button_pressed
+	Settings_Manager.INSTANCE.use_csg = use_csg_button.button_pressed
+	Settings_Manager.INSTANCE.see_trough_buildings = see_trough.button_pressed
 	Settings_Manager.INSTANCE.max_effects = max_effects_bar.value
 	Settings_Manager.INSTANCE.save_settings()

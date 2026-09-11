@@ -6,21 +6,13 @@
 [ext_resource type="PackedScene" uid="uid://caqoxtxta5muo" path="res://Models/Test/Tank_Test/turret_V3.fbx" id="5_kv7ca"]
 [ext_resource type="Script" uid="uid://cxxlffo81ypm" path="res://Scripts/AI/Enemies/enemy_tank.gd" id="7_6b5od"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pcmi7"]
-render_priority = 1
-transparency = 1
-no_depth_test = true
-shading_mode = 0
-albedo_color = Color(0.99607843, 0, 0, 1)
-stencil_mode = 3
-stencil_flags = 1
-stencil_compare = 5
-metadata/_stencil_owned = true
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bwv6e"]
+stencil_flags = 2
+stencil_reference = 2
+stencil_color = Color(1, 0, 0, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vwfjx"]
-next_pass = SubResource("StandardMaterial3D_pcmi7")
 distance_fade_max_distance = 1.0
-stencil_mode = 2
 stencil_flags = 2
 stencil_color = Color(0.99607843, 0, 0, 1)
 
@@ -134,10 +126,12 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_j5fwr")
 
-[node name="Enemy_tank" type="CharacterBody3D" unique_id=450725569 node_paths=PackedStringArray("vehicle_turrets")]
+[node name="Enemy_tank" type="CharacterBody3D" unique_id=450725569 node_paths=PackedStringArray("vehicle_turrets", "model")]
 transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, 0, 0, 0)
 script = ExtResource("1_lfxob")
 vehicle_turrets = [NodePath("Turret")]
+model = [NodePath("Minor/Minor"), NodePath("Minor/Gun"), NodePath("Turret/Gun/Gun")]
+material = SubResource("StandardMaterial3D_bwv6e")
 
 [node name="tanque_V3" parent="." unique_id=1683942184 instance=ExtResource("2_wnkmq")]
 transform = Transform3D(1.002, 0, 0, 0, 1.3, 0, 0, 0, 1.002, 0, -0.28692198, 0)

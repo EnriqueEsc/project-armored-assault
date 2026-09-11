@@ -4,6 +4,9 @@
 [ext_resource type="Shader" uid="uid://dbujcyghmjix6" path="res://Shaders/viewport.gdshader" id="2_2yfgf"]
 [ext_resource type="Script" uid="uid://dgldqtulm4ymj" path="res://Scripts/Player/Tank_camera.gd" id="2_emxqw"]
 [ext_resource type="Script" uid="uid://c1amjgu5fo0td" path="res://Scripts/Player/HUD_boss_info.gd" id="3_7k3ju"]
+[ext_resource type="Texture2D" uid="uid://dnmrnp8u32y7x" path="res://icon.svg" id="7_x6g45"]
+[ext_resource type="Script" uid="uid://btlgcwps55nxo" path="res://Scripts/Game/Text/HUD_Dialog.gd" id="7_y13j2"]
+[ext_resource type="Script" uid="uid://h846my1p00nw" path="res://Scripts/Game/Text/typing_text.gd" id="8_dem1y"]
 [ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="13_yfrtn"]
 [ext_resource type="Texture2D" uid="uid://yqsnwiuau3g7" path="res://Sprites/Test/ShootingPoint.png" id="14_rjqdq"]
 [ext_resource type="Script" uid="uid://hg6l1epqoto0" path="res://Scripts/Player/HUD_Map.gd" id="15_6grxy"]
@@ -124,9 +127,29 @@ text = "Boss [1200/1200]"
 scroll_active = false
 
 [node name="Icon" type="Sprite2D" parent="HUD/HUD_Player" unique_id=1942774347]
-position = Vector2(631, 333)
+position = Vector2(383, 333)
 scale = Vector2(0.15, 0.15)
 texture = ExtResource("14_rjqdq")
+
+[node name="HUD_Hitmarker" type="RichTextLabel" parent="HUD/HUD_Player/Icon" unique_id=1402170170]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -521.3334
+offset_top = -28.000015
+offset_right = -363.3333
+offset_bottom = 8.999985
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(5, 5)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 26
+text = "HIT"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="HUD_AP" type="RichTextLabel" parent="HUD/HUD_Player" unique_id=974705429]
 layout_mode = 0
@@ -177,6 +200,7 @@ text = "Score: 2000000"
 horizontal_alignment = 1
 
 [node name="Map" type="TextureRect" parent="HUD/HUD_Player" unique_id=661682572]
+visible = false
 layout_mode = 1
 anchors_preset = 6
 anchor_left = 1.0
@@ -225,6 +249,68 @@ theme_override_constants/outline_size = 5
 theme_override_font_sizes/normal_font_size = 20
 text = "Score: 2000000"
 horizontal_alignment = 1
+
+[node name="HUD_Dialog" type="Control" parent="HUD/HUD_Player" unique_id=391557090]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = -40.0
+offset_right = 20.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("7_y13j2")
+
+[node name="Background" type="Sprite2D" parent="HUD/HUD_Player/HUD_Dialog" unique_id=446068049]
+modulate = Color(0, 0, 0, 0.4862745)
+position = Vector2(13, -35)
+scale = Vector2(5.2, 2)
+texture = ExtResource("7_x6g45")
+
+[node name="Dialog_Text" type="RichTextLabel" parent="HUD/HUD_Player/HUD_Dialog" unique_id=507849041]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -150.0
+offset_right = 300.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 20
+bbcode_enabled = true
+text = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaas"
+scroll_active = false
+script = ExtResource("8_dem1y")
+
+[node name="Dialog_Name" type="RichTextLabel" parent="HUD/HUD_Player/HUD_Dialog" unique_id=269861481]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -325.0
+offset_top = -180.0
+offset_right = 325.0
+offset_bottom = -145.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 20
+bbcode_enabled = true
+text = "Character:"
+scroll_active = false
+
+[node name="Dialog_Sprite" type="Sprite2D" parent="HUD/HUD_Player/HUD_Dialog" unique_id=2122388348]
+position = Vector2(429, -70)
+texture = ExtResource("7_x6g45")
 
 [node name="Death_Screen" type="Control" parent="HUD" unique_id=1385155183]
 layout_mode = 3
@@ -435,6 +521,7 @@ text = "[font_size=38]Controls[/font_size]
 [A]/[D] - Tank steers
 [Space] - Shoot
 [Tab] - Show map
+[Q] - Activate / Disable Lock On
 [Mouse] - It shows the point that turret will rotate to aim to"
 scroll_active = false
 horizontal_alignment = 1

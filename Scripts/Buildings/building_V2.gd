@@ -31,8 +31,17 @@ var combiner: CSGCombiner3D = null
 @export var material: Material = null
 
 var csg_active: bool = true
+var see_trough: bool = false
+
+var player_ref: Vehicle_Rigid = null
+var max_shake_distance: float = 10.0
+
+var ignore_player_shake: bool = false
 
 func _ready() -> void:
+	csg_active = Settings_Manager.INSTANCE.use_csg
+	see_trough = Settings_Manager.INSTANCE.see_trough_buildings
+	
 	if csg_active:
 		combiner = CSGCombiner3D.new()
 		add_child(combiner)
@@ -51,27 +60,39 @@ func _ready() -> void:
 		set_shape_cast()
 	set_physics_process(false)
 	
+	
+	
 	await get_tree().physics_frame
 	
 	effects_manager = Effects_Manager.INSTANCE
 	
 	init_grid()
+	
+	player_ref = get_tree().get_first_node_in_group("Player") as Vehicle_Rigid
+	
 
 
 func init_grid() -> void:
 	if levels.is_empty():
 		return
 	
+	
 	lowest_height = levels[0].lowest_height
 	
 	col_size_x = levels[0].building_bounds.x
 	col_size_y = levels.size()
 	col_size_z = levels[0].building_bounds.y
-
-	multimesh = MultiMesh.new()
-	multimesh.transform_format = MultiMesh.TRANSFORM_3D
-	multimesh.mesh = pref_mesh
-	multimesh.instance_count = levels.size() * levels[0].blocks.size()
+	
+	if not csg_active:
+		#print("ola")
+		multimesh = MultiMesh.new()
+		multimesh.transform_format = MultiMesh.TRANSFORM_3D
+		
+		if see_trough:
+			pref_mesh.surface_set_material(0,material)
+		
+		multimesh.mesh = pref_mesh
+		multimesh.instance_count = levels.size() * levels[0].blocks.size()
 
 	var start_x = -col_size_x * 0.5 + 1 * 0.5
 	var start_y = 1 * 0.0
@@ -92,7 +113,8 @@ func init_grid() -> void:
 			if csg_active:
 				var blok: CSGBox3D = CSGBox3D.new()
 				blok.size = Vector3(2,2,1)
-				blok.material = material
+				if see_trough:
+					blok.material = material
 				combiner.add_child(blok)
 				blok.position = pos
 				b.got_destroyed.connect(destroy_b.bind(blok))
@@ -112,6 +134,7 @@ func init_grid() -> void:
 	
 	#active_count = counter
 	if not csg_active:
+		#print("adio")
 		multimesh_instance.multimesh = multimesh
 
 
@@ -137,6 +160,7 @@ func set_shape_cast() -> void:
 
 
 func crush_below() -> void:
+	ignore_player_shake = false
 	damage_zone.force_shapecast_update()
 	
 	for i in damage_zone.get_collision_count():
@@ -144,10 +168,21 @@ func crush_below() -> void:
 		var collider = damage_zone.get_collider(i)
 		if collider:
 			if collider.has_method("take_damage"):
-				print(collider)
+				#print(collider)
 				collider.take_damage(10,null,collider.global_position)
 			if collider.has_method("detonate"):
 				collider.detonate()
+			if collider is Vehicle_Rigid:
+				ignore_player_shake = collider == player_ref
+				collider.shakes.emit(1.0,1.0)
+
+func shake_player() -> void:
+	#print("OLA",damage_zone.global_position.distance_to(player_ref.global_position))
+	var distance = damage_zone.global_position.distance_to(player_ref.global_position)
+	if distance < max_shake_distance:
+		var factor: float = (max_shake_distance - distance) / max_shake_distance
+		#print("ADIO")
+		player_ref.shakes.emit(1.0,(1.0 * factor))
 
 func _physics_process(delta: float) -> void:
 	
@@ -186,6 +221,9 @@ func destruction() -> void:
 		
 	crush_below()
 	
+	if player_ref and not ignore_player_shake:
+		shake_player()
+	
 	if emmit_collapse_effect and effects_manager:
 		effects_manager.collapse_from_pool(damage_zone.global_position)
 
@@ -208,6 +246,7 @@ func destroy_basement() -> void:
 	for l in levels:
 		l.deactivate_collisions()
 	destroyed = true
+	shake_player()
 	set_physics_process(true)
 
 func deactivate() -> void:

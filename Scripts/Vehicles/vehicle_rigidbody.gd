@@ -54,6 +54,15 @@ var collision_shape: BoxShape3D = null
 
 @export var attachment: Attachment = null
 
+signal hits_enemy()
+signal shakes(shake_time: float, intensity: float)
+
+@export var model: Array[GeometryInstance3D] = []
+@export var material: BaseMaterial3D = null
+
+var tick: float = 1.0
+var last_tick: float = 0.0
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	time_controller = Time_Controller.INSTANCE
@@ -78,10 +87,31 @@ func _ready() -> void:
 	
 	time_passed = fire_rate_prim
 	
+	await get_tree().physics_frame
+	if material:
+		#print("ANTES: ", name, " ", material.get_instance_id())
+
+		material = material.duplicate(true) as BaseMaterial3D
+		material.stencil_outline_thickness = 0.05
+		#print("DESPUÉS: ", name, " ", material.get_instance_id())
+		update_stencil(2)
+	
 	for c in get_children():
+		
 		if c is CollisionShape3D and c.shape is BoxShape3D:
 			collision_shape = c.shape
 			return
+
+func update_stencil(stencil_mode: BaseMaterial3D.StencilMode) -> void:
+	if not material:
+		return
+	if stencil_mode == material.stencil_mode:
+		return
+	if not model.is_empty():
+		material.stencil_mode = stencil_mode
+		for m in model:
+			#print("sssss ",m," ",material.stencil_mode)
+			m.material_override = material
 
 func initialize_effects() -> void:
 	var damage_prefab = load("res://Prefabs/Effects/fire.tscn")
@@ -284,3 +314,16 @@ func use_attachment() -> void:
 func get_score(score: int) -> void:
 	self.score += score
 	score_changed.emit(self.score)
+
+func send_hit_signal() -> void:
+	hits_enemy.emit()
+
+func shake_vehicle(shake_time: float) -> void:
+	shakes.emit(shake_time)
+
+func _process(delta: float) -> void:
+	
+	last_tick += delta
+	if last_tick > tick:
+		update_stencil(2)
+		last_tick = 0

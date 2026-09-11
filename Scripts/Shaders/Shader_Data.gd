@@ -10,4 +10,4 @@ func _process(delta: float) -> void:
 		#var aim_direction = -player.tank_turret.global_transform.basis.x.normalized()
 		#RenderingServer.global_shader_parameter_set("player_aim_dir", aim_direction)
 	
-	print("FPS: ",Engine.get_frames_per_second())
+	#print("FPS: ",Engine.get_frames_per_second())

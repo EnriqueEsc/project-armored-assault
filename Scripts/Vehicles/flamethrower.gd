@@ -42,9 +42,13 @@ func _on_body_entered(body):
 	
 	#print(body)
 	
-	if body is Building:
+	if body is Building or body is Building_Chunk:
 		deactivate()
 		return
+	
+	if body is Vehicle_Rigid or body is Emplacement:
+		hits_enemy.emit()
+	
 	
 	if body.has_method("take_damage"):
 		direction = Vector3.ZERO
