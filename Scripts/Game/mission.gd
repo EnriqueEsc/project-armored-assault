@@ -18,8 +18,18 @@ var dialog_manager: Dialog_Manager = null
 signal mission_finished(result: bool)
 signal update_objectives(objectives: String)
 
+var fade_time: float = 3.0
+var time_since_fade: float = 0.0
+
+var fading_factor: float = 0.0
+
+var black_screen: ColorRect = null
+var mission_info_text: Typing_Text = null
+var player_dialog: HUD_Dialog = null
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	set_process(false)
 	
 	add_child(effects_manager)
 	
@@ -36,6 +46,11 @@ func _mission_failed() -> void:
 	mission_finished.emit(false)
 
 func _mission_succeeded() -> void:
+	black_screen.visible = true
+	time_since_fade = 0.0
+	fading_factor = - fading_factor
+	mission_info_text.set_text_to_type("....The End....")
+	set_process(true)
 	mission_finished.emit(true)
 	_add_score_to_player()
 
@@ -47,6 +62,18 @@ func _send_objectives_update() -> void:
 
 func _set_objectives() -> void:
 	pass
+
+func _process(delta: float) -> void:
+	time_since_fade += delta
+	black_screen.color.a -= fading_factor * delta
+	mission_info_text.modulate.a -= fading_factor * delta
+	print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+	if time_since_fade > fade_time:
+		if fading_factor > 0.0:
+			black_screen.visible = false
+			player.set_process(true)
+		player_dialog.start_mission()
+		set_process(false)
 
 func _link_player() -> void:
 	#player = get_tree().get_first_node_in_group("Player").get_parent() as Tank_player_controller
@@ -73,6 +100,26 @@ func _link_player() -> void:
 	
 	dialog_manager = Dialog_Manager.INSTANCE
 	dialog_manager.player = player
+	
+	black_screen = player.HUD_Black_screen
+	mission_info_text = player.HUD_Mission_info
+	player_dialog = player.HUD_dialog
+	fading_factor = black_screen.color.a / fade_time
+	
+	player.set_process(false)
+	
+	#set_process(true)
+	if mission_info_text:
+		_show_mission_info()
+		mission_info_text.finished_typing.connect(set_process.bind(true))
+	
+
+func _show_mission_info() -> void:
+	mission_info_text.set_text_to_type("Mission intel:
+
+Operation: Default shit
+Date: Today, duh
+			  ")
 
 func _check_success_conditions() -> void:
 	pass

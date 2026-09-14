@@ -38,6 +38,8 @@ var max_shake_distance: float = 10.0
 
 var ignore_player_shake: bool = false
 
+var vis_ref: MeshInstance3D = null
+
 func _ready() -> void:
 	csg_active = Settings_Manager.INSTANCE.use_csg
 	see_trough = Settings_Manager.INSTANCE.see_trough_buildings
@@ -51,6 +53,8 @@ func _ready() -> void:
 		add_child(multimesh_instance)
 	
 	for c in get_children():
+		if c is MeshInstance3D:
+			vis_ref = c
 		if c is Building_Chunk:
 			levels.append(c)
 			c.got_destroyed.connect(destroy_chunk.bind(c))
@@ -60,7 +64,8 @@ func _ready() -> void:
 		set_shape_cast()
 	set_physics_process(false)
 	
-	
+	if vis_ref:
+		vis_ref.visible = false
 	
 	await get_tree().physics_frame
 	
@@ -174,6 +179,7 @@ func crush_below() -> void:
 				collider.detonate()
 			if collider is Vehicle_Rigid:
 				ignore_player_shake = collider == player_ref
+				collider.gets_crushed.emit()
 				collider.shakes.emit(1.0,1.0)
 
 func shake_player() -> void:

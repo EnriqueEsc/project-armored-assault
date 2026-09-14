@@ -14,7 +14,7 @@ func _set_objectives() -> void:
 	var enemies = get_tree().get_nodes_in_group("Enemy")
 	var emplacements: Array[Emplacement] = []
 	var tanks: Array[Tank_Rigid] = []
-	
+	var counter: int = 1
 	for e in enemies:
 		if is_instance_of(e, Emplacement):
 			emplacements.append(e)
@@ -22,6 +22,8 @@ func _set_objectives() -> void:
 		if is_instance_of(e, Tank_Rigid):
 			e.gets_disabled.connect(tanks_kill_count)
 			tanks.append(e)
+			e.vehicle_pilot_name = "Tank #"+str(counter)
+			counter += 1
 	
 	min_tank_kills = tanks.size() - 1
 	min_emplacement_kills = emplacements.size()
@@ -49,8 +51,17 @@ func _set_objectives() -> void:
 	
 	await get_tree().create_timer(3.0).timeout
 	dialog_manager.add_text_to_buffer("Commander","Let's start the mission.
-Proceed carefully.")
+Proceed carefully, all of you.","commander")
+	dialog_manager.add_text_to_buffer("Rhino 2","Jeez, careful it's not my name, so I can't promise anything.","rhino2")
+	dialog_manager.add_text_to_buffer("Rhino 3","So funny...
+Weapons hot.","rhino3")
 
+func _show_mission_info() -> void:
+	mission_info_text.set_text_to_type("Mission intel:
+
+Operation: Default shit
+Date: Today, duh
+			  ")
 
 func _update_current_objectives() -> void:
 	
@@ -70,7 +81,10 @@ func _update_current_objectives() -> void:
 			exfil_zone.visible = true
 		
 		
-			dialog_manager.add_text_to_buffer("Commander","Your job there is done, go to the exfil zone so we could take your ass out of that dumpster.")
+			dialog_manager.add_text_to_buffer("Commander","Your job there is done, go to the exfil zone ASAP so we could take your ass out of that dumpster.","commander")
+			dialog_manager.add_text_to_buffer("Rhino 3","Thank god, I'm starving.
+I saw a delicious fried chicken on the frigde back at the base.","rhino3")
+			dialog_manager.add_text_to_buffer("Rhino 2","Don't even think about it, get your own food, jerk.","rhino2")
 		
 		
 		objectives_text = ^"[font_size=28]Objectives:[/font_size]
@@ -88,7 +102,9 @@ func emplacements_kill_count() -> void:
 	current_emplacement_kills += 1
 	
 	if current_emplacement_kills == min_emplacement_kills:
-		dialog_manager.add_text_to_buffer("Commander",".........Boom.......")
+		dialog_manager.add_text_to_buffer("Commander","The ammo depos and its defenses are gone.","commander")
+		dialog_manager.add_text_to_buffer("Rhino 3","We could sell some of that...","rhino3")
+	
 	#print("Kills: ",current_tank_kills)
 	
 	_update_current_objectives()
@@ -100,8 +116,9 @@ func tanks_kill_count() -> void:
 	current_tank_kills += 1
 	
 	if current_tank_kills == min_tank_kills:
+		dialog_manager.add_text_to_buffer("Rhino 2",".........Boom.......","rhino2")
 		dialog_manager.add_text_to_buffer("Commander","The biggest threat is no more.
-Nothing can stop you now")
+Nothing can stop you now","commander")
 	
 	#print("Kills: ",current_tank_kills)
 	
@@ -113,7 +130,8 @@ func desmadre_count(block: Building_Block_V2) -> void:
 	current_desmadre += 1
 	if current_desmadre == min_desmadre:
 		dialog_manager.add_text_to_buffer("Commander","They have nothing more than ruins now.
-Excellent work.")
+Nice job.","commander")
+		dialog_manager.add_text_to_buffer("Rhino 2","Well, at least it's a cheap land now, I guess.","rhino2")
 	_update_current_objectives()
 
 
@@ -125,7 +143,6 @@ func _object_enters_exfil_zone(object: Node3D) -> void:
 func _check_success_conditions() -> void:
 	
 	if current_tank_kills >= min_tank_kills and current_emplacement_kills >= min_emplacement_kills and current_desmadre >= min_desmadre and player_is_in_exfil_zone:
-		dialog_manager.add_text_to_buffer("Commander","Let's go back to base, I'm starving.
-Excellent job.")
-		
+		dialog_manager.add_text_to_buffer("Commander","Let's go back to base.","commander")
+
 		_mission_succeeded()

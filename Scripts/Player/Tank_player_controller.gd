@@ -7,6 +7,7 @@ signal aim_to(point: Vector3)
 @onready var tank_camera: Tank_camera = $Camera3D
 
 @onready var HUD_mouse: Sprite2D = $HUD/HUD_Player/Icon
+@onready var HUD_Lock_on: Sprite2D = $HUD/HUD_Player/Icon/Lock_on
 var HUD_aim: Array[Sprite2D] = []
 var HUD_aim_3D: Array[Sprite3D] = []
 var HUD_Shoot_Ready: Array[TextureProgressBar] = []
@@ -41,6 +42,9 @@ var HUD_height_line: Array[Line2D] = []
 
 @onready var HUD_dialog: HUD_Dialog = $HUD/HUD_Player/HUD_Dialog
 
+@onready var HUD_Black_screen: ColorRect = $HUD/HUD_Player/Black_screen/HUD_Black_Screen
+@onready var HUD_Mission_info: Typing_Text = $HUD/HUD_Player/Black_screen/HUD_Black_Screen/Mission_info
+
 var mission_finished = false
 var is_destroyed = false
 
@@ -64,6 +68,8 @@ var bellow_50: bool = true
 var bellow_25: bool = true
 var bellow_15: bool = true
 var bellow_5: bool = true
+
+var ready_to_shoot: bool = true
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -107,6 +113,7 @@ func _ready() -> void:
 	
 	HUD_Hitmarker.visible = false
 	last_time_hit_shown = hit_marker_time
+	HUD_Lock_on.visible = lock_on
 	
 	tank_rigid.shoot_recharge.connect(shoot_ready)
 	
@@ -132,6 +139,10 @@ func _ready() -> void:
 	#await get_tree().physics_frame
 	#Node.print_orphan_nodes()
 	#change_HUD_color(color)
+	
+	tank_rigid.embraces_damage.connect(dialog_hit)
+	tank_rigid.shoot_signal.connect(dialog_fire)
+	tank_rigid.gets_crushed.connect(dialog_building_collapsing)
 	
 	await get_tree().physics_frame
 	
@@ -206,7 +217,7 @@ func _ready() -> void:
 	tank_rigid.hits_enemy.connect(hits_enemy)
 	
 	await get_tree().process_frame
-	HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","Activating combat mode.",color))
+	HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","Activating combat mode.",color,"main_systems"))
 
 func color_HUD() -> void:
 		#HUD_aim.modulate = color
@@ -232,6 +243,14 @@ func color_HUD() -> void:
 func shoot_ready(charge: float) -> void:
 	for s in HUD_Shoot_Ready:
 		s.value = charge
+	if charge > 99 and not ready_to_shoot:
+		ready_to_shoot = true
+		var crew_speak: int = randi_range(0,4)
+		if crew_speak == 0:
+			var dialogs: Array[String] = ["Weapons loaded.","Ready to shoot"]
+			HUD_dialog.add_to_buffer_low_prior(Dialog_data.new("Rhino 3",dialogs[randi_range(0,dialogs.size()-1)],color,"rhino3"))
+		
+		
 
 func _physics_process(delta: float) -> void:
 	if not third_person:
@@ -298,17 +317,24 @@ func _physics_process(delta: float) -> void:
 	#HUD_height_line.points = [tank_camera.unproject_position(height_ground_pos),HUD_aim.position]
 	
 
-func add_text_to_buffer(name: String, dialog: String):
-	var new_dialog = Dialog_data.new(name,dialog,color)
+func add_text_to_buffer(name: String, dialog: String, char_image: String = "default"):
+	var new_dialog = Dialog_data.new(name,dialog,color,char_image)
 	HUD_dialog.add_to_buffer(new_dialog)
 
+func add_text_to_buffer_low_prior(name: String, dialog: String, char_image: String = "default"):
+	var new_dialog = Dialog_data.new(name,dialog,color,char_image)
+	HUD_dialog.add_to_buffer_low_prior(new_dialog)
 
-func display_text(name: String, dialog: String):
-	var new_dialog = Dialog_data.new(name,dialog,color)
+func display_text(name: String, dialog: String, char_image: String = "default"):
+	var new_dialog = Dialog_data.new(name,dialog,color,char_image)
 	HUD_dialog.display_dialog(new_dialog)
 
 func add_dialog_to_buffer(dialog: Dialog_data):
 	HUD_dialog.add_to_buffer(dialog)
+
+
+func add_dialog_to_buffer_low_prior(dialog: Dialog_data):
+	HUD_dialog.add_to_buffer_low_prior(dialog)
 
 func display_dialog(dialog: Dialog_data):
 	HUD_dialog.display_dialog(dialog)
@@ -326,7 +352,8 @@ func _process(delta: float) -> void:
 	
 	if mission_finished:
 		if Input.is_action_just_pressed("Shoot"):
-			get_tree().change_scene_to_file("res://Scenes/main_menu.tscn")
+			#get_tree().change_scene_to_file("res://Scenes/main_menu.tscn")
+			get_tree().change_scene_to_file("res://Scenes/after_mission.tscn")
 		return
 	
 	if Input.is_action_just_pressed("Reload"):
@@ -364,16 +391,23 @@ func _process(delta: float) -> void:
 		lock_on = !lock_on
 		if not lock_on:
 			enemy_locked = null
+			HUD_Lock_on.visible = lock_on
 			return
 		var lock = tank_camera.get_closest_enemy_to_mouse(tank_camera.get_mouse_3d_pos())
 		if lock:
 			enemy_locked = lock
+			if enemy_locked.gets_disabled.is_connected(untarget_enemy.bind(enemy_locked)):
+				lock_on = false
+				enemy_locked.gets_disabled.disconnect(untarget_enemy.bind(enemy_locked))
+				#enemy_locked = null
 			enemy_locked.gets_disabled.connect(untarget_enemy.bind(enemy_locked))
 			lock_on = true
 		else:
 			lock_on = false
 			enemy_locked = null
-
+		HUD_Lock_on.visible = lock_on
+	
+	
 	if last_time_hit_shown <= hit_marker_time:
 		last_time_hit_shown += delta
 		if last_time_hit_shown >= hit_marker_time:
@@ -407,31 +441,54 @@ func update_AP_Bar(percent: float) -> void:
 	HUD_AP_Bar.value = percent
 	
 	if percent <= 75 and bellow_75:
-		HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","Armor integrity at "+str(int(percent))+"%",color))
+		HUD_dialog.add_to_buffer_low_prior(Dialog_data.new("Main Systems","Armor integrity at "+str(int(percent))+"%",color,"main_systems"))
 		bellow_75 = false
+		return
 	
 	if percent <= 50 and bellow_50:
-		HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","Armor integrity at "+str(int(percent))+"%",color))
+		HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","Armor integrity at "+str(int(percent))+"%",color,"main_systems"))
 		bellow_50 = false
+		return
 	
 	if percent <= 25 and bellow_25:
 		HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","Armor integrity at "+str(int(percent))+"%
-Take evasive action",color))
+Take evasive action",color,"main_systems"))
 		bellow_25 = false
+		return
 	
 	if percent <= 15 and bellow_15:
-		HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","WARNING Armor integrity at "+str(int(percent))+"%",color))
+		HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","WARNING Armor integrity at "+str(int(percent))+"%",color,"main_systems"))
 		bellow_15 = false
+		return
 	
 	if percent <= 5 and bellow_5:
-		HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","WARNING WARNING WARNING
-Armor integrity at "+str(int(percent))+"% CRITICAL",color))
+		HUD_dialog.display_dialog(Dialog_data.new("Main Systems","WARNING WARNING WARNING
+Armor integrity at "+str(int(percent))+"% CRITICAL",color,"main_systems"))
 		bellow_5 = false
+		return
 		
 	if percent <= 0:
-		HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","WARNING WARNING WARNING
-Critcal system failiure",color))
-	#HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","Armor integrity at "+str(int(percent))+" percent",color))
+		HUD_dialog.display_dialog(Dialog_data.new("Main Systems","WARNING WARNING WARNING
+Critcal system failiure",color,"main_systems"))
+		return
+
+func dialog_fire() -> void:
+	ready_to_shoot = false
+	var crew_speak: int = randi_range(0,2)
+	if crew_speak == 0:
+		HUD_dialog.add_to_buffer_low_prior(Dialog_data.new("Rhino 3","Fire.",color,"rhino3"))
+
+	
+
+func dialog_hit(damage: int) -> void:
+	if damage < 10:
+		return
+	var dialogs: Array[String] = ["The hull is getting crushed","Evade!!!.","We will need a new tank after this mission.","I don't want to die, do something!"]
+	var crew_speak: int = randi_range(0,4)
+	
+	if crew_speak == 0:
+		HUD_dialog.add_to_buffer_low_prior(Dialog_data.new("Rhino 2",dialogs[randi_range(0,dialogs.size()-1)],color,"rhino2"))
+
 
 func show_HUD(state: bool) -> void:
 	
@@ -449,6 +506,8 @@ func show_HUD(state: bool) -> void:
 	HUD_Boss_info.show_boss_info()
 	#HUD_height_line.visible = state
 	HUD_Map.visible = false
+	
+	HUD_dialog.visible = (state and HUD_dialog.is_active) or mission_finished
 	
 	for l in HUD_height_line:
 		l.visible = state
@@ -478,6 +537,7 @@ func finish_mission(result: bool) -> void:
 		if result:
 			
 			HUD_Victory_Screen.visible = true
+			tank_rigid.move(Vector2.ZERO,1)
 			return
 		
 		destruction()
@@ -487,6 +547,34 @@ func finish_mission(result: bool) -> void:
 func hits_enemy() -> void:
 	last_time_hit_shown = 0.0
 	HUD_Hitmarker.visible = true
+	dialog_hit_enemy()
+
+func dialog_hit_enemy() -> void:
+	
+	var crew_speak: int = randi_range(0,2)
+	if crew_speak == 0:
+		var who: int = randi_range(0,2)
+		if who == 0:
+			var dialogs: Array[String] = ["Beautiful.","Good shoot"]
+			HUD_dialog.add_to_buffer_low_prior(Dialog_data.new("Rhino 3",dialogs[randi_range(0,dialogs.size()-1)],color,"rhino3"))
+			
+		else:
+			var dialogs: Array[String] = ["Bullseye~","Take that!"]
+			HUD_dialog.add_to_buffer_low_prior(Dialog_data.new("Rhino 2",dialogs[randi_range(0,dialogs.size()-1)],color,"rhino2"))
+
+func dialog_building_collapsing() -> void:
+	
+	var crew_speak: int = randi_range(0,1)
+	if crew_speak == 0:
+		var who: int = randi_range(0,2)
+		if who == 0:
+			var dialogs: Array[String] = ["Get away from here!!!","The building is collapsing!"]
+			HUD_dialog.add_to_buffer_low_prior(Dialog_data.new("Rhino 3",dialogs[randi_range(0,dialogs.size()-1)],color,"rhino3"))
+			
+		else:
+			var dialogs: Array[String] = ["Holy shit...","We will die if we stay here, moveeee!!!"]
+			HUD_dialog.add_to_buffer_low_prior(Dialog_data.new("Rhino 2",dialogs[randi_range(0,dialogs.size()-1)],color,"rhino2"))
+
 
 func target_enemy(e: Node3D) -> void:
 	if not e:
@@ -506,16 +594,25 @@ func untarget_enemy(e: Node3D) -> void:
 			if enemy_locked == lock:
 				lock_on = false
 				enemy_locked = null
+				HUD_Lock_on.visible = lock_on
 				return
 				
 			enemy_locked = lock
+			if enemy_locked.gets_disabled.is_connected(untarget_enemy.bind(enemy_locked)):
+				lock_on = false
+				enemy_locked = null
+				HUD_Lock_on.visible = lock_on
+				return
 			enemy_locked.gets_disabled.connect(untarget_enemy.bind(enemy_locked))
 			lock_on = true
+			HUD_Lock_on.visible = lock_on
 		else:
 			lock_on = false
 			enemy_locked = null
+			HUD_Lock_on.visible = lock_on
 		
 		return
 		
 		lock_on = false
 		enemy_locked = null
+		HUD_Lock_on.visible = lock_on

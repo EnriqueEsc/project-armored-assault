@@ -43,6 +43,7 @@ func break_typing() -> void:
 func stop_typing() -> void:
 	timer.stop()
 	text = additional_tags + text_to_type
+	finished_typing.emit()
 
 func start_typing() -> void:
 	timer.start()

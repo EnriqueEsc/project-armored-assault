@@ -20,7 +20,10 @@ shader_parameter/cutout_feather = 1.0
 [sub_resource type="BoxShape3D" id="BoxShape3D_bhunq"]
 size = Vector3(2, 2, 1)
 
-[node name="CSGCombiner3D4" type="Node3D" unique_id=921184687]
+[sub_resource type="BoxMesh" id="BoxMesh_bhunq"]
+size = Vector3(6, 16, 5)
+
+[node name="Big_Building" type="Node3D" unique_id=921184687]
 script = ExtResource("1_5tsft")
 pref_mesh = SubResource("BoxMesh_qr0ht")
 material = SubResource("ShaderMaterial_pni4c")
@@ -527,3 +530,7 @@ shape = SubResource("BoxShape3D_bhunq")
 [node name="CollisionShape3D15" type="CollisionShape3D" parent="StaticBody3D8" unique_id=526426626]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 2)
 shape = SubResource("BoxShape3D_bhunq")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1024649596]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
+mesh = SubResource("BoxMesh_bhunq")

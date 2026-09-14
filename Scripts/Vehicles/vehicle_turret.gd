@@ -41,6 +41,7 @@ var case_active: Array[Case] = []
 
 var time_controller: Time_Controller
 @export var fire_rate_prim: float = 2
+@export var muzzle_pos: Vector3 = Vector3.ZERO
 var last_shoot_prim: float = -10
 
 var original_side_angle: float = 0.0
@@ -91,6 +92,7 @@ func _ready() -> void:
 	
 	aim_limited = Settings_Manager.INSTANCE.aim_limited
 	
+	#muzzle_pos = global_position + muzzle_pos
 	pass
 
 

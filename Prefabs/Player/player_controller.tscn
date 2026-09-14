@@ -4,9 +4,11 @@
 [ext_resource type="Shader" uid="uid://dbujcyghmjix6" path="res://Shaders/viewport.gdshader" id="2_2yfgf"]
 [ext_resource type="Script" uid="uid://dgldqtulm4ymj" path="res://Scripts/Player/Tank_camera.gd" id="2_emxqw"]
 [ext_resource type="Script" uid="uid://c1amjgu5fo0td" path="res://Scripts/Player/HUD_boss_info.gd" id="3_7k3ju"]
+[ext_resource type="Texture2D" uid="uid://b86g6wukndswo" path="res://Sprites/Test/lock_on.png" id="6_dem1y"]
 [ext_resource type="Texture2D" uid="uid://dnmrnp8u32y7x" path="res://icon.svg" id="7_x6g45"]
 [ext_resource type="Script" uid="uid://btlgcwps55nxo" path="res://Scripts/Game/Text/HUD_Dialog.gd" id="7_y13j2"]
 [ext_resource type="Script" uid="uid://h846my1p00nw" path="res://Scripts/Game/Text/typing_text.gd" id="8_dem1y"]
+[ext_resource type="Texture2D" uid="uid://dv167uv5xah61" path="res://Sprites/Characters/default.png" id="11_imkmc"]
 [ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="13_yfrtn"]
 [ext_resource type="Texture2D" uid="uid://yqsnwiuau3g7" path="res://Sprites/Test/ShootingPoint.png" id="14_rjqdq"]
 [ext_resource type="Script" uid="uid://hg6l1epqoto0" path="res://Scripts/Player/HUD_Map.gd" id="15_6grxy"]
@@ -131,6 +133,9 @@ position = Vector2(383, 333)
 scale = Vector2(0.15, 0.15)
 texture = ExtResource("14_rjqdq")
 
+[node name="Lock_on" type="Sprite2D" parent="HUD/HUD_Player/Icon" unique_id=747781226]
+texture = ExtResource("6_dem1y")
+
 [node name="HUD_Hitmarker" type="RichTextLabel" parent="HUD/HUD_Player/Icon" unique_id=1402170170]
 anchors_preset = 8
 anchor_left = 0.5
@@ -250,6 +255,35 @@ theme_override_font_sizes/normal_font_size = 20
 text = "Score: 2000000"
 horizontal_alignment = 1
 
+[node name="Black_screen" type="Control" parent="HUD/HUD_Player" unique_id=255230971]
+anchors_preset = 0
+offset_right = 1150.0
+offset_bottom = 650.0
+
+[node name="HUD_Black_Screen" type="ColorRect" parent="HUD/HUD_Player/Black_screen" unique_id=1451788005]
+custom_minimum_size = Vector2(1152, 648)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+color = Color(0, 0, 0, 1)
+
+[node name="Mission_info" type="RichTextLabel" parent="HUD/HUD_Player/Black_screen/HUD_Black_Screen" unique_id=185450494]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 100.0
+offset_top = -348.0
+offset_right = 700.0
+offset_bottom = -198.0
+grow_vertical = 0
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 20
+bbcode_enabled = true
+text = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaas"
+scroll_active = false
+script = ExtResource("8_dem1y")
+
 [node name="HUD_Dialog" type="Control" parent="HUD/HUD_Player" unique_id=391557090]
 layout_mode = 1
 anchors_preset = 7
@@ -308,9 +342,90 @@ bbcode_enabled = true
 text = "Character:"
 scroll_active = false
 
-[node name="Dialog_Sprite" type="Sprite2D" parent="HUD/HUD_Player/HUD_Dialog" unique_id=2122388348]
+[node name="Dialog_Sprite_Bkgnd" type="Sprite2D" parent="HUD/HUD_Player/HUD_Dialog" unique_id=2122388348]
+modulate = Color(0, 0, 0, 1)
 position = Vector2(429, -70)
 texture = ExtResource("7_x6g45")
+
+[node name="Dialog_Sprite" type="Sprite2D" parent="HUD/HUD_Player/HUD_Dialog" unique_id=913294461]
+position = Vector2(429, -70)
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("11_imkmc")
+
+[node name="Icon" type="Sprite2D" parent="HUD/HUD_Player/HUD_Dialog/Dialog_Sprite" unique_id=176108752]
+position = Vector2(383, 333)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("14_rjqdq")
+
+[node name="HUD_Hitmarker" type="RichTextLabel" parent="HUD/HUD_Player/HUD_Dialog/Dialog_Sprite/Icon" unique_id=1646922781]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -521.3334
+offset_top = -28.000015
+offset_right = -363.3333
+offset_bottom = 8.999985
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(5, 5)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 26
+text = "HIT"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Icon" type="Sprite2D" parent="HUD/HUD_Player/HUD_Dialog/Dialog_Sprite/Icon" unique_id=113058539]
+position = Vector2(383, 333)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("14_rjqdq")
+
+[node name="HUD_Hitmarker" type="RichTextLabel" parent="HUD/HUD_Player/HUD_Dialog/Dialog_Sprite/Icon/Icon" unique_id=383687484]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -521.3334
+offset_top = -28.000015
+offset_right = -363.3333
+offset_bottom = 8.999985
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(5, 5)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 26
+text = "HIT"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Icon" type="Sprite2D" parent="HUD/HUD_Player/HUD_Dialog/Dialog_Sprite/Icon/Icon" unique_id=419063183]
+position = Vector2(383, 333)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("14_rjqdq")
+
+[node name="HUD_Hitmarker" type="RichTextLabel" parent="HUD/HUD_Player/HUD_Dialog/Dialog_Sprite/Icon/Icon/Icon" unique_id=2147257026]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -521.3334
+offset_top = -28.000015
+offset_right = -363.3333
+offset_bottom = 8.999985
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(5, 5)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 26
+text = "HIT"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Death_Screen" type="Control" parent="HUD" unique_id=1385155183]
 layout_mode = 3

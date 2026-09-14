@@ -56,6 +56,8 @@ var collision_shape: BoxShape3D = null
 
 signal hits_enemy()
 signal shakes(shake_time: float, intensity: float)
+signal embraces_damage(damage: int)
+signal gets_crushed()
 
 @export var model: Array[GeometryInstance3D] = []
 @export var material: BaseMaterial3D = null
@@ -113,6 +115,18 @@ func update_stencil(stencil_mode: BaseMaterial3D.StencilMode) -> void:
 			#print("sssss ",m," ",material.stencil_mode)
 			m.material_override = material
 
+func update_stencil_color(color: Color) -> void:
+	if not material:
+		return
+	if material.stencil_color == color:
+		return
+	if not model.is_empty():
+		material.stencil_color = color
+		for m in model:
+			#print("sssss ",m," ",material.stencil_mode)
+			m.material_override = material
+
+
 func initialize_effects() -> void:
 	var damage_prefab = load("res://Prefabs/Effects/fire.tscn")
 	if damage_prefab:
@@ -137,6 +151,7 @@ func calculate_charge(delta: float) -> void:
 	shoot_recharge.emit(percent)
 
 func recoil(dir: Vector3, force: float) -> void:
+	force = 1
 	var push = Vector3.ZERO.move_toward(dir, friction)
 	#push = Vector3(push.x, 0 ,push.z)
 	velocity += push * force
@@ -267,7 +282,7 @@ func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> v
 		deactivate() 
 		return
 	
-	
+	embraces_damage.emit(damage)
 	got_hit.emit(source, impact_point)
 
 func show_visual_damage(ap: float) -> void:

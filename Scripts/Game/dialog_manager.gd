@@ -13,15 +13,23 @@ func singleton() -> void:
 		return
 	Dialog_Manager.INSTANCE = self
 
-func add_text_to_buffer(name: String, dialog: String):
-	player.add_text_to_buffer(name,dialog)
+func get_current_buffer_size() -> int:
+	return player.HUD_dialog.dialog_buffer.size()
 
+func add_text_to_buffer(name: String, dialog: String, char_image: String = "default"):
+	player.add_text_to_buffer(name,dialog,char_image)
 
-func display_text(name: String, dialog: String):
-	player.display_text(name,dialog)
+func add_text_to_buffer_low_prior(name: String, dialog: String, char_image: String = "default"):
+	player.add_text_to_buffer_low_prior(name,dialog,char_image)
+
+func display_text(name: String, dialog: String, char_image: String = "default"):
+	player.display_text(name,dialog,char_image)
 
 func add_dialog_to_buffer(dialog: Dialog_data):
 	player.add_dialog_to_buffer(dialog)
+
+func add_dialog_to_buffer_low_prior(dialog: Dialog_data):
+	player.add_dialog_to_buffer_low_prior(dialog)
 
 func display_dialog(dialog: Dialog_data):
 	player.display_dialog(dialog)

@@ -48,7 +48,8 @@ func _set_buttons() -> void:
 	settings_button.button_down.connect(update_settings_window)
 	quit_game_button.button_down.connect(get_tree().quit)
 	
-	load_mission_button.button_down.connect(select_mission.bind("res://Scenes/test_mission.tscn"))
+	#load_mission_button.button_down.connect(select_mission.bind("res://Scenes/test_mission.tscn"))
+	load_mission_button.button_down.connect(select_mission.bind("res://Scenes/mission_zero.tscn"))
 	load_mission_button.button_down.connect(show_briefing)
 	back_to_main_menu.button_down.connect(switch_active.bind(mission_list_window))
 	

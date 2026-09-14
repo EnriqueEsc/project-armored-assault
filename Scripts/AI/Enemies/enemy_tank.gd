@@ -1,4 +1,5 @@
 extends NavigationAgent3D
+class_name Enemy_Tank_AI
 
 enum AI_State {IDLE, ENGAGED, INVESTIGATING}
 var current_state: AI_State = AI_State.IDLE
@@ -34,6 +35,10 @@ var left_whisker: RayCast3D = null
 var center_whisker: RayCast3D = null
 var right_whisker: RayCast3D = null
 
+var allies: Array[Enemy_Tank_AI] = []
+
+var alerted: bool = false
+
 signal aim_to
 
 func _ready() -> void:
@@ -49,6 +54,16 @@ func _ready() -> void:
 	
 	if is_enemy:
 		player_ref = get_tree().get_first_node_in_group("Player")
+		
+		for e in get_tree().get_nodes_in_group("Enemy"):
+			if e is Tank_Rigid and e != tank_rigid:
+				for c in e.get_children():
+					if c is Enemy_Tank_AI:
+						allies.append(c)
+						#continue
+	
+	for e in allies:
+		print(e)
 	
 	tank_turrets = tank_rigid.vehicle_turrets
 	
@@ -80,7 +95,9 @@ func _ready() -> void:
 		HUD_boss_info.update_boss_max_ap(tank_rigid.max_armor_points)
 		tank_rigid.hp_changed.connect(HUD_boss_info.update_boss_current_ap)
 		HUD_boss_info.update_boss_current_ap(tank_rigid.armor_points)
-		
+	
+	tank_rigid.gets_disabled.connect(destroyed_dialog)
+	tank_rigid.update_stencil_color(Color.YELLOW)
 
 
 func init_whiskers() -> void:
@@ -106,6 +123,10 @@ func init_whiskers() -> void:
 	center_whisker.add_exception_rid(tank_rid)
 	right_whisker.add_exception_rid(tank_rid)
 	
+	left_whisker.collide_with_areas = true
+	right_whisker.collide_with_areas = true
+	center_whisker.collide_with_areas = true
+	
 
 func get_whisker_steering() -> float:
 	var steering_offset: float = 0.0
@@ -121,7 +142,16 @@ func get_whisker_steering() -> float:
 func got_hit(source: Vehicle_Rigid, impact_point: Vector3) -> void:
 	if source and source.is_in_group("Player"):
 		current_state = AI_State.ENGAGED
+		tank_rigid.update_stencil_color(Color.RED)
 		detection_meter = 1.0
+		if not alerted:
+			alert_closest_ally()
+
+func destroyed_dialog() -> void:
+	var dialog: Array[String] = ["AAAAAAHHHH!","SOMEBODY SAVE MEEEE","x_X",":'v"]
+	var sel: String = dialog[randi_range(0,dialog.size()-1)]
+	Dialog_Manager.INSTANCE.add_dialog_to_buffer_low_prior(Dialog_data.new(tank_rigid.vehicle_pilot_name,sel,Color.RED))
+
 
 func _physics_process(delta: float) -> void:
 	
@@ -153,6 +183,9 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 			
 			if detection_meter >= 1.0:
 				current_state = AI_State.ENGAGED
+				tank_rigid.update_stencil_color(Color.RED)
+				if not alerted:
+					alert_closest_ally()
 				if is_boss:
 					Dialog_Manager.INSTANCE.add_dialog_to_buffer(Dialog_data.new(tank_rigid.vehicle_pilot_name,"I see you, sucker.",Color.RED))
 					
@@ -166,18 +199,25 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 			else:
 				current_aggro_time = aggro_max_time
 				current_state = AI_State.INVESTIGATING
+				tank_rigid.update_stencil_color(Color.ORANGE)
 				
 		AI_State.INVESTIGATING:
 			update_detection_meter(delta, can_see_player, distance_to_player)
 			
 			if detection_meter >= 1.0:
 				current_state = AI_State.ENGAGED
+				tank_rigid.update_stencil_color(Color.RED)
+				if not alerted:
+					alert_closest_ally()
 				if is_boss:
 					HUD_boss_info.update_boss_active(true)
 			else: 
 				current_aggro_time -= delta
 				if current_aggro_time <= 0:
 					current_state = AI_State.IDLE
+					tank_rigid.update_stencil_color(Color.YELLOW)
+					if alerted:
+						alerted = false
 					if is_boss:
 						Dialog_Manager.INSTANCE.add_dialog_to_buffer(Dialog_data.new(tank_rigid.vehicle_pilot_name,"Nah, nevermind.",Color.RED))
 					
@@ -277,17 +317,17 @@ func handle_turret_and_shooting(aim_pos: Vector3, can_shoot: bool, can_see_playe
 					
 					match rng2:
 						1:
-							Dialog_Manager.INSTANCE.add_dialog_to_buffer(Dialog_data.new(tank_rigid.vehicle_pilot_name,"Die, die, die.",Color.RED))
+							Dialog_Manager.INSTANCE.add_dialog_to_buffer_low_prior(Dialog_data.new(tank_rigid.vehicle_pilot_name,"Die, die, die.",Color.RED))
 					
 						2:
-							Dialog_Manager.INSTANCE.add_dialog_to_buffer(Dialog_data.new(tank_rigid.vehicle_pilot_name,"I hate this job.",Color.RED))
+							Dialog_Manager.INSTANCE.add_dialog_to_buffer_low_prior(Dialog_data.new(tank_rigid.vehicle_pilot_name,"I hate this job.",Color.RED))
 					
 						3:
-							Dialog_Manager.INSTANCE.add_dialog_to_buffer(Dialog_data.new(tank_rigid.vehicle_pilot_name,"Openning fire.",Color.RED))
+							Dialog_Manager.INSTANCE.add_dialog_to_buffer_low_prior(Dialog_data.new(tank_rigid.vehicle_pilot_name,"Openning fire.",Color.RED))
 					
 	
 						4:
-							Dialog_Manager.INSTANCE.add_dialog_to_buffer(Dialog_data.new(tank_rigid.vehicle_pilot_name,"LA CEBOLLA.",Color.RED))
+							Dialog_Manager.INSTANCE.add_dialog_to_buffer_low_prior(Dialog_data.new(tank_rigid.vehicle_pilot_name,"LA CEBOLLA.",Color.RED))
 					
 	
 
@@ -314,6 +354,27 @@ func is_on_sight_range() -> bool:
 	
 	return false
 
+func alert_closest_ally() -> void:
+	alerted = true
+	
+	if allies.is_empty():
+		return
+	
+	var min_distance: float = max_chase_distance * 1.5
+	var closest: Enemy_Tank_AI = null
+	
+	for a in allies:
+		var dist: float = tank_rigid.global_position.distance_to(a.tank_rigid.global_position)
+		if a.tank_rigid.armor_points > 0 and (not a.alerted) and dist < min_distance:
+			closest = a
+			min_distance = dist
+	
+	if closest:
+		print("ALERTING ",closest)
+		closest.got_hit(player_ref,closest.tank_rigid.global_position)
+		Dialog_Manager.INSTANCE.add_dialog_to_buffer_low_prior(Dialog_data.new(tank_rigid.vehicle_pilot_name,"To all nearby units, I got a hostile contact.
+Engaging.",Color.RED))
+	
 
 func activate() -> void:
 	process_mode = Node.PROCESS_MODE_INHERIT

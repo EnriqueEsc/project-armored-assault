@@ -3,6 +3,8 @@ class_name Tree_Zone
 
 @export var tree_mesh: Mesh
 @export var tree_spacing: float = 1.0
+@export var tree_prefab: MeshInstance3D = null
+
 
 @onready var collision: CollisionShape3D = $CollisionShape3D
 @onready var multimesh_instance: MultiMeshInstance3D = $MultiMeshInstance3D
@@ -33,7 +35,11 @@ func init_grid() -> void:
 
 	multimesh = MultiMesh.new()
 	multimesh.transform_format = MultiMesh.TRANSFORM_3D
-	multimesh.mesh = tree_mesh
+	
+	if tree_prefab:
+		multimesh.mesh = tree_prefab.mesh
+	else:
+		multimesh.mesh = tree_mesh
 	multimesh.instance_count = col_size_x * col_size_z
 
 	tree_grid.resize(col_size_x)
