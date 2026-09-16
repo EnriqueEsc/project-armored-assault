@@ -129,7 +129,7 @@ text = "Boss [1200/1200]"
 scroll_active = false
 
 [node name="Icon" type="Sprite2D" parent="HUD/HUD_Player" unique_id=1942774347]
-position = Vector2(383, 333)
+position = Vector2(-52, 333)
 scale = Vector2(0.15, 0.15)
 texture = ExtResource("14_rjqdq")
 

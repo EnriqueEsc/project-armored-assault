@@ -16,6 +16,10 @@ func singleton() -> void:
 func get_current_buffer_size() -> int:
 	return player.HUD_dialog.dialog_buffer.size()
 
+
+func add_text_to_buffer_max_prior(name: String, dialog: String, char_image: String = "default"):
+	player.add_text_to_buffer_max_prior(name,dialog,char_image)
+
 func add_text_to_buffer(name: String, dialog: String, char_image: String = "default"):
 	player.add_text_to_buffer(name,dialog,char_image)
 
@@ -30,6 +34,9 @@ func add_dialog_to_buffer(dialog: Dialog_data):
 
 func add_dialog_to_buffer_low_prior(dialog: Dialog_data):
 	player.add_dialog_to_buffer_low_prior(dialog)
+	
+func add_dialog_to_buffer_max_prior(dialog: Dialog_data):
+	player.add_dialog_to_buffer_max_prior(dialog)
 
 func display_dialog(dialog: Dialog_data):
 	player.display_dialog(dialog)

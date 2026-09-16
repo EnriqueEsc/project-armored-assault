@@ -71,6 +71,16 @@ var bellow_5: bool = true
 
 var ready_to_shoot: bool = true
 
+var transition_to_game: bool = false
+
+
+var controller_move: bool = false
+var controller_aim: bool = false
+var aim_dir_input: Vector2 = Vector2(3.0,0.0)
+var aim_dir_3d: Vector3 = Vector3.ZERO
+
+var mouse_visible: bool = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	var tank_load
@@ -144,11 +154,22 @@ func _ready() -> void:
 	tank_rigid.shoot_signal.connect(dialog_fire)
 	tank_rigid.gets_crushed.connect(dialog_building_collapsing)
 	
+	
+	
+	
 	await get_tree().physics_frame
 	
 	aim_guideline = Settings_Manager.INSTANCE.aim_guideline
 	aim_3d = Settings_Manager.INSTANCE.aim_3d
 	third_person = Settings_Manager.INSTANCE.third_person
+	
+	controller_aim = Settings_Manager.INSTANCE.controller_aim
+	controller_move = Settings_Manager.INSTANCE.controller_move
+	
+	mouse_visible = Settings_Manager.INSTANCE.mouse_visible
+	
+	if not mouse_visible:
+		Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
 	
 	for t in tank_rigid.vehicle_turrets:
 		
@@ -261,6 +282,9 @@ func _physics_process(delta: float) -> void:
 		$UI_3D_Rect/SubViewport/Camera3D.global_rotation = tank_camera.global_rotation
 	#tank_rigid.allign_with_floor(delta)
 	
+	if transition_to_game:
+		return
+	
 	if pause_menu.visible:
 		return
 	
@@ -268,13 +292,23 @@ func _physics_process(delta: float) -> void:
 	
 	var pointer_pos: Vector3 = Vector3.ZERO
 	
+	
+	
 	if lock_on:
 		#print(enemy_locked)
 		pointer_pos = enemy_locked.global_position
 		HUD_mouse.position = tank_camera.unproject_position(pointer_pos)
 	else:
-		pointer_pos = tank_camera.get_mouse_3d_pos()
-		HUD_mouse.position = get_viewport().get_mouse_position()
+		if controller_aim:
+		#pointer_pos = tank_camera.get_mouse_3d_pos()
+		#HUD_mouse.position = get_viewport().get_mouse_position()
+			aim_dir_input = Input.get_vector("Aim_Left","Aim_Right","Aim_Up","Aim_Down").normalized() * 3 if Input.get_vector("Aim_Left","Aim_Right","Aim_Up","Aim_Down").length_squared() > 0.2 else aim_dir_input
+			aim_dir_3d = tank_rigid.global_position + Vector3(aim_dir_input.x,0.0,aim_dir_input.y)
+			pointer_pos = aim_dir_3d
+			HUD_mouse.position = tank_camera.unproject_position(pointer_pos)
+		else:
+			pointer_pos = tank_camera.get_mouse_3d_pos()
+			HUD_mouse.position = get_viewport().get_mouse_position()
 	#HUD_aim.scale = aim_new_scale
 	
 	#print(tank_rigid.get_aim_point_3d())
@@ -321,6 +355,10 @@ func add_text_to_buffer(name: String, dialog: String, char_image: String = "defa
 	var new_dialog = Dialog_data.new(name,dialog,color,char_image)
 	HUD_dialog.add_to_buffer(new_dialog)
 
+func add_text_to_buffer_max_prior(name: String, dialog: String, char_image: String = "default"):
+	var new_dialog = Dialog_data.new(name,dialog,color,char_image)
+	HUD_dialog.add_to_buffer_max_prior(new_dialog)
+
 func add_text_to_buffer_low_prior(name: String, dialog: String, char_image: String = "default"):
 	var new_dialog = Dialog_data.new(name,dialog,color,char_image)
 	HUD_dialog.add_to_buffer_low_prior(new_dialog)
@@ -333,6 +371,9 @@ func add_dialog_to_buffer(dialog: Dialog_data):
 	HUD_dialog.add_to_buffer(dialog)
 
 
+func add_dialog_to_buffer_max_prior(dialog: Dialog_data):
+	HUD_dialog.add_to_buffer_max_prior(dialog)
+	
 func add_dialog_to_buffer_low_prior(dialog: Dialog_data):
 	HUD_dialog.add_to_buffer_low_prior(dialog)
 
@@ -374,7 +415,11 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("Attachment"):
 		tank_rigid.use_attachment()
 	
-	tank_rigid.move(input_dir, delta)
+	if controller_move:
+		controller_movement(input_dir,delta)
+	else:
+		tank_rigid.move(input_dir, delta)
+	
 	
 	#tank_rigid.rotate_turret_to_point(get_viewport().get_mouse_position())
 	
@@ -382,7 +427,11 @@ func _process(delta: float) -> void:
 	if lock_on:
 		aim_to.emit(enemy_locked.global_position)
 	else:
-		aim_to.emit(tank_camera.get_mouse_3d_pos())
+		if controller_aim:
+			aim_to.emit(aim_dir_3d)
+		else:
+			aim_to.emit(tank_camera.get_mouse_3d_pos())
+		#print("AIM ",aim_dir," ",aim_dir.length_squared())
 	
 	if Input.is_action_just_pressed("Map"):
 		HUD_Map.visible = not HUD_Map.visible
@@ -412,6 +461,33 @@ func _process(delta: float) -> void:
 		last_time_hit_shown += delta
 		if last_time_hit_shown >= hit_marker_time:
 			HUD_Hitmarker.visible = false
+
+
+func controller_movement(target_pos: Vector2, delta: float) -> void:
+	var next_pos: Vector3 = tank_rigid.global_position + Vector3(target_pos.x,0.0,target_pos.y)
+	
+	print(target_pos)
+	
+	if target_pos == Vector2.ZERO:
+		tank_rigid.move(Vector2.ZERO, delta)
+		return
+	
+	var dir_to_path = tank_rigid.global_position.direction_to(next_pos)
+	dir_to_path.y = 0.0
+	dir_to_path = dir_to_path.normalized()
+	
+	var forward = tank_rigid.global_transform.basis.z.normalized()
+	var angle = forward.signed_angle_to(dir_to_path, tank_rigid.global_basis.y)
+	
+	var input_x: float = -clamp(angle, -1.0, 1.0)
+	
+	input_x = clamp(input_x, -1.0, 1.0)
+	
+	var input_y: float = 1.0 if abs(angle) < 1.8 else 0.0
+	
+	print(input_x,",",input_y)
+	tank_rigid.move(Vector2(input_x, -input_y), delta)
+
 
 func update_HUD() -> void:
 	update_AP(tank_rigid.armor_points)
@@ -495,6 +571,12 @@ func show_HUD(state: bool) -> void:
 	if is_destroyed or mission_finished:
 		state = false
 		HUD_Boss_info.update_boss_active(state)
+	
+	if not mouse_visible:
+		if state:
+			Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
+		else:
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	
 	#HUD_aim.visible = state
 	HUD_mouse.visible = state
@@ -580,6 +662,9 @@ func target_enemy(e: Node3D) -> void:
 	if not e:
 		return
 	e = e as Vehicle_Rigid
+	if tank_camera.check_enemy_visibility(e):
+		e.update_stencil(2)
+		return
 	e.update_stencil(1)
 
 func untarget_enemy(e: Node3D) -> void:

@@ -143,6 +143,26 @@ func _object_enters_exfil_zone(object: Node3D) -> void:
 func _check_success_conditions() -> void:
 	
 	if current_tank_kills >= min_tank_kills and current_emplacement_kills >= min_emplacement_kills and current_desmadre >= min_desmadre and player_is_in_exfil_zone:
-		dialog_manager.add_text_to_buffer("Commander","Let's go back to base.","commander")
+		dialog_manager.add_text_to_buffer_max_prior("Commander","Let's go back to base.","commander")
 
 		_mission_succeeded()
+
+func _additional_rewards_to_player() -> void:
+	var reward: String = Save_File_Manager.INSTANCE.get_random_tank_reward()
+	var add_text: String = ""
+	
+	if reward == "":
+		add_text = "1000 points"
+	if Save_File_Manager.INSTANCE.check_has_tank(reward):
+		add_text = " (Already owned) -> Converted to 1000 points"
+	if reward != "":
+		Save_File_Manager.INSTANCE.unlock_tank(reward)
+	
+	mission_results = {
+		"tank_kills": current_tank_kills,
+		"score" : player.tank_rigid.score,
+		"tanks_unlocked" : reward + add_text
+	}
+
+func _create_results_dictionary() -> void:
+	Save_File_Manager.INSTANCE.LAST_MISSION_RESULTS = mission_results

@@ -10,14 +10,22 @@ var settings_file: ConfigFile = ConfigFile.new()
 var current_tank_used_in_game: Tank_Data = null
 
 var fullscreen: bool = false
+
 var aim_3d: bool = false
 var aim_guideline: bool = false
 var aim_limited: bool = false
 var third_person: bool = false
 var use_csg: bool = false
+
 var see_trough_buildings: bool = false
 var max_effects: int = 30
 var max_shake_strength: float = 0.2
+var mouse_visible: bool = false
+
+var controller_move: bool = false
+var controller_aim: bool = false
+var use_vibration: bool = false
+
 var current_save: String = "user://test.json"
 
 # Called when the node enters the scene tree for the first time.
@@ -49,6 +57,10 @@ func save_settings() -> void:
 	settings_file.set_value("Game","see_trough_buildings",see_trough_buildings)
 	settings_file.set_value("Game","max_shake_strength",max_shake_strength)
 	settings_file.set_value("Game","max_effects",max_effects)
+	settings_file.set_value("Game","mouse_visible",mouse_visible)
+	settings_file.set_value("Controls","controller_aim",controller_aim)
+	settings_file.set_value("Controls","controller_move",controller_move)
+	settings_file.set_value("Controls","use_vibration",use_vibration)
 	settings_file.save(SETTINGS_PATH)
 	print("SETTINGS GUARDADOS")
 	print(settings_file,settings_file.get_value("Video","fullscreen",fullscreen))
@@ -66,6 +78,12 @@ func load_settings() -> void:
 		see_trough_buildings = settings_file.get_value("Game","see_trough_buildings",see_trough_buildings)
 		max_shake_strength = settings_file.get_value("Game","max_shake_strength",max_shake_strength)
 		max_effects = settings_file.get_value("Game","max_effects",max_effects)
+		
+		mouse_visible = settings_file.get_value("Game","mouse_visible",mouse_visible)
+		
+		controller_aim = settings_file.get_value("Controls","controller_aim",controller_aim)
+		controller_move = settings_file.get_value("Controls","controller_move",controller_move)
+		use_vibration = settings_file.get_value("Controls","use_vibration",use_vibration)
 		apply_settings()
 	else:
 		print("no existe")

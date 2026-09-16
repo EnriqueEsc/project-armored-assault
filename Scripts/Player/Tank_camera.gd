@@ -18,6 +18,8 @@ var base_position: Vector3 = Vector3.ZERO
 
 var intens: float = 1.0
 
+var use_controller_vibration: bool = false
+
 func _ready() -> void:
 	vision_cast = ShapeCast3D.new()
 	var sphere = SphereShape3D.new()
@@ -30,6 +32,7 @@ func _ready() -> void:
 	add_child(vision_cast)
 	
 	max_shake_strength = Settings_Manager.INSTANCE.max_shake_strength
+	use_controller_vibration = Settings_Manager.INSTANCE.use_vibration
 
 func move_cam(move: Vector3, delta: float) -> void:
 	base_position = base_position.lerp(move + camera_offset, camera_follow_speed * delta)
@@ -99,6 +102,8 @@ func start_shake(shake: float, intensity: float) -> void:
 	shake_time = shake
 	intens = intensity
 	time_since_shaking = 0.0
+	if use_controller_vibration:
+		Input.start_joy_vibration(0, intensity, intensity, shake)
 
 func get_mouse_3d_pos() -> Vector3:
 	var res: Vector3 = Vector3.ZERO
@@ -162,3 +167,28 @@ func get_closest_enemy_to_pivot(pivot: Vehicle_Rigid) -> Vehicle_Rigid:
 				closest = e
 	#print(closest)
 	return closest
+
+
+func check_enemy_visibility(enemy: Node3D) -> bool:
+	#print("OLAAAA")
+	
+	if not is_instance_valid(player):
+		return false
+	
+	var from = global_position
+	var to = enemy.global_position
+	
+	var space = get_world_3d().direct_space_state
+	var query = PhysicsRayQueryParameters3D.create(from,to)
+	
+	query.collide_with_areas = false
+	query.exclude = [enemy]
+	
+	var point = space.intersect_ray(query)
+	
+	if point:
+		return true
+	else:
+		return false
+		
+	

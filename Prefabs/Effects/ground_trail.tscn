@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://c38gr8yyjx55k"]
+
+[sub_resource type="Gradient" id="Gradient_4s2y8"]
+offsets = PackedFloat32Array(0, 0.96153843)
+colors = PackedColorArray(1, 1, 1, 1, 0.2585664, 0.2585664, 0.25856638, 0.69803923)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_8xwsb"]
+gradient = SubResource("Gradient_4s2y8")
+
+[sub_resource type="Curve" id="Curve_6k30k"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.9147728, 0.2053572), 0.0, 0.0, 0, 0, Vector2(1, 0.29464293), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_c06xr"]
+curve = SubResource("Curve_6k30k")
+
+[sub_resource type="Curve" id="Curve_vunn8"]
+_limits = [0.0, 3.0, 0.0, 1.0]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.80645156, 0.80357146), 0.0, 0.0, 0, 0, Vector2(1, 2.169643), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_2lhqt"]
+curve = SubResource("Curve_vunn8")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_ngdcl"]
+emission_shape_scale = Vector3(0.3, 0.2, 0.2)
+emission_shape = 3
+emission_box_extents = Vector3(1, 1, 1)
+gravity = Vector3(0, 2, 0)
+scale_min = 0.0
+scale_max = 0.19999999
+scale_curve = SubResource("CurveTexture_c06xr")
+scale_over_velocity_curve = SubResource("CurveTexture_2lhqt")
+color = Color(0.6771817, 0.5897122, 0.5798481, 1)
+color_ramp = SubResource("GradientTexture1D_8xwsb")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0i11f"]
+transparency = 1
+vertex_color_use_as_albedo = true
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_8kc88"]
+material = SubResource("StandardMaterial3D_0i11f")
+size = Vector2(0.2, 0.2)
+
+[node name="ground_trail" type="GPUParticles3D" unique_id=296457303]
+amount = 10
+lifetime = 0.75
+randomness = 0.7
+collision_base_size = 1.0
+process_material = SubResource("ParticleProcessMaterial_ngdcl")
+draw_pass_1 = SubResource("QuadMesh_8kc88")

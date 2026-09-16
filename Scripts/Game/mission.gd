@@ -27,6 +27,8 @@ var black_screen: ColorRect = null
 var mission_info_text: Typing_Text = null
 var player_dialog: HUD_Dialog = null
 
+var mission_results: Dictionary = {}
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	set_process(false)
@@ -41,6 +43,8 @@ func _ready() -> void:
 	_link_player()
 	
 	_set_objectives()
+	
+	Save_File_Manager.INSTANCE.LAST_MISSION_RESULTS = mission_results
 
 func _mission_failed() -> void:
 	mission_finished.emit(false)
@@ -53,6 +57,8 @@ func _mission_succeeded() -> void:
 	set_process(true)
 	mission_finished.emit(true)
 	_add_score_to_player()
+	_additional_rewards_to_player()
+	_create_results_dictionary()
 
 func _update_current_objectives() -> void:
 	pass
@@ -67,11 +73,12 @@ func _process(delta: float) -> void:
 	time_since_fade += delta
 	black_screen.color.a -= fading_factor * delta
 	mission_info_text.modulate.a -= fading_factor * delta
-	print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+	#print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 	if time_since_fade > fade_time:
 		if fading_factor > 0.0:
 			black_screen.visible = false
 			player.set_process(true)
+			player.transition_to_game = false
 		player_dialog.start_mission()
 		set_process(false)
 
@@ -107,6 +114,7 @@ func _link_player() -> void:
 	fading_factor = black_screen.color.a / fade_time
 	
 	player.set_process(false)
+	player.transition_to_game = true
 	
 	#set_process(true)
 	if mission_info_text:
@@ -141,3 +149,9 @@ func _object_exits_exfil_zone(object: Node3D) -> void:
 
 func _add_score_to_player() -> void:
 	Save_File_Manager.INSTANCE.score_record(player.tank_rigid.score)
+
+func _additional_rewards_to_player() -> void:
+	pass
+
+func _create_results_dictionary() -> void:
+	Save_File_Manager.INSTANCE.LAST_MISSION_RESULTS = mission_results

@@ -55,7 +55,13 @@ var recoil_force: float = 1.0
 
 signal target(node: Node3D)
 
+var static_model: bool = false
+
 func spawn() -> void:
+	
+	if static_model:
+		return
+	
 	projectile = projectile_prefab.instantiate() as Projectile
 	projectile.deactivate()
 	get_tree().root.call_deferred("add_child",projectile)
@@ -67,6 +73,10 @@ func spawn() -> void:
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	
+	if static_model:
+		return
+	
 	case_prefab = load("res://Prefabs/Test/case.tscn")
 	
 	match projectile_type:

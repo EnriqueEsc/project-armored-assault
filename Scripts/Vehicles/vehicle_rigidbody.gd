@@ -65,8 +65,23 @@ signal gets_crushed()
 var tick: float = 1.0
 var last_tick: float = 0.0
 
+
+
+var move_effect: GPUParticles3D = null
+var original_effect_time: float = 0.0
+var current_effect_time: float = 0.0
+
+var static_model: bool = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	
+	if static_model:
+		collision.queue_free()
+		set_process(false)
+		set_physics_process(false)
+		return
+	
 	time_controller = Time_Controller.INSTANCE
 	
 	#if tank_Data:
@@ -82,6 +97,12 @@ func _ready() -> void:
 			t.ignore.append(c as Node3D)
 		
 		shoot_signal.connect(t.shoot)
+	
+	if not vehicle_turrets.is_empty():
+		shoot_signal.connect(shake_on_shoot)
+	
+	if attachment:
+		attachment.shakes.connect(shakes.emit)
 	
 	initialize_effects()
 	
@@ -103,6 +124,12 @@ func _ready() -> void:
 		if c is CollisionShape3D and c.shape is BoxShape3D:
 			collision_shape = c.shape
 			return
+
+func shake_on_shoot() -> void:
+	
+	for t in vehicle_turrets:
+		shakes.emit(0.2,t.projectile.recoil_force/2.0)
+	
 
 func update_stencil(stencil_mode: BaseMaterial3D.StencilMode) -> void:
 	if not material:
@@ -138,6 +165,17 @@ func initialize_effects() -> void:
 		damage_effect.hide()
 		damage_effect.process_mode = Node.PROCESS_MODE_DISABLED
 	
+	var move_trail_prefab = load("res://Prefabs/Effects/ground_trail.tscn")
+	if move_trail_prefab:
+		move_effect = move_trail_prefab.instantiate() as GPUParticles3D
+		add_child(move_effect)
+		move_effect.one_shot = false
+		move_effect.show()
+		move_effect.process_mode = Node.PROCESS_MODE_INHERIT
+		original_effect_time = move_effect.lifetime
+		velocimeter.connect(show_move_effects)
+		print("col ",collision.shape.size)
+		move_effect.position -= Vector3(0,collision.shape.size.y/4,collision.shape.size.z/4)
 	
 	armor_points = max_armor_points
 	
@@ -234,6 +272,37 @@ func _physics_process(delta: float) -> void:
 			collider.calculate_impact_chunk(5 ,self, global_position)
 			last_building_impact = 0
 
+func show_move_effects(vel: float) -> void:
+	if not is_on_floor():
+		if move_effect.emitting:
+			move_effect.emitting = false
+			move_effect.hide()
+			move_effect.process_mode = Node.PROCESS_MODE_DISABLED
+			
+		return
+	if vel < 0.1:
+		move_effect.emitting = false
+		move_effect.hide()
+		move_effect.process_mode = Node.PROCESS_MODE_DISABLED
+		return
+	if vel < 0.3:
+		move_effect.one_shot = true
+		return
+	
+	if not move_effect.emitting:
+		move_effect.emitting = true
+		move_effect.show()
+		move_effect.process_mode = Node.PROCESS_MODE_ALWAYS
+	
+	if move_effect.one_shot:
+		move_effect.one_shot = false
+	
+	current_effect_time = ((vel/max_speed) * original_effect_time ) + 0.1
+	move_effect.lifetime = current_effect_time
+	
+	#print(vel," ",move_effect.lifetime," ",original_effect_time," ",max_speed)
+	
+	
 
 func move(move: Vector2, delta: float) -> void:
 	#rotate_y(-move.x * turn_speed * delta)

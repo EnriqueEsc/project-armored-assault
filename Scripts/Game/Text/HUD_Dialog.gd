@@ -16,6 +16,7 @@ var is_active: bool = false
 var mission_started: bool = false
 
 var low_prior_buffer: Array[Dialog_data] = []
+var max_prior_buffer: Array[Dialog_data] = []
 
 var using_low_prior: bool = false
 
@@ -32,6 +33,8 @@ func _process(delta: float) -> void:
 	if time_active > screen_time:
 		set_process(false)
 		
+		if not max_prior_buffer.is_empty():
+			display_dialog(max_prior_buffer.pop_front())
 		if not dialog_buffer.is_empty():
 			display_dialog(dialog_buffer.pop_front())
 			if dialog_buffer.size() > 0:
@@ -92,6 +95,17 @@ func add_to_buffer_low_prior(dialog: Dialog_data) -> void:
 	
 	if dialog_buffer.size() > 1:
 		using_low_prior = false
+
+func add_to_buffer_max_prior(dialog: Dialog_data) -> void:
+	#if low_prior_buffer.size() > 0:
+	#	return
+	max_prior_buffer.append(dialog)
+	dialog_buffer.clear()
+	if is_typing:
+		is_typing = false
+		dialog_text.break_typing()
+	display_dialog(max_prior_buffer.pop_back())
+		
 
 
 func start_mission() -> void:

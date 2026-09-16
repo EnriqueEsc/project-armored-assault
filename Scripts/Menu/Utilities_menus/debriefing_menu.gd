@@ -11,16 +11,18 @@ func _ready() -> void:
 	to_menu_button.visible = debriefing_finished
 	briefing_text.finished_typing.connect(finish_debrief)
 	briefing_text.set_process(true)
-	briefing_text.set_text_to_type("Mission completed succesfully
+	
+	var text_to_show = "Mission completed succesfully
 ....
 ....
 ....
 STATS:
-....Tanks destroyed:
-...."+str(Save_File_Manager.INSTANCE.current_save_data["tank_kills_record"])+"
-....
-....Total points:
-...."+str(Save_File_Manager.INSTANCE.current_save_data["total_score"]))
+"
+	var results: Dictionary = Save_File_Manager.INSTANCE.LAST_MISSION_RESULTS
+	for v in results:
+		text_to_show += "%s : %s\n\n" % [v,results[v]]
+	
+	briefing_text.set_text_to_type(text_to_show)
 
 func finish_debrief() -> void:
 	debriefing_finished = true

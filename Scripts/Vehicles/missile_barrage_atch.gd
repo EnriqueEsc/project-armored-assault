@@ -27,6 +27,7 @@ func _use_attachment() -> void:
 			case.shoot(Vector3(global_position.x, global_position.y,global_position.z),Vector2(90,0))
 			#case.recoil(global_position, -global_basis.z)
 		
+		shakes.emit(0.1,0.2)
 		
 		await get_tree().create_timer(0.2).timeout
 	pass
