@@ -24,6 +24,7 @@ func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exit)
 	area_entered.connect(_on_area_entered)
+	area_exited.connect(_on_area_exit)
 	init_grid()
 
 
@@ -105,6 +106,20 @@ func _on_area_entered(body):
 		if body.explodes.is_connected(take_explosion):
 			body.explodes.disconnect(take_explosion)
 		body.explodes.connect(take_explosion)
+
+
+func _on_area_exit(body):
+	#print(body.collider.get_parent.name)
+	
+	#print(body == origin)
+	
+	#print(body)
+	
+	#print(body)
+	if body is Projectile:
+		if body.explodes.is_connected(take_explosion):
+			body.explodes.disconnect(take_explosion)
+		#body.explodes.connect(take_explosion)
 
 func take_explosion(pos: Vector3, blast_rad: float, blast_damage: float) -> void:
 	var closest_tree: Tree_data = null

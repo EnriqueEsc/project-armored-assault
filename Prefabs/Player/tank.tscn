@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://bf7d7fljdkdcy" path="res://Models/Test/tanque_V2.fbx" id="6_c3mcr"]
 [ext_resource type="PackedScene" uid="uid://cr2e151pg0ro6" path="res://Models/Test/Minor.fbx" id="7_26ka3"]
 [ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Vehicles/vehicle_turret.gd" id="8_m1iq8"]
+[ext_resource type="PackedScene" uid="uid://cc8wea7bn5t8e" path="res://Models/Test/Barrage_Attachment.fbx" id="10_6k30k"]
 [ext_resource type="Script" uid="uid://ihmlg2cppvyn" path="res://Scripts/Vehicles/missile_barrage_atch.gd" id="10_8xwsb"]
 [ext_resource type="PackedScene" uid="uid://b8u4pylde5yu4" path="res://Models/Test/torreta_V2.fbx" id="11_kqa3r"]
 [ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="13_jxxtf"]
@@ -294,11 +295,15 @@ transform = Transform3D(0.4, 0, 0, 0, -1.7484556e-08, -0.4, 0, 0.4, -1.7484556e-
 modulate = Color(1, 1, 1, 0.2509804)
 texture = ExtResource("13_jxxtf")
 
-[node name="Node3D" type="Node3D" parent="." unique_id=58369107]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.1490066e-08, 1.4741588, -1.1779554)
-script = ExtResource("10_8xwsb")
-
-[node name="Forward2" type="MeshInstance3D" parent="Node3D" unique_id=180086968]
-transform = Transform3D(0.3, 0, 0, 0, 0.3, 0, 0, 0, 0.3, 9.572787e-08, -1.6308972, 2.1899984)
+[node name="Forward2" type="MeshInstance3D" parent="Forward" unique_id=180086968]
+transform = Transform3D(0.75, 0, 0, 0, -3.2783543e-08, 0.75, 1.0587912e-22, -0.75, -3.2783543e-08, 1.1059451e-07, 0.030107498, -0.7434884)
 material_override = SubResource("StandardMaterial3D_kancj")
 mesh = SubResource("ArrayMesh_48xej")
+
+[node name="Node3D" type="Node3D" parent="." unique_id=58369107]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2019929e-08, -0.21309257, -0.50375724)
+script = ExtResource("10_8xwsb")
+cooldown = 5.0
+
+[node name="Barrage_Attachment" parent="Node3D" unique_id=2073670498 instance=ExtResource("10_6k30k")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5694368e-08, 0, 0.35904527)

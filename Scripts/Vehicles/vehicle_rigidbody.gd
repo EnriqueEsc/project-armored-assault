@@ -15,6 +15,9 @@ var damage_effect: GPUParticles3D = null
 @export var acceleration: float = 5.0
 @export var turn_speed: float = 1.0
 
+@export var boost_speed: float = 6.0
+@export var boost_cooldown: float = 5.0
+var boost_last_use: float = 5.0
 
 @export var turning_velocity: float = 0
 @export var turning_acceleration: float = 0.2
@@ -102,6 +105,7 @@ func _ready() -> void:
 		shoot_signal.connect(shake_on_shoot)
 	
 	if attachment:
+		attachment.master_vehicle = self
 		attachment.shakes.connect(shakes.emit)
 	
 	initialize_effects()
@@ -124,6 +128,7 @@ func _ready() -> void:
 		if c is CollisionShape3D and c.shape is BoxShape3D:
 			collision_shape = c.shape
 			return
+	boost_last_use = boost_cooldown
 
 func shake_on_shoot() -> void:
 	
@@ -174,7 +179,7 @@ func initialize_effects() -> void:
 		move_effect.process_mode = Node.PROCESS_MODE_INHERIT
 		original_effect_time = move_effect.lifetime
 		velocimeter.connect(show_move_effects)
-		print("col ",collision.shape.size)
+		#print("col ",collision.shape.size)
 		move_effect.position -= Vector3(0,collision.shape.size.y/4,collision.shape.size.z/4)
 	
 	armor_points = max_armor_points
@@ -193,6 +198,29 @@ func recoil(dir: Vector3, force: float) -> void:
 	var push = Vector3.ZERO.move_toward(dir, friction)
 	#push = Vector3(push.x, 0 ,push.z)
 	velocity += push * force
+
+
+func boost(force: float) -> void:
+	var dir = direction.normalized()
+	if dir == Vector3.ZERO:
+		dir = global_basis.z
+	var push = Vector3.ZERO.move_toward(dir, friction)
+	#push = Vector3(push.x, 0 ,push.z)
+	velocity += push * force
+
+
+
+func quick_boost() -> void:
+	if boost_last_use < boost_cooldown:
+		return
+	
+	var dir = direction.normalized()
+	if dir == Vector3.ZERO:
+		dir = global_basis.z
+	var push = Vector3.ZERO.move_toward(dir, friction)
+	#push = Vector3(push.x, 0 ,push.z)
+	velocity += push * boost_speed
+	boost_last_use = 0.0
 
 func allign_with_floor(delta: float) -> void:
 	var normal: Vector3 = Vector3.UP
@@ -411,3 +439,6 @@ func _process(delta: float) -> void:
 	if last_tick > tick:
 		update_stencil(2)
 		last_tick = 0
+	
+	if boost_last_use < boost_cooldown:
+		boost_last_use += delta

@@ -436,6 +436,9 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("Map"):
 		HUD_Map.visible = not HUD_Map.visible
 	
+	if Input.is_action_just_pressed("Boost"):
+		tank_rigid.quick_boost()
+	
 	if Input.is_action_just_pressed("LockOn"):
 		lock_on = !lock_on
 		if not lock_on:
@@ -485,7 +488,7 @@ func controller_movement(target_pos: Vector2, delta: float) -> void:
 	
 	var input_y: float = 1.0 if abs(angle) < 1.8 else 0.0
 	
-	print(input_x,",",input_y)
+	#print(input_x,",",input_y)
 	tank_rigid.move(Vector2(input_x, -input_y), delta)
 
 

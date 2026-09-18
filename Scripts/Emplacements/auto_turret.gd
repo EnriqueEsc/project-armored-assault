@@ -5,11 +5,14 @@ signal gets_disabled
 enum AI_State {IDLE, ENGAGED, SCANNING}
 var current_state: AI_State = AI_State.IDLE
 
+
+enum Team {ENEMY, ALLY}
+@export var current_team: Team = Team.ENEMY
+
 @onready var turret: Vehicle_turret = $Turret
 var player_ref: Node3D = null
 var last_known_position: Vector3 = Vector3.ZERO
 
-# Parámetros de la Torreta
 @export var barrel_upper_limit: float = 360.0
 @export var barrel_lower_limit: float = -360.0
 @export var max_shoot_angle: float = 1.0
@@ -17,7 +20,6 @@ var last_known_position: Vector3 = Vector3.ZERO
 @export var fire_rate: float = 1.0
 @export var time_since_last_shot: float = 0.0
 
-# Sistema de Detección
 var detection_meter: float = 0.0
 @export var detection_time_front: float = 0.5
 @export var detection_time_rear: float = 2.0
@@ -40,16 +42,28 @@ func _ready() -> void:
 	turret.ignore = [parent_col, grand_parent_col]
 	
 	
-	if is_enemy:
-		self.add_to_group("Enemy")
+	#current_team = randi_range(0,Team.size()-1)
 	
+	
+	match current_team:
+		Team.ENEMY:
+			print("ENEMY")
+			self.add_to_group("Enemy")
+		Team.ALLY:
+			print("ALLY")
+			self.add_to_group("Player")
+
+
 	turret.create_projectiles()
 	
 	await get_tree().physics_frame
 	
 	
-	if is_enemy:
-		player_ref = get_tree().get_first_node_in_group("Player")
+	match current_team:
+		Team.ENEMY:
+			player_ref = get_tree().get_first_node_in_group("Player")
+		Team.ALLY:
+			player_ref = get_tree().get_first_node_in_group("Enemy")
 	
 	var turret_rigid = null
 	turret_rigid = get_parent_node_3d() as Emplacement
@@ -66,7 +80,7 @@ func _ready() -> void:
 		max_shoot_angle = deg_to_rad(turret.side_angle_limit)
 
 
-func got_hit(source: Vehicle_Rigid, impact_point: Vector3) -> void:
+func got_hit(source: Node3D, impact_point: Vector3) -> void:
 	current_state = AI_State.ENGAGED
 	detection_meter = 1.0
 
@@ -170,3 +184,36 @@ func activate() -> void:
 func deactivate() -> void:
 	gets_disabled.emit()
 	process_mode = Node.PROCESS_MODE_DISABLED
+
+
+func _process(delta: float) -> void:
+	get_closest_foe()
+
+func get_closest_foe() -> void:
+	
+	if current_state == AI_State.ENGAGED:
+		return
+	
+	var min_distance: float = INF
+	var closest_foe: Tank_Rigid = null
+	
+	match current_team:
+		Team.ENEMY:
+			for e in get_tree().get_nodes_in_group("Player"):
+				if e is Tank_Rigid:
+					var distance = global_position.distance_to(e.global_position)
+					if distance < min_distance:
+						closest_foe = e
+						min_distance = distance
+						
+		Team.ALLY:
+			for e in get_tree().get_nodes_in_group("Enemy"):
+				if e is Tank_Rigid:
+					var distance = global_position.distance_to(e.global_position)
+					if distance < min_distance:
+						closest_foe = e
+						min_distance = distance
+						
+	
+	player_ref = closest_foe
+	#print("Closest foe: ",player_ref)

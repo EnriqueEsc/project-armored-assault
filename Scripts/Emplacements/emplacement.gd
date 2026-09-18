@@ -86,9 +86,12 @@ func deactivate() -> void:
 	#set_deferred("monitoring", false)
 	#set_deferred("monitorable", false)
 	
+	queue_free()
+	
 	for c in get_children():
 		if c.has_method("deactivate"):
 			c.deactivate()
+			c.queue_free()
 	
 
 

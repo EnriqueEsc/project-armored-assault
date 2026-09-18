@@ -13,7 +13,8 @@ func _ready() -> void:
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _use_attachment() -> void:
+func _attachment_function() -> void:
+	
 	for i in 5:
 		
 		var case: Missile

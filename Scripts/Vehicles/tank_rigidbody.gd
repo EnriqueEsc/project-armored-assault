@@ -70,10 +70,11 @@ func _physics_process(delta: float) -> void:
 				collider.take_damage(impact_damage, self, global_position)
 			
 		#print(last_building_impact)
+		
 		if last_building_impact < 1:
 			return
 		
-		#Para seguir desgastando las estructuras si se sigue avanzando
+		
 		if collider is Building or collider is Building_Chunk:
 			shakes.emit(0.2,0.2)
 			collider.calculate_impact_chunk(5 ,self, global_position)
