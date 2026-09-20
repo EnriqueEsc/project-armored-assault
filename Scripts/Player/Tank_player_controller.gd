@@ -280,6 +280,12 @@ func _physics_process(delta: float) -> void:
 		$Outline_Rect/SubViewport/Camera3D.global_rotation = tank_camera.global_rotation
 		$UI_3D_Rect/SubViewport/Camera3D.global_position = tank_camera.global_position
 		$UI_3D_Rect/SubViewport/Camera3D.global_rotation = tank_camera.global_rotation
+	if third_person:
+		var stick_input = Input.get_vector("Aim_Left", "Aim_Right", "Aim_Up", "Aim_Down")
+		if stick_input.length_squared() > 0.04:
+			stick_input = stick_input.normalized() * 5.0
+		Input.warp_mouse(get_viewport().get_mouse_position() + stick_input)
+		
 	#tank_rigid.allign_with_floor(delta)
 	
 	if transition_to_game:
@@ -307,6 +313,11 @@ func _physics_process(delta: float) -> void:
 			pointer_pos = aim_dir_3d
 			HUD_mouse.position = tank_camera.unproject_position(pointer_pos)
 		else:
+			var stick_input = Input.get_vector("Aim_Left", "Aim_Right", "Aim_Up", "Aim_Down")
+			if stick_input.length_squared() > 0.04:
+				stick_input = stick_input.normalized() * 5.0
+				Input.warp_mouse(get_viewport().get_mouse_position() + stick_input)
+			
 			pointer_pos = tank_camera.get_mouse_3d_pos()
 			HUD_mouse.position = get_viewport().get_mouse_position()
 	#HUD_aim.scale = aim_new_scale

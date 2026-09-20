@@ -237,7 +237,7 @@ func got_hit(source: Node3D, impact_point: Vector3) -> void:
 			alert_closest_ally()
 	elif source and not source.is_in_group(enemy_group):
 		if randi_range(0,3) == 1:
-			Dialog_Manager.INSTANCE.add_dialog_to_buffer_low_prior(Dialog_data.new(tank_rigid.vehicle_pilot_name,"Hit them, not us me!",message_color))
+			Dialog_Manager.INSTANCE.add_dialog_to_buffer_low_prior(Dialog_data.new(tank_rigid.vehicle_pilot_name,"Hit them, not me!",message_color))
 
 func get_report(source: Node3D, impact_point: Vector3) -> void:
 	
@@ -282,6 +282,7 @@ func network_collapse(source: Node3D, impact_point: Vector3) -> void:
 func stagger() -> void:
 	set_physics_process(false)
 	stagger_timer = 0.0
+	tank_rigid.stagger()
 
 func destroyed_dialog() -> void:
 	pass

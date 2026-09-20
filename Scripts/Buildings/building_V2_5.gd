@@ -1,5 +1,5 @@
 extends Node3D
-class_name Building_V2
+class_name Building_V2_5
 
 var levels: Array[Building_Chunk] = []
 
@@ -21,28 +21,6 @@ var multimesh_instance: MultiMeshInstance3D = null
 var multimesh: MultiMesh
 
 
-
-@export var side_pref_mesh_instance: MeshInstance3D
-var side_pref_mesh: Mesh
-var side_multimesh_instance: MultiMeshInstance3D = null
-
-var side_multimesh: MultiMesh
-
-
-
-@export var corner_pref_mesh_instance: MeshInstance3D
-var corner_pref_mesh: Mesh
-var corner_multimesh_instance: MultiMeshInstance3D = null
-
-var corner_multimesh: MultiMesh
-
-
-
-@export var street_pref_mesh_instance: MeshInstance3D
-var street_pref_mesh: Mesh
-var street_multimesh_instance: MultiMeshInstance3D = null
-
-var street_multimesh: MultiMesh
 
 signal got_destroyed
 
@@ -75,20 +53,6 @@ func _ready() -> void:
 	if inner_pref_mesh_instance:
 		pref_mesh = inner_pref_mesh_instance.mesh
 	
-	if side_pref_mesh_instance:
-		side_pref_mesh = side_pref_mesh_instance.mesh
-	else:
-		side_pref_mesh = pref_mesh
-	
-	if corner_pref_mesh_instance:
-		corner_pref_mesh = corner_pref_mesh_instance.mesh
-	else:
-		corner_pref_mesh = pref_mesh
-		
-	if street_pref_mesh_instance:
-		street_pref_mesh = street_pref_mesh_instance.mesh
-	else:
-		street_pref_mesh = pref_mesh
 	
 	
 	if csg_active:
@@ -99,14 +63,6 @@ func _ready() -> void:
 		multimesh_instance = MultiMeshInstance3D.new()
 		add_child(multimesh_instance)
 		
-		side_multimesh_instance = MultiMeshInstance3D.new()
-		add_child(side_multimesh_instance)
-		
-		corner_multimesh_instance = MultiMeshInstance3D.new()
-		add_child(corner_multimesh_instance)
-		
-		street_multimesh_instance = MultiMeshInstance3D.new()
-		add_child(street_multimesh_instance)
 	
 	for c in get_children():
 		if c is MeshInstance3D:
@@ -150,51 +106,22 @@ func init_grid() -> void:
 		multimesh = MultiMesh.new()
 		multimesh.transform_format = MultiMesh.TRANSFORM_3D
 		
-		side_multimesh = MultiMesh.new()
-		side_multimesh.transform_format = MultiMesh.TRANSFORM_3D
-		
-		corner_multimesh = MultiMesh.new()
-		corner_multimesh.transform_format = MultiMesh.TRANSFORM_3D
-		
-		street_multimesh = MultiMesh.new()
-		street_multimesh.transform_format = MultiMesh.TRANSFORM_3D
 		
 		
 		if see_trough:
 			pref_mesh.surface_set_material(0,material)
-			if side_pref_mesh:
-				side_pref_mesh.surface_set_material(0,material)
-			if corner_pref_mesh:
-				corner_pref_mesh.surface_set_material(0,material)
-			if street_pref_mesh:
-				street_pref_mesh.surface_set_material(0,material)
+			
 				
-		street_multimesh.mesh = street_pref_mesh
-		street_multimesh.instance_count = levels[0].blocks_of_type(Building_Block_V2.Block_Types.SIDE)
-		
 		
 		multimesh.mesh = pref_mesh
-		multimesh.instance_count = levels.size() * levels[0].blocks_of_type(Building_Block_V2.Block_Types.INNER)
+		multimesh.instance_count = levels.size() * levels[0].blocks.size()
 		
-		side_multimesh.mesh = side_pref_mesh
-		side_multimesh.instance_count = (levels.size() - 1) * levels[0].blocks_of_type(Building_Block_V2.Block_Types.SIDE)
-		
-		corner_multimesh.mesh = corner_pref_mesh
-		corner_multimesh.instance_count = levels.size() * levels[0].blocks_of_type(Building_Block_V2.Block_Types.CORNER)
-		
-		#print("Inner ",multimesh.instance_count)
-		#print("Side ",side_multimesh.instance_count)
-		#print("Corner ",corner_multimesh.instance_count)
-		#print("Street ",street_multimesh.instance_count)
 		
 	var start_x = -col_size_x * 0.5 + 1 * 0.5
 	var start_y = 1 * 0.0
 	var start_z = -col_size_z * 0.5 + 1 * 0.5
 
-	var street_counter = 0
 	var counter = 0
-	var side_counter = 0
-	var corner_counter = 0
 	
 	
 	for c in levels:
@@ -220,28 +147,11 @@ func init_grid() -> void:
 				blok.position = pos
 				b.got_destroyed.connect(destroy_b.bind(blok))
 			else:
-				#print(b.block_type)
-				transform.basis = Basis.from_euler(Vector3(0.0, deg_to_rad(b.block_visual_rotation), 0.0))
-				if b.block_type == b.Block_Types.STREET:
-					street_multimesh.set_instance_transform(street_counter, transform)
-					b.id = street_counter
-					b.got_destroyed.connect(destroy_block.bind(street_counter))
-					street_counter += 1
-				if b.block_type == b.Block_Types.INNER:
-					multimesh.set_instance_transform(counter, transform)
-					b.id = counter
-					b.got_destroyed.connect(destroy_block.bind(counter))
-					counter += 1
-				if b.block_type == b.Block_Types.SIDE:
-					side_multimesh.set_instance_transform(side_counter, transform)
-					b.id = side_counter
-					b.got_destroyed.connect(destroy_block.bind(side_counter))
-					side_counter += 1
-				if b.block_type == b.Block_Types.CORNER:
-					corner_multimesh.set_instance_transform(corner_counter, transform)
-					b.id = corner_counter
-					b.got_destroyed.connect(destroy_block.bind(corner_counter))
-					corner_counter += 1
+				multimesh.set_instance_transform(counter, transform)
+				b.id = counter
+				b.got_destroyed.connect(destroy_block.bind(counter))
+				counter += 1
+				
 			#b.queue_free()
 			#var tree: Tree_data = Tree_data.new(1,counter, multimesh_instance.to_global(transform.origin) ,Vector2i(x,z))
 			#tree.got_destroyed.connect(destroy_tree)
@@ -255,26 +165,6 @@ func init_grid() -> void:
 	if not csg_active:
 		#print("adio")
 		multimesh_instance.multimesh = multimesh
-		#multimesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		side_multimesh_instance.multimesh = side_multimesh
-		#side_multimesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		corner_multimesh_instance.multimesh = corner_multimesh
-		#corner_multimesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		street_multimesh_instance.multimesh = street_multimesh
-		#street_multimesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		#print("Inner ",counter_blocks)
-		#print("Side ",side_counter)
-		#print("Corner ",corner_counter)
-		#print("Street ",street_counter)
-		
-		var mesh = multimesh_instance.multimesh.mesh
-		#print(mesh.resource_name," Inner | Superficies: ",mesh.get_surface_count())
-		mesh = side_multimesh_instance.multimesh.mesh
-		#print(mesh.resource_name," Side | Superficies: ",mesh.get_surface_count())
-		mesh = corner_multimesh_instance.multimesh.mesh
-		#print(mesh.resource_name," Corner | Superficies: ",mesh.get_surface_count())
-		mesh = street_multimesh_instance.multimesh.mesh
-		#print(mesh.resource_name," Street | Superficies: ",mesh.get_surface_count())
 
 
 func set_shape_cast() -> void:
@@ -394,7 +284,7 @@ func destroy_basement() -> void:
 
 func deactivate() -> void:
 	got_destroyed.emit()
-	#print("siuuuuuuu V2")
+	print("siuuuuuuu V2")
 	damage_zone.queue_free()
 	queue_free()
 	visible = false
@@ -412,17 +302,10 @@ func deactivate() -> void:
 func destroy_block(bld:Building_Block_V2, type: Building_Block_V2.Block_Types, id: int) -> void:
 	var mm: MultiMesh = null
 	
-	#print("INTENTANDO DESTRUIR ",id," ",str(type))
+	print("INTENTANDO DESTRUIR ",id," ",str(type))
 	
-	match type:
-		Building_Block_V2.Block_Types.INNER:
-			mm = multimesh_instance.multimesh
-		Building_Block_V2.Block_Types.SIDE:
-			mm = side_multimesh_instance.multimesh
-		Building_Block_V2.Block_Types.CORNER:
-			mm = corner_multimesh_instance.multimesh
-		Building_Block_V2.Block_Types.STREET:
-			mm = street_multimesh_instance.multimesh
+	
+	mm = multimesh_instance.multimesh
 	
 	if not mm:
 		return
@@ -437,7 +320,7 @@ func destroy_block(bld:Building_Block_V2, type: Building_Block_V2.Block_Types, i
 			counter += 1
 	
 	counter_blocks -= 1
-	#print("Counter ",counter, " | ",counter_blocks)
+	print("Counter ",counter, " | ",counter_blocks)
 
 
 func destroy_b(bld:Building_Block_V2, b: CSGBox3D) -> void:

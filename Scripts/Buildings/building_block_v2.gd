@@ -4,11 +4,18 @@ class_name Building_Block_V2
 var max_armor_points: int = 40
 var armor_points: int = 40
 
-signal got_destroyed(building_block: Building_Block_V2)
+signal got_destroyed(building_block: Building_Block_V2, type: Block_Types)
 
 var render: MeshInstance3D = null
 
 var id: int = 0
+
+var is_being_destroyed: bool = false
+
+enum Block_Types {STREET, INNER, CORNER, SIDE, ROOF}
+var block_type: Block_Types = Block_Types.INNER
+
+var block_visual_rotation: float = 0.0
 
 func initialize() -> void:
 	return
@@ -30,6 +37,9 @@ func initialize() -> void:
 		add_child(r)
 
 func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> void:
+	if is_being_destroyed:
+		return
+	
 	armor_points -= damage
 	armor_points = clamp(armor_points,0,max_armor_points)
 	
@@ -41,9 +51,19 @@ func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> v
 			
 		#if is_player:
 			#self.get_parent().get_parent().death_screen.visible = true
-		got_destroyed.emit(self)
-		deactivate() 
-
+		destroy_now()
+		#got_destroyed.emit(self)
+		#deactivate() 
+		
+func destroy_now() -> void:
+	if is_being_destroyed:
+		return
+	is_being_destroyed = true
+	armor_points = 0
+	
+	got_destroyed.emit(self, block_type)
+	queue_free()
+	
 func deactivate() -> void:
 	
 	queue_free()

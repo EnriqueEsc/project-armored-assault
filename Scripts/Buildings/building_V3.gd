@@ -1,5 +1,5 @@
 extends Node3D
-class_name Building_V2
+class_name Building_V3
 
 var levels: Array[Building_Chunk] = []
 
@@ -16,33 +16,21 @@ var destroyed: bool = false
 
 @export var inner_pref_mesh_instance: MeshInstance3D
 @export var pref_mesh: Mesh
-var multimesh_instance: MultiMeshInstance3D = null
-
-var multimesh: MultiMesh
 
 
 
 @export var side_pref_mesh_instance: MeshInstance3D
 var side_pref_mesh: Mesh
-var side_multimesh_instance: MultiMeshInstance3D = null
-
-var side_multimesh: MultiMesh
 
 
 
 @export var corner_pref_mesh_instance: MeshInstance3D
 var corner_pref_mesh: Mesh
-var corner_multimesh_instance: MultiMeshInstance3D = null
-
-var corner_multimesh: MultiMesh
 
 
 
 @export var street_pref_mesh_instance: MeshInstance3D
 var street_pref_mesh: Mesh
-var street_multimesh_instance: MultiMeshInstance3D = null
-
-var street_multimesh: MultiMesh
 
 signal got_destroyed
 
@@ -68,9 +56,15 @@ var vis_ref: MeshInstance3D = null
 
 var counter_blocks: int = 0
 
+@export var grid_map: GridMap = null
+var mesh_library: MeshLibrary = null
+
+
 func _ready() -> void:
 	csg_active = Settings_Manager.INSTANCE.use_csg
 	see_trough = Settings_Manager.INSTANCE.see_trough_buildings
+	
+	mesh_library = MeshLibrary.new()
 	
 	if inner_pref_mesh_instance:
 		pref_mesh = inner_pref_mesh_instance.mesh
@@ -90,23 +84,42 @@ func _ready() -> void:
 	else:
 		street_pref_mesh = pref_mesh
 	
+	var item_id = 0
+	var item_name = "Inner"
+	mesh_library.create_item(item_id)
+	mesh_library.set_item_name(item_id, item_name)
+	mesh_library.set_item_mesh(item_id, pref_mesh)
+	
+	
+	item_id = 1
+	item_name = "Side"
+	mesh_library.create_item(item_id)
+	mesh_library.set_item_name(item_id, item_name)
+	mesh_library.set_item_mesh(item_id, side_pref_mesh)
+	
+	item_id = 2
+	item_name = "Corner"
+	mesh_library.create_item(item_id)
+	mesh_library.set_item_name(item_id, item_name)
+	mesh_library.set_item_mesh(item_id, corner_pref_mesh)
+	
+	item_id = 3
+	item_name = "Street"
+	mesh_library.create_item(item_id)
+	mesh_library.set_item_name(item_id, item_name)
+	mesh_library.set_item_mesh(item_id, street_pref_mesh)
+	
+	
+	grid_map = GridMap.new()
+	add_child(grid_map)
+	grid_map.position -= Vector3(0,1.0,0)
 	
 	if csg_active:
 		combiner = CSGCombiner3D.new()
 		add_child(combiner)
 		combiner.use_collision = false
 	else:
-		multimesh_instance = MultiMeshInstance3D.new()
-		add_child(multimesh_instance)
-		
-		side_multimesh_instance = MultiMeshInstance3D.new()
-		add_child(side_multimesh_instance)
-		
-		corner_multimesh_instance = MultiMeshInstance3D.new()
-		add_child(corner_multimesh_instance)
-		
-		street_multimesh_instance = MultiMeshInstance3D.new()
-		add_child(street_multimesh_instance)
+		pass
 	
 	for c in get_children():
 		if c is MeshInstance3D:
@@ -138,6 +151,10 @@ func init_grid() -> void:
 	if levels.is_empty():
 		return
 	
+	grid_map.mesh_library = mesh_library
+	grid_map.cell_size = Vector3.ONE
+	grid_map.collision_layer = 0
+	grid_map.collision_mask = 0
 	
 	lowest_height = levels[0].lowest_height
 	
@@ -147,17 +164,6 @@ func init_grid() -> void:
 	
 	if not csg_active:
 		#print("ola")
-		multimesh = MultiMesh.new()
-		multimesh.transform_format = MultiMesh.TRANSFORM_3D
-		
-		side_multimesh = MultiMesh.new()
-		side_multimesh.transform_format = MultiMesh.TRANSFORM_3D
-		
-		corner_multimesh = MultiMesh.new()
-		corner_multimesh.transform_format = MultiMesh.TRANSFORM_3D
-		
-		street_multimesh = MultiMesh.new()
-		street_multimesh.transform_format = MultiMesh.TRANSFORM_3D
 		
 		
 		if see_trough:
@@ -169,23 +175,7 @@ func init_grid() -> void:
 			if street_pref_mesh:
 				street_pref_mesh.surface_set_material(0,material)
 				
-		street_multimesh.mesh = street_pref_mesh
-		street_multimesh.instance_count = levels[0].blocks_of_type(Building_Block_V2.Block_Types.SIDE)
 		
-		
-		multimesh.mesh = pref_mesh
-		multimesh.instance_count = levels.size() * levels[0].blocks_of_type(Building_Block_V2.Block_Types.INNER)
-		
-		side_multimesh.mesh = side_pref_mesh
-		side_multimesh.instance_count = (levels.size() - 1) * levels[0].blocks_of_type(Building_Block_V2.Block_Types.SIDE)
-		
-		corner_multimesh.mesh = corner_pref_mesh
-		corner_multimesh.instance_count = levels.size() * levels[0].blocks_of_type(Building_Block_V2.Block_Types.CORNER)
-		
-		#print("Inner ",multimesh.instance_count)
-		#print("Side ",side_multimesh.instance_count)
-		#print("Corner ",corner_multimesh.instance_count)
-		#print("Street ",street_multimesh.instance_count)
 		
 	var start_x = -col_size_x * 0.5 + 1 * 0.5
 	var start_y = 1 * 0.0
@@ -223,25 +213,26 @@ func init_grid() -> void:
 				#print(b.block_type)
 				transform.basis = Basis.from_euler(Vector3(0.0, deg_to_rad(b.block_visual_rotation), 0.0))
 				if b.block_type == b.Block_Types.STREET:
-					street_multimesh.set_instance_transform(street_counter, transform)
+					#street_multimesh.set_instance_transform(street_counter, transform)
 					b.id = street_counter
 					b.got_destroyed.connect(destroy_block.bind(street_counter))
 					street_counter += 1
+					grid_map.set_cell_item(Vector3i(b.position.x,b.global_position.y,b.position.z),3,grid_map.get_orthogonal_index_from_basis(transform.basis))
 				if b.block_type == b.Block_Types.INNER:
-					multimesh.set_instance_transform(counter, transform)
 					b.id = counter
 					b.got_destroyed.connect(destroy_block.bind(counter))
 					counter += 1
+					grid_map.set_cell_item(Vector3i(b.position.x,b.global_position.y,b.position.z),0,grid_map.get_orthogonal_index_from_basis(transform.basis))
 				if b.block_type == b.Block_Types.SIDE:
-					side_multimesh.set_instance_transform(side_counter, transform)
 					b.id = side_counter
 					b.got_destroyed.connect(destroy_block.bind(side_counter))
 					side_counter += 1
+					grid_map.set_cell_item(Vector3i(b.position.x,b.global_position.y,b.position.z),1,grid_map.get_orthogonal_index_from_basis(transform.basis))
 				if b.block_type == b.Block_Types.CORNER:
-					corner_multimesh.set_instance_transform(corner_counter, transform)
 					b.id = corner_counter
 					b.got_destroyed.connect(destroy_block.bind(corner_counter))
 					corner_counter += 1
+					grid_map.set_cell_item(Vector3i(b.position.x,b.global_position.y,b.position.z),2,grid_map.get_orthogonal_index_from_basis(transform.basis))
 			#b.queue_free()
 			#var tree: Tree_data = Tree_data.new(1,counter, multimesh_instance.to_global(transform.origin) ,Vector2i(x,z))
 			#tree.got_destroyed.connect(destroy_tree)
@@ -254,27 +245,7 @@ func init_grid() -> void:
 	#active_count = counter
 	if not csg_active:
 		#print("adio")
-		multimesh_instance.multimesh = multimesh
-		#multimesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		side_multimesh_instance.multimesh = side_multimesh
-		#side_multimesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		corner_multimesh_instance.multimesh = corner_multimesh
-		#corner_multimesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		street_multimesh_instance.multimesh = street_multimesh
-		#street_multimesh_instance.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-		#print("Inner ",counter_blocks)
-		#print("Side ",side_counter)
-		#print("Corner ",corner_counter)
-		#print("Street ",street_counter)
-		
-		var mesh = multimesh_instance.multimesh.mesh
-		#print(mesh.resource_name," Inner | Superficies: ",mesh.get_surface_count())
-		mesh = side_multimesh_instance.multimesh.mesh
-		#print(mesh.resource_name," Side | Superficies: ",mesh.get_surface_count())
-		mesh = corner_multimesh_instance.multimesh.mesh
-		#print(mesh.resource_name," Corner | Superficies: ",mesh.get_surface_count())
-		mesh = street_multimesh_instance.multimesh.mesh
-		#print(mesh.resource_name," Street | Superficies: ",mesh.get_surface_count())
+		pass
 
 
 func set_shape_cast() -> void:
@@ -410,26 +381,7 @@ func deactivate() -> void:
 	
 
 func destroy_block(bld:Building_Block_V2, type: Building_Block_V2.Block_Types, id: int) -> void:
-	var mm: MultiMesh = null
-	
-	#print("INTENTANDO DESTRUIR ",id," ",str(type))
-	
-	match type:
-		Building_Block_V2.Block_Types.INNER:
-			mm = multimesh_instance.multimesh
-		Building_Block_V2.Block_Types.SIDE:
-			mm = side_multimesh_instance.multimesh
-		Building_Block_V2.Block_Types.CORNER:
-			mm = corner_multimesh_instance.multimesh
-		Building_Block_V2.Block_Types.STREET:
-			mm = street_multimesh_instance.multimesh
-	
-	if not mm:
-		return
-	
-	var t: Transform3D = mm.get_instance_transform(id)
-	t.basis = Basis.from_scale(Vector3.ZERO)
-	mm.set_instance_transform(id,t)
+	grid_map.set_cell_item(Vector3i(bld.position.x,bld.global_position.y,bld.position.z), grid_map.INVALID_CELL_ITEM)
 	
 	var counter: int = 0
 	for l in levels:

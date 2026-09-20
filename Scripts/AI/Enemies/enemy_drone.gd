@@ -62,7 +62,7 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 	
 	
 	
-	if distance_to_target < 5:
+	if distance_to_target < 3:
 		tank_rigid.move(Vector2(input_x,0.0), delta)
 		if is_kamikaze and current_state == AI_State.ENGAGED:
 			shoot_angle = forward.angle_to(target_pos)

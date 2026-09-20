@@ -124,7 +124,7 @@ Nothing can stop you now","commander")
 	
 	_update_current_objectives()
 
-func desmadre_count(block: Building_Block_V2) -> void:
+func desmadre_count(block: Building_Block_V2, type: Building_Block_V2.Block_Types) -> void:
 	if current_desmadre > min_desmadre:
 		return
 	current_desmadre += 1

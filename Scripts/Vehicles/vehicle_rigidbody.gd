@@ -76,6 +76,11 @@ var current_effect_time: float = 0.0
 
 var static_model: bool = false
 
+
+var stagger_max_time: float = 5.0
+var stagger_timer: float = 5.0
+var staggered: bool = false
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	
@@ -236,6 +241,7 @@ func allign_with_floor(delta: float) -> void:
 	global_transform.basis = new_basis.orthonormalized()
 
 func _physics_process(delta: float) -> void:
+	
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 	
@@ -300,6 +306,11 @@ func _physics_process(delta: float) -> void:
 			collider.calculate_impact_chunk(5 ,self, global_position)
 			last_building_impact = 0
 
+func stagger() -> void:
+	staggered = true
+	direction = Vector3.ZERO
+	stagger_timer = 0.0
+
 func show_move_effects(vel: float) -> void:
 	if not is_on_floor():
 		if move_effect.emitting:
@@ -334,6 +345,8 @@ func show_move_effects(vel: float) -> void:
 
 func move(move: Vector2, delta: float) -> void:
 	#rotate_y(-move.x * turn_speed * delta)
+	if staggered:
+		return
 	
 	turning_velocity = lerpf(turning_velocity, -move.x * turn_speed, turning_acceleration * delta)
 	
@@ -439,6 +452,11 @@ func _process(delta: float) -> void:
 	if last_tick > tick:
 		update_stencil(2)
 		last_tick = 0
+	
+	if stagger_timer < stagger_max_time:
+		stagger_timer += delta
+		if stagger_timer >= stagger_max_time:
+			staggered = false
 	
 	if boost_last_use < boost_cooldown:
 		boost_last_use += delta

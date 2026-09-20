@@ -3,7 +3,7 @@ class_name Tank_camera
 
 @export var camera_offset: Vector3 = Vector3.ZERO
 @export var camera_follow_speed: float = 2.0
-@export var cutout_radius: float = 2.0
+@export var cutout_radius: float = 5.0
 
 var player: Node3D = null
 var objects_in_between: Array[RID] = []
@@ -28,6 +28,9 @@ func _ready() -> void:
 	vision_cast.shape = sphere
 	
 	vision_cast.collide_with_areas = true
+	vision_cast.collide_with_bodies = true
+	
+	vision_cast.collision_mask = 0xFFFFFFFF
 	
 	add_child(vision_cast)
 	
@@ -45,23 +48,38 @@ func _process(delta: float) -> void:
 		time_since_shaking += delta
 
 func check_visibility() -> void:
-	
 	objects_in_between.clear()
-	
-	
+
 	if not is_instance_valid(player):
 		return
-	
-	objects_in_between.append(player)
-	
+
+	if player is CollisionObject3D:
+		objects_in_between.append(player.get_rid())
+
 	vision_cast.target_position = to_local(player.global_position)
 	vision_cast.force_shapecast_update()
-	
+
 	for i in vision_cast.get_collision_count():
-		var collider = vision_cast.get_collider(i)
-		if collider.is_in_group("Terrain"):
-			objects_in_between.append(vision_cast.get_collider_rid(i))
-	
+		var collider := vision_cast.get_collider(i)
+
+		if not collider:
+			continue
+
+		if collider is Building_Chunk:
+			var building = collider.get_parent()
+
+			if building is Building_V3:
+				for chunk in building.levels:
+					var rid = chunk.get_rid()
+
+					if not objects_in_between.has(rid):
+						objects_in_between.append(rid)
+
+		elif collider.is_in_group("Terrain"):
+			var rid := vision_cast.get_collider_rid(i)
+
+			if not objects_in_between.has(rid):
+				objects_in_between.append(rid)
 	'''
 	var res: Vector3 = Vector3.ZERO
 	

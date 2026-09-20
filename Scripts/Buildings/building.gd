@@ -62,7 +62,7 @@ func _ready() -> void:
 	total_blocks = blocks.size()
 	min_blocks = total_blocks/2
 	
-	print(building_bounds)
+	#print(building_bounds)
 	
 	set_shape_cast()
 	
@@ -275,7 +275,7 @@ func activate() -> void:
 
 func deactivate() -> void:
 	got_destroyed.emit()
-	print("siuuuuuuu")
+	#print("siuuuuuuu")
 	damage_zone	.queue_free()
 	queue_free()
 	visible = false

@@ -106,6 +106,8 @@ func detonate() -> void:
 						current_collider.take_damage(damage,origin,global_position)
 					if current_collider.has_method("detonate"):
 						current_collider.detonate()
+					if current_collider.has_method("stagger"):
+						current_collider.stagger()
 				
 	
 	deactivate()

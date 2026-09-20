@@ -6,6 +6,7 @@ var tank_Data: Tank_Data = null
 
 
 func _physics_process(delta: float) -> void:
+	
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 	
