@@ -1,5 +1,5 @@
 extends Node3D
-class_name Building_V3
+class_name Building_V4
 
 var levels: Array[Building_Chunk] = []
 
@@ -56,12 +56,12 @@ var vis_ref: MeshInstance3D = null
 
 var counter_blocks: int = 0
 
-@export var grid_map: GridMap = null
 var mesh_library: MeshLibrary = null
-var using_preexisting_grid: bool = false
-var grid_offset: Vector3i = Vector3i.ONE
 
 var ghost_colission: Area3D = null
+
+var multimeshes: Dictionary = {}
+var meshes_type: Dictionary = {}
 
 func _ready() -> void:
 	csg_active = Settings_Manager.INSTANCE.use_csg
@@ -74,18 +74,12 @@ func _ready() -> void:
 	
 	if side_pref_mesh_instance:
 		side_pref_mesh = side_pref_mesh_instance.mesh
-	else:
-		side_pref_mesh = pref_mesh
 	
 	if corner_pref_mesh_instance:
 		corner_pref_mesh = corner_pref_mesh_instance.mesh
-	else:
-		corner_pref_mesh = pref_mesh
 		
 	if street_pref_mesh_instance:
 		street_pref_mesh = street_pref_mesh_instance.mesh
-	else:
-		street_pref_mesh = pref_mesh
 	
 	var item_id = Building_Block_V2.Block_Types.INNER
 	var item_name = "Inner"
@@ -93,25 +87,46 @@ func _ready() -> void:
 	mesh_library.set_item_name(item_id, item_name)
 	mesh_library.set_item_mesh(item_id, pref_mesh)
 	
+	var multimesh_instance = MultiMeshInstance3D.new()
+	multimeshes[item_id] = multimesh_instance
+	add_child(multimesh_instance)
+	meshes_type[item_id] = pref_mesh
 	
-	item_id = Building_Block_V2.Block_Types.SIDE
-	item_name = "Side"
-	mesh_library.create_item(item_id)
-	mesh_library.set_item_name(item_id, item_name)
-	mesh_library.set_item_mesh(item_id, side_pref_mesh)
+	if side_pref_mesh:
+		item_id = Building_Block_V2.Block_Types.SIDE
+		item_name = "Side"
+		mesh_library.create_item(item_id)
+		mesh_library.set_item_name(item_id, item_name)
+		mesh_library.set_item_mesh(item_id, side_pref_mesh)
+		
+		multimesh_instance = MultiMeshInstance3D.new()
+		multimeshes[item_id] = multimesh_instance
+		add_child(multimesh_instance)
+		meshes_type[item_id] = side_pref_mesh
 	
-	item_id = Building_Block_V2.Block_Types.CORNER
-	item_name = "Corner"
-	mesh_library.create_item(item_id)
-	mesh_library.set_item_name(item_id, item_name)
-	mesh_library.set_item_mesh(item_id, corner_pref_mesh)
+	if corner_pref_mesh:
+		item_id = Building_Block_V2.Block_Types.CORNER
+		item_name = "Corner"
+		mesh_library.create_item(item_id)
+		mesh_library.set_item_name(item_id, item_name)
+		mesh_library.set_item_mesh(item_id, corner_pref_mesh)
+		
+		multimesh_instance = MultiMeshInstance3D.new()
+		multimeshes[item_id] = multimesh_instance
+		add_child(multimesh_instance)
+		meshes_type[item_id] = corner_pref_mesh
 	
-	item_id = Building_Block_V2.Block_Types.STREET
-	item_name = "Street"
-	mesh_library.create_item(item_id)
-	mesh_library.set_item_name(item_id, item_name)
-	mesh_library.set_item_mesh(item_id, street_pref_mesh)
-	
+	if street_pref_mesh:
+		item_id = Building_Block_V2.Block_Types.STREET
+		item_name = "Street"
+		mesh_library.create_item(item_id)
+		mesh_library.set_item_name(item_id, item_name)
+		mesh_library.set_item_mesh(item_id, street_pref_mesh)
+		
+		multimesh_instance = MultiMeshInstance3D.new()
+		multimeshes[item_id] = multimesh_instance
+		add_child(multimesh_instance)
+		meshes_type[item_id] = street_pref_mesh
 	
 	if csg_active:
 		combiner = CSGCombiner3D.new()
@@ -141,17 +156,8 @@ func _ready() -> void:
 	
 	effects_manager = Effects_Manager.INSTANCE
 	
-	
 	player_ref = get_tree().get_first_node_in_group("Player") as Vehicle_Rigid
 	
-	
-	using_preexisting_grid = is_instance_valid(grid_map)
-	
-	if not using_preexisting_grid:
-		grid_map = GridMap.new()
-		add_child(grid_map)
-		#grid_map.position -= Vector3(0,1.0,0)
-		grid_map.position -= Vector3(0.5,1.75,0.5)
 	
 	init_grid()
 
@@ -164,24 +170,37 @@ func init_grid() -> void:
 		if b.block_type == b.Block_Types.SIDE:
 			b.block_type = b.Block_Types.STREET
 	
+	var block_counter: Dictionary = {}
+	
+	
+	for t in multimeshes:
+		block_counter[t] = 0
+		
+	for l in levels:
+		for b in l.blocks:
+			var t = b.block_type
+			
+			if not multimeshes.has(t):
+				t = Building_Block_V2.Block_Types.INNER
+			
+			block_counter[t] += 1
+	
+	for t in multimeshes:
+		var inst: MultiMeshInstance3D = multimeshes[t]
+		
+		var mm = MultiMesh.new()
+		mm.transform_format = MultiMesh.TRANSFORM_3D
+		mm.mesh = meshes_type[t]
+		mm.instance_count = block_counter[t]
+		
+		inst.multimesh = mm
+
 	
 	lowest_height = levels[0].lowest_height
 	
 	col_size_x = levels[0].building_bounds.x
 	col_size_y = levels.size()
 	col_size_z = levels[0].building_bounds.y
-	
-	
-	if using_preexisting_grid:
-		for l in levels:
-			for b in l.blocks:
-				b.got_destroyed.connect(destroy_block.bind(0))
-		return
-	
-	grid_map.mesh_library = mesh_library
-	grid_map.cell_size = Vector3.ONE
-	grid_map.collision_layer = 0
-	grid_map.collision_mask = 0
 	
 	if not csg_active:
 		#print("ola")
@@ -202,66 +221,38 @@ func init_grid() -> void:
 	var start_y = 1 * 0.0
 	var start_z = -col_size_z * 0.5 + 1 * 0.5
 
-	var street_counter = 0
 	var counter = 0
-	var side_counter = 0
-	var corner_counter = 0
-	
-	
+	var next_index: Dictionary = {}
+
+	for type in multimeshes:
+		next_index[type] = 0
+		
 	for c in levels:
 		c.damage_zone = damage_zone
 		c.building_half_extents = damage_zone.shape.size / 2.0
 		c.building_max_radius = c.building_half_extents.length()
+		
 		for b in c.blocks:
-			var pos = Vector3(b.position.x,b.global_position.y - global_position.y,b.position.z)
-
-			var transform = Transform3D.IDENTITY
-
-			#transform = transform.rotated(Vector3.UP,randf_range(0.0, TAU))
-			transform.origin = pos
+			var type = b.block_type
 			
-			if csg_active:
-				var blok: CSGBox3D = CSGBox3D.new()
-				blok.size = Vector3(2,2,1)
-				if see_trough:
-					blok.material = material
-				combiner.add_child(blok)
-				blok.position = pos
-				b.got_destroyed.connect(destroy_b.bind(blok))
-			else:
-				#print(b.block_type)
-				transform.basis = Basis.from_euler(Vector3(0.0, deg_to_rad(b.block_visual_rotation), 0.0))
-				if b.block_type == b.Block_Types.STREET:
-					#street_multimesh.set_instance_transform(street_counter, transform)
-					b.id = street_counter
-					b.got_destroyed.connect(destroy_block.bind(street_counter))
-					street_counter += 1
-					grid_map.set_cell_item(Vector3i(b.position.x,b.global_position.y,b.position.z),b.block_type,grid_map.get_orthogonal_index_from_basis(transform.basis))
-				if b.block_type == b.Block_Types.INNER:
-					b.id = counter
-					b.got_destroyed.connect(destroy_block.bind(counter))
-					counter += 1
-					grid_map.set_cell_item(Vector3i(b.position.x,b.global_position.y,b.position.z),b.block_type,grid_map.get_orthogonal_index_from_basis(transform.basis))
-				if b.block_type == b.Block_Types.SIDE:
-					b.id = side_counter
-					b.got_destroyed.connect(destroy_block.bind(side_counter))
-					side_counter += 1
-					grid_map.set_cell_item(Vector3i(b.position.x,b.global_position.y,b.position.z),b.block_type,grid_map.get_orthogonal_index_from_basis(transform.basis))
-				if b.block_type == b.Block_Types.CORNER:
-					b.id = corner_counter
-					b.got_destroyed.connect(destroy_block.bind(corner_counter))
-					corner_counter += 1
-					grid_map.set_cell_item(Vector3i(b.position.x,b.global_position.y,b.position.z),b.block_type,grid_map.get_orthogonal_index_from_basis(transform.basis))
-			#b.queue_free()
-			#var tree: Tree_data = Tree_data.new(1,counter, multimesh_instance.to_global(transform.origin) ,Vector2i(x,z))
-			#tree.got_destroyed.connect(destroy_tree)
-			#tree.got_burnt.connect(burn_tree)
-			#tree_grid[x][z] = tree
-			#print("[",x,"][",z,"]"," ",tree_grid[x][z])
-
-	
-	counter_blocks = counter
-	#active_count = counter
+			if not multimeshes.has(type):
+				type = Building_Block_V2.Block_Types.INNER
+		
+			var index: int = next_index[type]
+		
+			var transform := Transform3D.IDENTITY
+			transform.origin = Vector3(b.position.x,b.global_position.y - global_position.y,b.position.z)
+		
+			transform.basis = Basis.from_euler(Vector3(0.0,deg_to_rad(b.block_visual_rotation),0.0))
+		
+			var instance: MultiMeshInstance3D = multimeshes[type]
+		
+			instance.multimesh.set_instance_transform(index,transform)
+		
+			b.id = index
+			b.got_destroyed.connect(destroy_block.bind(index))
+		
+			next_index[type] = index + 1
 	if not csg_active:
 		#print("adio")
 		pass
@@ -439,12 +430,25 @@ func deactivate() -> void:
 			c.deactivate()
 	
 
+
 func destroy_block(bld:Building_Block_V2, type: Building_Block_V2.Block_Types, id: int) -> void:
-	if using_preexisting_grid:
-		grid_map.set_cell_item(Vector3i(bld.position.x,bld.position.y,bld.position.z)/ grid_offset, grid_map.INVALID_CELL_ITEM)
-	else:
-		grid_map.set_cell_item(Vector3i(bld.position.x,bld.global_position.y,bld.position.z), grid_map.INVALID_CELL_ITEM)
-	#print(Vector3i(bld.position.x,bld.position.y,bld.position.z))
+	var mm: MultiMesh = null
+	
+	var aux = bld.Block_Types.INNER
+	#print("INTENTANDO DESTRUIR ",id," ",str(type))
+	
+	if bld.block_type in multimeshes:
+		aux = bld.block_type
+	
+	mm = multimeshes[aux].multimesh
+	
+	if not mm:
+		return
+	
+	var t: Transform3D = mm.get_instance_transform(id)
+	t.basis = Basis.from_scale(Vector3.ZERO)
+	mm.set_instance_transform(id,t)
+	
 	var counter: int = 0
 	for l in levels:
 		for c in l.blocks:

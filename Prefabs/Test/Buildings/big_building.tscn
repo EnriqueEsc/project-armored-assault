@@ -1314,7 +1314,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7, 0)
 mesh = SubResource("BoxMesh_bhunq")
 
 [node name="Building_blocks" type="Node3D" parent="." unique_id=587121857]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -5.455294, 0)
+visible = false
 
 [node name="Side" type="MeshInstance3D" parent="Building_blocks" unique_id=1747917114]
 mesh = SubResource("ArrayMesh_fava0")

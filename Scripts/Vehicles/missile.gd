@@ -25,7 +25,7 @@ func move(delta: float) -> void:
 	var corrected_direction = current_forward.slerp(target_direction,clamp(25 * delta, 0.0, 1.0)).normalized()
 
 	look_at(global_position + corrected_direction, Vector3.UP)
-	print(current_forward.angle_to(target_direction))
+	#print(current_forward.angle_to(target_direction))
 	
 	
 	global_position += -global_basis.z * speed * delta

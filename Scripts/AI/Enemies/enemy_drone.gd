@@ -6,7 +6,7 @@ extends Basic_AI
 func _init_rigid() -> void:
 	tank_rigid = get_parent() as Drone_Rigid
 	#current_team = randi_range(1,Team.size()-1)
-	tank_rigid.is_kamikaze = is_kamikaze
+	#tank_rigid.is_kamikaze = is_kamikaze
 
 
 
@@ -62,7 +62,7 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 	
 	
 	
-	if distance_to_target < 3:
+	if distance_to_target < 2:
 		tank_rigid.move(Vector2(input_x,0.0), delta)
 		if is_kamikaze and current_state == AI_State.ENGAGED:
 			shoot_angle = forward.angle_to(target_pos)
@@ -73,6 +73,8 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 			#tank_rigid.set_distance_to_ground(-3.0,delta)
 		return
 	
+	if tank_rigid.attachment:
+		tank_rigid.use_attachment()
 	var input_y: float = 1.0 if abs(angle) < 1.8 else 0.0
 	
 	tank_rigid.move(Vector2(input_x, input_y), delta)

@@ -12,6 +12,7 @@ var origin: Vehicle_Rigid
 @export var blast_rad: float = 2
 @export var blast_damage: float = 10
 @export var recoil_force: float = 1
+@export var heat: float = 5.0
 var ignore = []
 
 signal deactivated(projectile: Projectile)
@@ -210,10 +211,8 @@ func detonate() -> void:
 		#print("olaaaa ",t," | ",hits_enemy.is_connected(origin.send_hit_signal))
 		if t.has_method("take_explosion"):
 			t.call_deferred("take_explosion", blast_damage, origin, global_position, blast_rad)
-			continue
 			
-		if t.has_method("detonate"):
-			t.call_deferred("detonate")
+			print(t)
 			continue
 	
 		if t.has_method("take_damage"):
@@ -223,4 +222,9 @@ func detonate() -> void:
 			#print(t)
 			t.shakes.emit(0.4,0.6)
 			t.call_deferred("recoil",global_position.direction_to(t.global_position),blast_rad * blast_damage)
+		
+			
+		if t.has_method("detonate"):
+			t.call_deferred("detonate")
+			continue
 	deactivate()

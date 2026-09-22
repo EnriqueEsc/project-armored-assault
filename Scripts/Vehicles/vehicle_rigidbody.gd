@@ -102,7 +102,8 @@ func _ready() -> void:
 		await t.create_projectiles()
 		
 		for c in self.get_children():
-			t.ignore.append(c as Node3D)
+			if c is Node3D:
+				t.ignore.append(c as Node3D)
 		
 		shoot_signal.connect(t.shoot)
 	

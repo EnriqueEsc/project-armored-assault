@@ -44,6 +44,11 @@ var time_controller: Time_Controller
 @export var muzzle_pos: Vector3 = Vector3.ZERO
 var last_shoot_prim: float = -10
 
+var max_heat: float = 100.0
+var current_heat: float = 0.0
+@export var cooling_factor: float = 1.0
+var overheat: bool = false
+
 var original_side_angle: float = 0.0
 
 signal aim_point(point: Vector3)
@@ -52,6 +57,7 @@ var aim_point_normal: Vector3 = Vector3.ZERO
 var aim_limited: bool = false
 
 var recoil_force: float = 1.0
+var heat: float = 1.0
 
 signal target(node: Node3D)
 
@@ -102,6 +108,7 @@ func _ready() -> void:
 	
 	aim_limited = Settings_Manager.INSTANCE.aim_limited
 	
+	set_fire_mode(fire_mode)
 	#muzzle_pos = global_position + muzzle_pos
 	pass
 
@@ -132,10 +139,8 @@ func rotate_turret_to_point_3d(point: Vector3) -> void:
 	var target_y = lerp_angle(rotation.y, target_rot_euler.y - (PI), turret_turning_speed)
 	if side_angle_limit < 360:
 		
-		# 2. Limitamos esa diferencia con tus variables de ángulo
 		var dif = clampf(angle_difference(original_side_angle, target_y), deg_to_rad(-side_angle_limit), deg_to_rad(side_angle_limit))
 		
-		# 3. Sumamos la diferencia limitada de vuelta a la rotación original
 		target_y = original_side_angle + dif
 	rotation.y = target_y
 	
@@ -172,7 +177,14 @@ func get_aim_point_3d(distance: float) -> Vector3:
 	query.collide_with_areas = false
 	#query.exclude = [self, get_parent_node_3d(), projectile]
 	
-	query.exclude = (ignore)
+	var excluded: Array[RID] = []
+	
+	for i in ignore:
+		if not is_instance_valid(i):
+			continue
+		excluded.append(i)
+	
+	query.exclude = excluded
 	
 	var point = space.intersect_ray(query)
 	
@@ -213,6 +225,7 @@ func create_projectiles() -> void:
 	
 	if not projectile_pool.is_empty():
 		recoil_force = projectile_pool[0].recoil_force
+		heat = projectile_pool[0].heat
 	
 	if projectile_type == Projectile_Type.Flamethrower:
 		return
@@ -258,6 +271,11 @@ func shoot() -> void:
 	last_shoot_prim = time_controller.running_time
 	
 	recoil.emit(forward,recoil_force)
+	
+	if fire_mode == Fire_Mode.Auto:
+		current_heat += heat
+		if current_heat >= max_heat:
+			overheat = true
 
 func projectile_to_pool(current_projectile: Projectile) -> void:
 	projectile_active.erase(current_projectile)
@@ -270,5 +288,31 @@ func case_to_pool(current_case: Case) -> void:
 	case_pool.push_back(current_case)
 	#current_projectile.deactivate()
 
+func _process(delta: float) -> void:
+	cooling(delta)
+	#print("HEAT ",current_heat," ",overheat)
+
+func cooling(delta: float) -> void:
+	if current_heat <= 0:
+		return
+	
+	current_heat -= cooling_factor * delta
+	
+	if not overheat:
+		return
+	
+	if current_heat <= 0:
+		overheat = false
+
+func set_fire_mode(mode: Fire_Mode) -> void:
+	fire_mode = mode
+	
+	if fire_mode == Fire_Mode.Auto:
+		set_process(true)
+	else:
+		set_process(false)
+
 func can_shoot() -> bool:
+	if overheat:
+		return false
 	return last_shoot_prim + fire_rate_prim < time_controller.running_time

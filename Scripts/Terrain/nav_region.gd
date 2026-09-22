@@ -3,7 +3,8 @@ extends NavigationRegion3D
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	await get_tree().physics_frame
+	for i in 10:
+		await get_tree().physics_frame
 	set_group_recursive(self, "Terrain")
 	print("Done")
 	

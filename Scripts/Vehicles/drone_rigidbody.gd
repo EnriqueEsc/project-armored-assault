@@ -16,12 +16,12 @@ var objective: Vector3 = Vector3.ZERO
 
 func _physics_process(delta: float) -> void:
 	
+	#print(check_distance_from_ground())
 	
 	if is_kamikaze and is_armed and not detonated:
 		kamikaze_move(delta)
 		if check_distance_from_ground() < 1.0:
 			print("Boom")
-			take_damage(999,self,global_position)
 			detonate()
 		return
 	
@@ -51,7 +51,15 @@ func _physics_process(delta: float) -> void:
 	
 	var pre_impact_vel: Vector3 = velocity
 	
+	#print(global_position.y)
+	
 	move_and_slide()
+	
+	if global_position.y >= distance_to_ground:
+		
+		global_position.y = distance_to_ground
+		velocity.y = minf(velocity.y, 0.0)
+		#print(global_position.y)
 	
 	#print("AAAAAAAAAAAAAAAAAA ",is_kamikaze,is_armed,not detonated)
 	
@@ -122,8 +130,13 @@ func check_distance_from_ground() -> float:
 
 
 func detonate() -> void:
+	if not is_kamikaze:
+		return
+	
 	if detonated:
 		return
+	
+	take_damage(999,self,global_position)
 	
 	detonated = true
 	var effects_manager = Effects_Manager.INSTANCE

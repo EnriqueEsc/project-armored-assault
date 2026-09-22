@@ -68,6 +68,8 @@ var vis_ref: MeshInstance3D = null
 
 var counter_blocks: int = 0
 
+var ghost_colission: Area3D = null
+
 func _ready() -> void:
 	csg_active = Settings_Manager.INSTANCE.use_csg
 	see_trough = Settings_Manager.INSTANCE.see_trough_buildings
@@ -118,6 +120,7 @@ func _ready() -> void:
 		levels[0].got_destroyed.connect(destroy_basement)
 		building_bounds = levels[0].building_bounds
 		set_shape_cast()
+		set_ghost_colission()
 	set_physics_process(false)
 	
 	if vis_ref:
@@ -275,6 +278,25 @@ func init_grid() -> void:
 		#print(mesh.resource_name," Corner | Superficies: ",mesh.get_surface_count())
 		mesh = street_multimesh_instance.multimesh.mesh
 		#print(mesh.resource_name," Street | Superficies: ",mesh.get_surface_count())
+
+
+func set_ghost_colission() -> void:
+	ghost_colission = Area3D.new()
+	
+	var cube = BoxShape3D.new()
+	var col = CollisionShape3D.new()
+	col.shape = cube
+	
+	#damage_zone.collide_with_areas = true
+	
+	col.shape.size = Vector3(building_bounds.x,5,building_bounds.y)
+	
+	call_deferred("add_child",ghost_colission)
+	ghost_colission.call_deferred("add_child",col)
+	if not levels.is_empty():
+		ghost_colission.call_deferred("set_global_position", levels[0].global_position)
+	else:
+		ghost_colission.call_deferred("set_global_position", global_position)
 
 
 func set_shape_cast() -> void:
