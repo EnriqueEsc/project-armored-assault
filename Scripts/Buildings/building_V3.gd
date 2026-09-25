@@ -142,7 +142,10 @@ func _ready() -> void:
 	effects_manager = Effects_Manager.INSTANCE
 	
 	
-	player_ref = get_tree().get_first_node_in_group("Player") as Vehicle_Rigid
+	if not player_ref:
+		for c in get_tree().get_nodes_in_group("Player"):
+			if c is Tank_player_controller:
+				player_ref = c.tank_rigid as Vehicle_Rigid
 	
 	
 	using_preexisting_grid = is_instance_valid(grid_map)
@@ -170,6 +173,10 @@ func init_grid() -> void:
 	col_size_x = levels[0].building_bounds.x
 	col_size_y = levels.size()
 	col_size_z = levels[0].building_bounds.y
+	
+	var radious = ((building_bounds.x+building_bounds.y)/2.0) * 3
+	max_shake_distance = radious * levels.size()
+	print("SAAAAAAAAAAAAA ",max_shake_distance)
 	
 	
 	if using_preexisting_grid:
@@ -394,6 +401,7 @@ func destruction() -> void:
 	crush_below()
 	
 	if player_ref and not ignore_player_shake:
+	#if player_ref:
 		shake_player()
 	
 	if emmit_collapse_effect and effects_manager:

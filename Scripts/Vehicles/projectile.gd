@@ -15,6 +15,7 @@ var origin: Vehicle_Rigid
 @export var heat: float = 5.0
 var ignore = []
 
+signal activated(projectile: Projectile)
 signal deactivated(projectile: Projectile)
 signal explodes(pos: Vector3, blast_rad: float, blast_damage: float)
 signal hits_enemy()
@@ -52,9 +53,15 @@ func set_origin(vehicle: Vehicle_Rigid) -> void:
 	origin = vehicle
 	hits_enemy.connect(origin.send_hit_signal)
 	is_player = origin.is_player
+	
+func _additional_shoot_process() -> void:
+	pass
 
 func shoot(pos: Vector3, rot: Vector2) -> void:
 	activate()
+	
+	_additional_shoot_process()
+	
 	current_pos = pos
 	position = current_pos
 	rotation.y = rot.y
@@ -70,6 +77,8 @@ func activate() -> void:
 	
 	if is_explosive:
 		detonated = false
+	
+	activated.emit(self)
 
 func deactivate() -> void:
 	visible = false
@@ -77,7 +86,12 @@ func deactivate() -> void:
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
 	
+	_additional_deactivate_process()
+	
 	deactivated.emit(self)
+
+func _additional_deactivate_process() -> void:
+	pass
 
 func move(delta: float) -> void:
 	if direction == Vector3.ZERO:

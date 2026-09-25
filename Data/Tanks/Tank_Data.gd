@@ -23,6 +23,6 @@ func _apply_values(tank: Tank_Rigid) -> void:
 	tank.turning_acceleration = turning_acceleration
 	tank.friction = friction
 	tank.traction = traction
-	tank.fire_rate_prim = fire_rate_prim
+	#tank.fire_rate_prim = fire_rate_prim
 	tank.max_armor_points = max_armor_points
 	tank.armor_points = max_armor_points

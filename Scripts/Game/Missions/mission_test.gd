@@ -28,7 +28,8 @@ func _set_objectives() -> void:
 	min_tank_kills = tanks.size() - 1
 	min_emplacement_kills = emplacements.size()
 	
-	await get_tree().physics_frame
+	for i in 20:
+		await get_tree().physics_frame
 	
 	
 	

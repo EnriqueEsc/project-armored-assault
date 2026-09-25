@@ -89,6 +89,8 @@ func _ready() -> void:
 		tank_data = Settings_Manager.INSTANCE.current_tank_used_in_game
 		if tank_data.tank_Name == "mk_-2inferno":
 			tank_load = load("res://Prefabs/Player/inferno.tscn")
+		elif tank_data.tank_Name == "iris":
+			tank_load = load("res://Prefabs/Player/iris.tscn")
 		elif tank_data.tank_Name != "MK_01 vindicator":
 			tank_load = load("res://Prefabs/Player/tank.tscn")
 		else:
@@ -109,6 +111,7 @@ func _ready() -> void:
 	tank_rigid.tank_Data._apply_values(tank_rigid)
 	
 	tank_rigid.add_to_group("Player")
+	self.add_to_group("Player")
 	
 	tank_rigid.hp_changed.connect(update_AP)
 	tank_rigid.score_changed.connect(update_Score)
@@ -131,6 +134,8 @@ func _ready() -> void:
 	
 	#tank_rigid.max_armor_points = max_armor_points
 	#tank_rigid.armor_points = max_armor_points
+	
+	tank_rigid.current_team = Basic_AI.Team.ALLY
 	
 	update_HUD()
 	
@@ -173,7 +178,6 @@ func _ready() -> void:
 	
 	for t in tank_rigid.vehicle_turrets:
 		
-		t.target.connect(target_enemy)
 		
 		aim_to.connect(t.rotate_turret_to_point_3d)
 		var new_aim = Sprite2D.new()
@@ -214,11 +218,14 @@ func _ready() -> void:
 		get_tree().current_scene.add_child(new_aim_3d)
 		HUD_aim_3D.append(new_aim_3d)
 		
+		
 		if aim_3d:
 			new_aim.visible = false
+			t.target.connect(target_enemy.bind(new_aim_3d))
 			new_ready.visible = false
 		else:
 			new_aim_3d.visible = false
+			t.target.connect(target_enemy_2d.bind(new_aim))
 	
 	if not HUD_aim.is_empty():
 		aim_point_original_scale = HUD_aim[0].scale
@@ -226,9 +233,6 @@ func _ready() -> void:
 	pause_menu.game_state.connect(show_HUD)
 	pause_menu.color_change.connect(change_HUD_color)
 	pause_menu.set_color(color)
-	
-	if not tank_rigid.vehicle_turrets.is_empty():
-		tank_rigid.fire_rate_prim = tank_rigid.vehicle_turrets[0].fire_rate_prim
 	
 	if third_person:
 		tank_camera.reparent(tank_rigid,true)
@@ -262,6 +266,7 @@ func color_HUD() -> void:
 	
 
 func shoot_ready(charge: float) -> void:
+	#print("SOOOT ",charge)
 	for s in HUD_Shoot_Ready:
 		s.value = charge
 	if charge > 99 and not ready_to_shoot:
@@ -326,25 +331,27 @@ func _physics_process(delta: float) -> void:
 	var counter: int = 0
 	for a in HUD_aim:
 		
-		var aim_point = tank_rigid.get_aim_point_3d(counter, tank_rigid.vehicle_turrets[counter].global_position.distance_to(pointer_pos))
+		var aim_point = tank_rigid.get_aim_point_3d(counter, tank_rigid.vehicle_turrets[counter].sight_pos.global_position.distance_to(pointer_pos))
 		
 		var height_ground_pos = aim_point
 		height_ground_pos.y = tank_rigid.global_position.y
 		
 		#print(tank_camera.global_position.y - (aim_point.y))
 		
+		#print("HUD ",tank_rigid.vehicle_turrets[counter].sight_pos.global_position," ",tank_rigid.vehicle_turrets[counter].sight_pos.global_rotation_degrees)
+		
 		var aim_new_scale = (aim_point_scale_ref / (tank_camera.global_position.y - (aim_point.y))) * aim_point_original_scale
 		HUD_aim[counter].scale = aim_new_scale
 		
-		HUD_aim[counter].position = tank_camera.unproject_position(tank_rigid.get_aim_point_3d(counter, tank_rigid.vehicle_turrets[counter].global_position.distance_to(pointer_pos)))
+		HUD_aim[counter].position = tank_camera.unproject_position(tank_rigid.get_aim_point_3d(counter, tank_rigid.vehicle_turrets[counter].sight_pos.global_position.distance_to(pointer_pos)))
 		
 		if aim_guideline:
-			HUD_height_line[counter].points = [tank_camera.unproject_position(tank_rigid.vehicle_turrets[counter].global_position),HUD_aim[counter].position,tank_camera.unproject_position(height_ground_pos)]
+			HUD_height_line[counter].points = [tank_camera.unproject_position(tank_rigid.vehicle_turrets[counter].sight_pos.global_position),HUD_aim[counter].position,tank_camera.unproject_position(height_ground_pos)]
 		else:
 			HUD_height_line[counter].points = [tank_camera.unproject_position(height_ground_pos),HUD_aim[counter].position]
 		
 		
-		var point = tank_rigid.get_aim_point_3d(counter, tank_rigid.vehicle_turrets[counter].global_position.distance_to(pointer_pos))
+		var point = tank_rigid.get_aim_point_3d(counter, tank_rigid.vehicle_turrets[counter].sight_pos.global_position.distance_to(pointer_pos))
 		var normal = tank_rigid.get_aim_point_3d_normal(counter)
 		HUD_aim_3D[counter].position = point
 		
@@ -672,10 +679,33 @@ func dialog_building_collapsing() -> void:
 			HUD_dialog.add_to_buffer_low_prior(Dialog_data.new("Rhino 2",dialogs[randi_range(0,dialogs.size()-1)],color,"rhino2"))
 
 
-func target_enemy(e: Node3D) -> void:
+func target_enemy(e: Node3D, aim: Node3D) -> void:
 	if not e:
+		if aim.modulate != color:
+			aim.modulate = color
 		return
 	e = e as Vehicle_Rigid
+	
+	
+	if e.current_team != tank_rigid.current_team and aim.modulate != Color.RED:
+		aim.modulate = Color.RED
+	
+	if tank_camera.check_enemy_visibility(e):
+		e.update_stencil(2)
+		return
+	e.update_stencil(1)
+
+func target_enemy_2d(e: Node3D, aim: Node2D) -> void:
+	if not e:
+		if aim.modulate != color:
+			aim.modulate = color
+		return
+	e = e as Vehicle_Rigid
+	
+	
+	if e.current_team != tank_rigid.current_team and aim.modulate != Color.RED:
+		aim.modulate = Color.RED
+	
 	if tank_camera.check_enemy_visibility(e):
 		e.update_stencil(2)
 		return

@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://bf7d7fljdkdcy" path="res://Models/Test/tanque_V2.fbx" id="6_er66g"]
 [ext_resource type="PackedScene" uid="uid://cr2e151pg0ro6" path="res://Models/Test/Minor.fbx" id="7_woq7o"]
 [ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Vehicles/vehicle_turret.gd" id="8_b2b7k"]
+[ext_resource type="Script" uid="uid://bjh2nh20l8im4" path="res://Scripts/Vehicles/turret_weapon.gd" id="8_y2wnc"]
 [ext_resource type="PackedScene" uid="uid://b8u4pylde5yu4" path="res://Models/Test/torreta_V2.fbx" id="11_xydte"]
 [ext_resource type="PackedScene" uid="uid://koxj0b8ls2xa" path="res://Models/Test/Gun.fbx" id="12_gdeoh"]
 [ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="13_bks5b"]
@@ -31,11 +32,11 @@ visible = false
 shape = SubResource("BoxShape3D_wojap")
 debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 
-[node name="Turret" type="Node3D" parent="." unique_id=1547171519]
+[node name="Turret" type="Node3D" parent="." unique_id=1547171519 node_paths=PackedStringArray("turret_barrel")]
 transform = Transform3D(-4.371138e-08, 0, 1, 0, 1, 0, -1, 0, -4.371138e-08, 0.65, -0.217, 0)
 script = ExtResource("8_b2b7k")
+turret_barrel = [NodePath("Gun")]
 side_angle_limit = 90.0
-projectile_type = 0
 
 [node name="torreta_V2" parent="Turret" unique_id=29810314 instance=ExtResource("11_xydte")]
 transform = Transform3D(0.12, 0, -2.0981473e-08, 0, 0.12, 0, 2.0981473e-08, 0, 0.12, 0, -0.2802639, 0)
@@ -43,12 +44,14 @@ visible = false
 
 [node name="Gun" parent="Turret" unique_id=51241174 instance=ExtResource("12_gdeoh")]
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0, 0)
+script = ExtResource("8_y2wnc")
+projectile_type = 0
 
-[node name="Turret2" type="Node3D" parent="." unique_id=703131202]
+[node name="Turret2" type="Node3D" parent="." unique_id=703131202 node_paths=PackedStringArray("turret_barrel")]
 transform = Transform3D(-4.3711395e-08, 0, -1, 0, 1, 0, 1, 0, -4.3711395e-08, -0.65, -0.217, 0)
 script = ExtResource("8_b2b7k")
+turret_barrel = [NodePath("Gun")]
 side_angle_limit = 90.0
-projectile_type = 0
 
 [node name="torreta_V2" parent="Turret2" unique_id=357323879 instance=ExtResource("11_xydte")]
 transform = Transform3D(0.12, 0, -2.0981473e-08, 0, 0.12, 0, 2.0981473e-08, 0, 0.12, 0, -0.2802639, 0)
@@ -56,6 +59,8 @@ visible = false
 
 [node name="Gun" parent="Turret2" unique_id=306476003 instance=ExtResource("12_gdeoh")]
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0, 0)
+script = ExtResource("8_y2wnc")
+projectile_type = 0
 
 [node name="Forward" type="Sprite3D" parent="." unique_id=175284499]
 transform = Transform3D(0.4, 0, 0, 0, -1.7484556e-08, -0.4, 0, 0.4, -1.7484556e-08, 0, -0.45413375, 1)

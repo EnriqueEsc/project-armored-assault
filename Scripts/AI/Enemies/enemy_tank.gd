@@ -139,19 +139,17 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 func handle_turret_and_shooting(aim_pos: Vector3, can_shoot: bool, can_see_player: bool) -> void:
 	#tank_rigid.rotate_turret_to_point_3d(aim_pos)
 	aim_to.emit(aim_pos)
+	
 	if not can_shoot:
 		return
 	
-	var current_pos: Vector3 = tank_rigid.global_position
-	var shoot_dir = current_pos.direction_to(aim_pos).normalized()
-	
+
 	for t in tank_turrets:
-		var turret_forward = t.turret_barrel.global_basis.z.normalized()
-		shoot_angle = turret_forward.signed_angle_to(shoot_dir, t.global_basis.y)
-		#if current_state == AI_State.ENGAGED:
-			#print(abs(shoot_angle)," ",max_shoot_angle," ",t.can_shoot())
-		
-		if abs(shoot_angle) < max_shoot_angle and t.can_shoot():
+		var shoot_dir = t.sight_pos.global_position.direction_to(aim_pos)
+		var turret_forward = t.calculate_mean_rotation()
+
+		shoot_angle = turret_forward.angle_to(shoot_dir)
+		if abs(shoot_angle) < max_shoot_angle:
 			if can_see_player and not is_enemy_in_front(): 
 				#tank_rigid.shoot()
 				t.shoot()

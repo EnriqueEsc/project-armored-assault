@@ -5,9 +5,10 @@
 [ext_resource type="Shader" uid="uid://c0uiwf02t5tf7" path="res://Shaders/depth_shader.gdshader" id="3_6k30k"]
 [ext_resource type="PackedScene" uid="uid://bf7d7fljdkdcy" path="res://Models/Test/tanque_V2.fbx" id="6_c3mcr"]
 [ext_resource type="PackedScene" uid="uid://cr2e151pg0ro6" path="res://Models/Test/Minor.fbx" id="7_26ka3"]
+[ext_resource type="Script" uid="uid://bjh2nh20l8im4" path="res://Scripts/Vehicles/turret_weapon.gd" id="8_6k30k"]
 [ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Vehicles/vehicle_turret.gd" id="8_m1iq8"]
 [ext_resource type="PackedScene" uid="uid://cc8wea7bn5t8e" path="res://Models/Test/Barrage_Attachment.fbx" id="10_6k30k"]
-[ext_resource type="Script" uid="uid://ihmlg2cppvyn" path="res://Scripts/Vehicles/missile_barrage_atch.gd" id="10_8xwsb"]
+[ext_resource type="Script" uid="uid://cdr4qfdmc2brj" path="res://Scripts/Vehicles/auto_drone_atch.gd" id="10_c06xr"]
 [ext_resource type="PackedScene" uid="uid://b8u4pylde5yu4" path="res://Models/Test/torreta_V2.fbx" id="11_kqa3r"]
 [ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="13_jxxtf"]
 
@@ -265,12 +266,11 @@ visible = false
 shape = SubResource("BoxShape3D_6blnc")
 debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 
-[node name="Turret" type="Node3D" parent="." unique_id=1627339079]
+[node name="Turret" type="Node3D" parent="." unique_id=1627339079 node_paths=PackedStringArray("turret_barrel")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04852271, 0)
 script = ExtResource("8_m1iq8")
+turret_barrel = [NodePath("Gun")]
 side_angle_limit = 360.0
-projectile_type = 0
-muzzle_pos = Vector3(-0.7, 0, 0)
 
 [node name="turret_V3" type="Node3D" parent="Turret" unique_id=1331242705]
 transform = Transform3D(1.6391772e-07, 0, 1.25, 0, 1.25, 0, -1.25, 0, 1.6391772e-07, 0, -0.29506743, 0)
@@ -285,6 +285,8 @@ visible = false
 
 [node name="Gun" type="Node3D" parent="Turret" unique_id=51241174]
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0, 0)
+script = ExtResource("8_6k30k")
+projectile_type = 0
 
 [node name="Gun" type="MeshInstance3D" parent="Turret/Gun" unique_id=1346115680]
 material_override = SubResource("StandardMaterial3D_vwfjx")
@@ -302,8 +304,8 @@ mesh = SubResource("ArrayMesh_48xej")
 
 [node name="Node3D" type="Node3D" parent="." unique_id=58369107]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2019929e-08, -0.21309257, -0.50375724)
-script = ExtResource("10_8xwsb")
-cooldown = 5.0
+script = ExtResource("10_c06xr")
+cooldown = 60.0
 
 [node name="Barrage_Attachment" parent="Node3D" unique_id=2073670498 instance=ExtResource("10_6k30k")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5694368e-08, 0, 0.35904527)

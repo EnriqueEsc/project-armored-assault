@@ -5,6 +5,7 @@
 [ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Vehicles/vehicle_turret.gd" id="3_qjmwd"]
 [ext_resource type="PackedScene" uid="uid://caqoxtxta5muo" path="res://Models/Test/Tank_Test/turret_V3.fbx" id="4_r2psv"]
 [ext_resource type="Script" uid="uid://cxxlffo81ypm" path="res://Scripts/AI/Enemies/enemy_tank.gd" id="5_gl1xq"]
+[ext_resource type="Script" uid="uid://bjh2nh20l8im4" path="res://Scripts/Vehicles/turret_weapon.gd" id="5_guyko"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bwv6e"]
 stencil_flags = 2
@@ -152,11 +153,11 @@ mesh = SubResource("ArrayMesh_emau0")
 shape = SubResource("BoxShape3D_6blnc")
 debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 
-[node name="Turret" type="Node3D" parent="." unique_id=1777633236]
+[node name="Turret" type="Node3D" parent="." unique_id=1777633236 node_paths=PackedStringArray("turret_barrel")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5295446, 0)
 script = ExtResource("3_qjmwd")
+turret_barrel = [NodePath("Gun")]
 side_angle_limit = 90.0
-projectile_type = 0
 
 [node name="turret_V3" parent="Turret" unique_id=1331242705 instance=ExtResource("4_r2psv")]
 transform = Transform3D(1.6391772e-07, 0, 1.25, 0, 1.25, 0, -1.25, 0, 1.6391772e-07, 0, -0.29506743, 0)
@@ -164,6 +165,8 @@ visible = false
 
 [node name="Gun" type="Node3D" parent="Turret" unique_id=51241174]
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0, 0)
+script = ExtResource("5_guyko")
+projectile_type = 0
 
 [node name="Gun" type="MeshInstance3D" parent="Turret/Gun" unique_id=1346115680]
 material_override = SubResource("StandardMaterial3D_vwfjx")

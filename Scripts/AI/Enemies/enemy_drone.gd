@@ -1,4 +1,5 @@
 extends Basic_AI
+class_name Drone_AI
 
 
 @export var is_kamikaze: bool = false
@@ -29,7 +30,7 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 	
 	var dir_to_path := target_position - tank_rigid.global_position
 	
-	if dir_to_path.length_squared() < 1:
+	if dir_to_path.length_squared() < 2:
 		tank_rigid.move(Vector2.ZERO, delta)
 		return
 	
@@ -62,7 +63,7 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 	
 	
 	
-	if distance_to_target < 2:
+	if distance_to_target < 5:
 		tank_rigid.move(Vector2(input_x,0.0), delta)
 		if is_kamikaze and current_state == AI_State.ENGAGED:
 			shoot_angle = forward.angle_to(target_pos)
@@ -71,11 +72,19 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 				tank_rigid.is_armed = true
 				tank_rigid.objective = target_pos
 			#tank_rigid.set_distance_to_ground(-3.0,delta)
-		return
+			return
 	
-	if tank_rigid.attachment:
+	if tank_rigid.attachment and distance_to_target > 5.5:
+		#print(distance_to_target)
 		tank_rigid.use_attachment()
+	
 	var input_y: float = 1.0 if abs(angle) < 1.8 else 0.0
+	
+	#print(distance_to_target)
+	if distance_to_target < 5:
+		input_y = -1.0 * (5.0/(distance_to_target)) + 0.1
+		#input_y = -1
+		#tank_rigid.use_attachment()
 	
 	tank_rigid.move(Vector2(input_x, input_y), delta)
 	

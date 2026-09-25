@@ -1,15 +1,16 @@
-[gd_scene format=4 uid="uid://bh3xvk3xr0t1g"]
+[gd_scene format=4 uid="uid://dieemih42tiyu"]
 
-[ext_resource type="Script" uid="uid://bykhssfaytcmi" path="res://Scripts/Vehicles/tank_rigidbody.gd" id="1_s8qys"]
-[ext_resource type="Shader" uid="uid://7akj88j53kma" path="res://Shaders/tank_highligt.gdshader" id="2_niw7e"]
-[ext_resource type="Shader" uid="uid://c0uiwf02t5tf7" path="res://Shaders/depth_shader.gdshader" id="3_kk6jm"]
-[ext_resource type="PackedScene" uid="uid://bf7d7fljdkdcy" path="res://Models/Test/tanque_V2.fbx" id="4_feo41"]
-[ext_resource type="PackedScene" uid="uid://cr2e151pg0ro6" path="res://Models/Test/Minor.fbx" id="5_evl0p"]
-[ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Vehicles/vehicle_turret.gd" id="6_bbnpd"]
-[ext_resource type="PackedScene" uid="uid://b8u4pylde5yu4" path="res://Models/Test/torreta_V2.fbx" id="7_lrqip"]
-[ext_resource type="Script" uid="uid://bjh2nh20l8im4" path="res://Scripts/Vehicles/turret_weapon.gd" id="8_niw7e"]
-[ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="8_qg7qk"]
-[ext_resource type="Script" uid="uid://ihmlg2cppvyn" path="res://Scripts/Vehicles/missile_barrage_atch.gd" id="9_o7ob8"]
+[ext_resource type="Script" uid="uid://bykhssfaytcmi" path="res://Scripts/Vehicles/tank_rigidbody.gd" id="1_h1ok1"]
+[ext_resource type="Shader" uid="uid://7akj88j53kma" path="res://Shaders/tank_highligt.gdshader" id="2_egim8"]
+[ext_resource type="Shader" uid="uid://c0uiwf02t5tf7" path="res://Shaders/depth_shader.gdshader" id="3_j3v34"]
+[ext_resource type="PackedScene" uid="uid://bf7d7fljdkdcy" path="res://Models/Test/tanque_V2.fbx" id="4_l5jv8"]
+[ext_resource type="PackedScene" uid="uid://cr2e151pg0ro6" path="res://Models/Test/Minor.fbx" id="5_6j6ot"]
+[ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Vehicles/vehicle_turret.gd" id="6_epjab"]
+[ext_resource type="PackedScene" uid="uid://b8u4pylde5yu4" path="res://Models/Test/torreta_V2.fbx" id="7_ecrt6"]
+[ext_resource type="Script" uid="uid://bjh2nh20l8im4" path="res://Scripts/Vehicles/turret_weapon.gd" id="8_id1vq"]
+[ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="9_jf3hx"]
+[ext_resource type="Script" uid="uid://ihmlg2cppvyn" path="res://Scripts/Vehicles/missile_barrage_atch.gd" id="10_h1ok1"]
+[ext_resource type="PackedScene" uid="uid://cc8wea7bn5t8e" path="res://Models/Test/Barrage_Attachment.fbx" id="11_xyatx"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6k30k"]
 render_priority = 2
@@ -71,13 +72,13 @@ shadow_mesh = SubResource("ArrayMesh_hdkdv")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_6k30k"]
 render_priority = 0
-shader = ExtResource("2_niw7e")
+shader = ExtResource("2_egim8")
 shader_parameter/outline_color = Color(0, 1, 0, 1)
 shader_parameter/outline_size = 0.01
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_7k3ju"]
 render_priority = 0
-shader = ExtResource("3_kk6jm")
+shader = ExtResource("3_j3v34")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_6blnc"]
 
@@ -183,10 +184,62 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_j5fwr")
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_c06xr"]
+render_priority = 1
+transparency = 1
+no_depth_test = true
+shading_mode = 0
+albedo_color = Color(0, 1, 0, 1)
+stencil_mode = 3
+stencil_flags = 1
+stencil_compare = 5
+metadata/_stencil_owned = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kancj"]
+next_pass = SubResource("StandardMaterial3D_c06xr")
+transparency = 1
+albedo_color = Color(1, 1, 1, 0)
+stencil_mode = 2
+stencil_flags = 2
+stencil_color = Color(0, 1, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_40gik"]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_vqn0w"]
+_surfaces = [{
+"aabb": AABB(-1, -1.0184627, -1, 2, 0.41846263, 2),
+"format": 34359742465,
+"index_count": 60,
+"index_data": PackedByteArray("AAABAAIAAgADAAAAAQAAAAQAAAADAAQAAgABAAUABAAFAAEABQAGAAIABwADAAIAAgAGAAcABwAEAAMACAAFAAQACQAEAAcABAAKAAgACgAEAAkACwAIAAoABQAIAAsACgAJAAsACwAGAAUACwAJAAcABwAGAAsA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 12,
+"vertex_data": PackedByteArray("AAAAv5qZGb9G/tG+AAAAv5qZGb+a39C9AACAvwAAgL/gmIU8AACAvwAAgL8AAIC/AAAAAJqZGb9KGpO+AAAAAJqZGb9Um8c+AAAAAAAAgL8AAIA/DD+Xovxcgr84a7W+AAAAP5qZGb+a39C9AACAPwAAgL8AAIC/AAAAP5qZGb9G/tG+AACAPwAAgL/gmIU8")
+}]
+blend_shape_mode = 0
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_48xej"]
+resource_name = "Cube_002"
+_surfaces = [{
+"aabb": AABB(-1, -1.0184627, -1, 2, 0.41846263, 2),
+"attribute_data": PackedByteArray("AAAgPwAAQD8AACA/AACAPwAAwD4AAIA/AADAPgAAQD8AAMA+AAAAPwAAID8AACA/AADAPgAAID8AAMA+AACAPgAAID8AAIA+AAAgPwAAAD8AAMA+AAAAPwAAwD4AAAAAAAAgPwAAAAAAACA/AAAAPgAAwD4AAAA+AADAPgAAgD4AAMA+AAAAPwAAgD4AAAA/AACAPgAAgD4AAGA/AACAPgAAYD8AAAA/AABAPwAAAD8AAEA/AACAPgAAID8AAIA+AABAPwAAgD4AAEA/AAAAPwAAID8AAAA/AAAAPgAAgD4AAIA+AACAPgAAgD4AAAA/AAAAPgAAAD8AACA/AAAAPgAAID8AAIA+AADAPgAAgD4AAMA+AAAAPgAAwD4AACA/AAAgPwAAID8AAMA+AABAPwAAID8AAAA/AAAgPwAAID8AAMA+AAAAPwAAID8AAEA/AADAPgAAQD8AACA/AAAgPw=="),
+"format": 34359742487,
+"index_count": 60,
+"index_data": PackedByteArray("AAABAAIAAgADAAAABAAFAAYABwAIAAkACQAKAAcACwAMAA0ADQAOAAsADwAQABEAEQASAA8AEwAUABUAFQAWABMAFwAYABkAGQAaABcAGwAcAB0AHQAeABsAHwAgACEAIQAiAB8AIwAkACUAJgAnACgAKQAqACsA"),
+"material": SubResource("StandardMaterial3D_40gik"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 44,
+"vertex_data": PackedByteArray("AAAAv5qZGb9G/tG+AAAAv5qZGb+a39C9AACAvwAAgL/gmIU8AACAvwAAgL8AAIC/AACAPwAAgL8AAIC/AAAAAJqZGb9KGpO+DD+Xovxcgr84a7W+AACAPwAAgL/gmIU8AAAAP5qZGb+a39C9AAAAP5qZGb9G/tG+AACAPwAAgL8AAIC/AACAvwAAgL/gmIU8AAAAv5qZGb+a39C9AAAAAJqZGb9Um8c+AAAAAAAAgL8AAIA/AACAPwAAgL/gmIU8AACAPwAAgL8AAIC/DD+Xovxcgr84a7W+AAAAAAAAgL8AAIA/AAAAv5qZGb+a39C9AAAAv5qZGb9G/tG+AAAAAJqZGb9KGpO+AAAAAJqZGb9Um8c+AAAAP5qZGb+a39C9AAAAAJqZGb9Um8c+AAAAAJqZGb9KGpO+AAAAP5qZGb9G/tG+AACAvwAAgL/gmIU8AAAAAAAAgL8AAIA/DD+Xovxcgr84a7W+AACAvwAAgL8AAIC/AAAAAJqZGb9Um8c+AAAAP5qZGb+a39C9AACAPwAAgL/gmIU8AAAAAAAAgL8AAIA/DD+Xovxcgr84a7W+AAAAAJqZGb9KGpO+AACAvwAAgL8AAIC/AAAAP5qZGb9G/tG+AAAAAJqZGb9KGpO+AACAPwAAgL8AAIC/AAAAv5qZGb9G/tG+AACAvwAAgL8AAIC/AAAAAJqZGb9KGpO+HEcbxzu4fdYcRxvHt82S4BxHG8ets6vUHEcbx/SqLdFVCxjS/38p91ULGNL/fyn3VQsY0v9/KffiuBvHUUyr1OK4G8dHMpLg4rgbx8NHfdbiuBvHClUt0R1co7eIza3uHVyjt7fNkuAdXKO3a8139x1co7dPzf//8oHsAlT/htzygewCLv9Z2fKB7AJb/xPd8oHsAnz/3d//f/7/AACU1v9//v8AAJ7M/3/+/wAAFtr/f/7/AAC73/9//v8rLf+//3/+/3k//7//f/7/LjT/v/9//v8+Gf+/DH7sAvDGqr8MfuwCQsC+vwx+7ALWxa2/DH7sAknNlr/ho6O3kzJ39+Gjo7dHMpLg4aOjt3Yyre7ho6O3T83//6n0GNL/fyn3qfQY0v9/Kfep9BjS/38p9+099/IKVS3R7T338gpVLdHtPffyClUt0RHC9/L0qi3REcL38vSqLdERwvfy9Kot0Q==")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_vqn0w")
+
 [node name="Tank_Player" type="CharacterBody3D" unique_id=975234286 node_paths=PackedStringArray("vehicle_turrets", "attachment")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
-script = ExtResource("1_s8qys")
-vehicle_turrets = [NodePath("Turret"), NodePath("Turret2")]
+script = ExtResource("1_h1ok1")
+vehicle_turrets = [NodePath("Turret")]
+max_armor_points = 300
 attachment = NodePath("Node3D")
 
 [node name="tanque_V3" type="Node3D" parent="." unique_id=1683942184]
@@ -202,11 +255,11 @@ material_overlay = SubResource("ShaderMaterial_6k30k")
 mesh = SubResource("ArrayMesh_7mtmu")
 surface_material_override/0 = SubResource("ShaderMaterial_7k3ju")
 
-[node name="tanque_V2" parent="." unique_id=2003364869 instance=ExtResource("4_feo41")]
+[node name="tanque_V2" parent="." unique_id=2003364869 instance=ExtResource("4_l5jv8")]
 transform = Transform3D(0.07866464, 0, 0, 0, 0.1365011, 0, 0, 0, 0.075632125, 0, -0.29108393, 0.040996313)
 visible = false
 
-[node name="Minor" parent="." unique_id=60055419 instance=ExtResource("5_evl0p")]
+[node name="Minor" parent="." unique_id=60055419 instance=ExtResource("5_6j6ot")]
 transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
 visible = false
 
@@ -215,9 +268,9 @@ shape = SubResource("BoxShape3D_6blnc")
 debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 
 [node name="Turret" type="Node3D" parent="." unique_id=1627339079 node_paths=PackedStringArray("turret_barrel")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.24404578, 0.04852271, 1.066758e-08)
-script = ExtResource("6_bbnpd")
-turret_barrel = [NodePath("Gun")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.04852271, 0)
+script = ExtResource("6_epjab")
+turret_barrel = [NodePath("Gun"), NodePath("Gun2"), NodePath("Gun3"), NodePath("Gun4")]
 side_angle_limit = 360.0
 
 [node name="turret_V3" type="Node3D" parent="Turret" unique_id=1331242705]
@@ -227,52 +280,72 @@ transform = Transform3D(1.6391772e-07, 0, 1.25, 0, 1.25, 0, -1.25, 0, 1.6391772e
 material_override = SubResource("StandardMaterial3D_apxmf")
 mesh = SubResource("ArrayMesh_s8kdm")
 
-[node name="torreta_V2" parent="Turret" unique_id=29810314 instance=ExtResource("7_lrqip")]
+[node name="torreta_V2" parent="Turret" unique_id=29810314 instance=ExtResource("7_ecrt6")]
 transform = Transform3D(0.12, 0, -2.0981473e-08, 0, 0.12, 0, 2.0981473e-08, 0, 0.12, 0, -0.2802639, 0)
 visible = false
 
 [node name="Gun" type="Node3D" parent="Turret" unique_id=51241174]
-transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0, 0)
-script = ExtResource("8_niw7e")
-projectile_type = 4
+transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, -0.344, 0, 0)
+script = ExtResource("8_id1vq")
+projectile_type = 2
 fire_mode = 1
+fire_rate_prim = 0.2
 
 [node name="Gun" type="MeshInstance3D" parent="Turret/Gun" unique_id=1346115680]
+transform = Transform3D(0.3, 0, 0, 0, 0.39999998, 0, 0, 0, 1.0000001, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_vwfjx")
 mesh = SubResource("ArrayMesh_bdpwl")
 
-[node name="Turret2" type="Node3D" parent="." unique_id=1713529153 node_paths=PackedStringArray("turret_barrel")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2449382, 0.04852271, -1.07065885e-08)
-script = ExtResource("6_bbnpd")
-turret_barrel = [NodePath("Gun")]
-side_angle_limit = 360.0
-
-[node name="turret_V3" type="Node3D" parent="Turret2" unique_id=1753641770]
-transform = Transform3D(1.6391772e-07, 0, 1.25, 0, 1.25, 0, -1.25, 0, 1.6391772e-07, 0, -0.29506743, 0)
-
-[node name="Cube_002" type="MeshInstance3D" parent="Turret2/turret_V3" unique_id=1672496375]
-material_override = SubResource("StandardMaterial3D_apxmf")
-mesh = SubResource("ArrayMesh_s8kdm")
-
-[node name="torreta_V2" parent="Turret2" unique_id=859827481 instance=ExtResource("7_lrqip")]
-transform = Transform3D(0.12, 0, -2.0981473e-08, 0, 0.12, 0, 2.0981473e-08, 0, 0.12, 0, -0.2802639, 0)
-visible = false
-
-[node name="Gun" type="Node3D" parent="Turret2" unique_id=44147976]
-transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0, 0)
-script = ExtResource("8_niw7e")
-projectile_type = 4
+[node name="Gun2" type="Node3D" parent="Turret" unique_id=1115701518]
+transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0.3428709, 0, -1.4987362e-08)
+script = ExtResource("8_id1vq")
+projectile_type = 2
 fire_mode = 1
+fire_rate_prim = 0.2
 
-[node name="Gun" type="MeshInstance3D" parent="Turret2/Gun" unique_id=637877119]
+[node name="Gun" type="MeshInstance3D" parent="Turret/Gun2" unique_id=1460588150]
+transform = Transform3D(0.3, 0, 0, 0, 0.39999998, 0, 0, 0, 1.0000001, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_vwfjx")
+mesh = SubResource("ArrayMesh_bdpwl")
+
+[node name="Gun3" type="Node3D" parent="Turret" unique_id=1262219485]
+transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, -0.344, 0.17882353, 0)
+script = ExtResource("8_id1vq")
+projectile_type = 2
+fire_mode = 1
+fire_rate_prim = 0.2
+
+[node name="Gun" type="MeshInstance3D" parent="Turret/Gun3" unique_id=1076089126]
+transform = Transform3D(0.3, 0, 0, 0, 0.39999998, 0, 0, 0, 1.0000001, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_vwfjx")
+mesh = SubResource("ArrayMesh_bdpwl")
+
+[node name="Gun4" type="Node3D" parent="Turret" unique_id=1712975162]
+transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0.3428709, 0.17882353, -1.4987362e-08)
+script = ExtResource("8_id1vq")
+projectile_type = 2
+fire_mode = 1
+fire_rate_prim = 0.2
+
+[node name="Gun" type="MeshInstance3D" parent="Turret/Gun4" unique_id=2105652170]
+transform = Transform3D(0.3, 0, 0, 0, 0.39999998, 0, 0, 0, 1.0000001, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_vwfjx")
 mesh = SubResource("ArrayMesh_bdpwl")
 
 [node name="Forward" type="Sprite3D" parent="." unique_id=1585055350]
 transform = Transform3D(0.4, 0, 0, 0, -1.7484556e-08, -0.4, 0, 0.4, -1.7484556e-08, 0, -0.45413375, 1)
 modulate = Color(1, 1, 1, 0.2509804)
-texture = ExtResource("8_qg7qk")
+texture = ExtResource("9_jf3hx")
+
+[node name="Forward2" type="MeshInstance3D" parent="Forward" unique_id=180086968]
+transform = Transform3D(0.75, 0, 0, 0, -3.2783543e-08, 0.75, 1.0587912e-22, -0.75, -3.2783543e-08, 1.1059451e-07, 0.030107498, -0.7434884)
+material_override = SubResource("StandardMaterial3D_kancj")
+mesh = SubResource("ArrayMesh_48xej")
 
 [node name="Node3D" type="Node3D" parent="." unique_id=58369107]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.1490066e-08, 1.4741588, -1.1779554)
-script = ExtResource("9_o7ob8")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2019929e-08, -0.21309257, -0.50375724)
+script = ExtResource("10_h1ok1")
+cooldown = 5.0
+
+[node name="Barrage_Attachment" parent="Node3D" unique_id=2073670498 instance=ExtResource("11_xyatx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5694368e-08, 0, 0.35904527)

@@ -35,11 +35,11 @@ func _ready() -> void:
 	turret.barrel_upper_limit = barrel_upper_limit
 	turret.turret_turning_speed = 0.05
 	
-	turret.fire_rate_prim = fire_rate
+	#turret.fire_rate_prim = fire_rate
 	
 	var parent_col = get_parent_node_3d()
 	var grand_parent_col = parent_col.get_parent_node_3d()
-	turret.ignore = [parent_col, grand_parent_col]
+	turret.ignore.append_array([parent_col, grand_parent_col])
 	
 	
 	#current_team = randi_range(0,Team.size()-1)
@@ -156,7 +156,7 @@ func attempt_shoot(aim_pos: Vector3) -> void:
 	var turret_forward = turret.global_basis.z.normalized()
 	var angle = turret_forward.signed_angle_to(dir_to_target, turret.global_basis.y)
 	
-	if abs(angle) < max_shoot_angle and turret.can_shoot():
+	if abs(angle) < max_shoot_angle:
 		turret.shoot()
 
 func is_on_sight_range() -> bool:

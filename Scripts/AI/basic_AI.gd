@@ -24,8 +24,6 @@ var last_known_position: Vector3 = Vector3.ZERO
 @export var aggro_max_time: float = 65.0
 var current_aggro_time: float = 0.0
 
-@export var fire_rate: float = 1.0
-@export var time_since_last_shot: float = 0.0
 
 var detection_meter: float = 0.0
 
@@ -77,10 +75,12 @@ func _ready() -> void:
 			print("ENEMY")
 			tank_rigid.add_to_group("Enemy")
 			message_color = Color.RED
+			tank_rigid.current_team = current_team
 		Team.ALLY:
 			print("ALLY")
 			tank_rigid.add_to_group("Player")
 			message_color = Color.GREEN
+			tank_rigid.current_team = current_team
 
 
 	await get_tree().physics_frame
@@ -135,7 +135,6 @@ func _ready() -> void:
 	
 	if not tank_turrets.is_empty():
 		tank_turrets[0].turret_turning_speed /= 2
-		fire_rate = tank_rigid.fire_rate_prim
 	
 		tank_rigid.got_hit.connect(got_hit)
 		tank_rigid.gets_disabled.connect(Save_File_Manager.INSTANCE.tank_kills_record)
@@ -289,7 +288,11 @@ func destroyed_dialog() -> void:
 
 func _physics_process(delta: float) -> void:
 	
-	if not is_instance_valid(player_ref) or not player_ref.visible:
+	var static_model: bool = false
+	if player_ref is Vehicle_Rigid:
+		static_model = player_ref.static_model
+	
+	if not is_instance_valid(player_ref) or not player_ref.visible or static_model:
 		current_state = AI_State.IDLE
 		if current_team == Team.ALLY:
 			tank_rigid.update_stencil_color(Color.GREEN)
@@ -304,7 +307,6 @@ func _physics_process(delta: float) -> void:
 	if not is_instance_valid(tank_rigid):
 		return
 	
-	time_since_last_shot += delta
 	
 	var can_see_player: bool = is_on_sight_range()
 	
@@ -460,14 +462,13 @@ func handle_turret_and_shooting(aim_pos: Vector3, can_shoot: bool, can_see_playe
 	if not can_shoot:
 		return
 	
-	var current_pos: Vector3 = tank_rigid.global_position
-	var shoot_dir = current_pos.direction_to(aim_pos).normalized()
-	
+
 	for t in tank_turrets:
-		var turret_forward = t.turret_barrel.global_basis.z.normalized()
-		shoot_angle = turret_forward.signed_angle_to(shoot_dir, t.global_basis.y)
-		
-		if abs(shoot_angle) < max_shoot_angle and t.can_shoot():
+		var shoot_dir = t.sight_pos.global_position.direction_to(aim_pos)
+		var turret_forward = t.calculate_mean_rotation()
+
+		shoot_angle = turret_forward.angle_to(shoot_dir)
+		if abs(shoot_angle) < max_shoot_angle:
 			if can_see_player and not is_enemy_in_front(): 
 				#tank_rigid.shoot()
 				t.shoot()
@@ -510,7 +511,7 @@ func is_on_sight_range() -> bool:
 	if tank_turrets.is_empty():
 		origin = tank_rigid.global_position
 	else:
-		origin = tank_turrets[0].global_position
+		origin = tank_turrets[0].sight_pos.global_position
 	
 	var query = PhysicsRayQueryParameters3D.create(origin, end)
 	query.exclude = [tank_rigid.get_rid()]
@@ -538,7 +539,7 @@ func is_enemy_in_front() -> bool:
 	if tank_turrets.is_empty():
 		origin = tank_rigid.global_position
 	else:
-		origin = tank_turrets[0].global_position
+		origin = tank_turrets[0].sight_pos.global_position
 	
 	var query = PhysicsRayQueryParameters3D.create(origin, end)
 	query.collide_with_bodies = true
@@ -712,6 +713,9 @@ func get_closest_foe() -> void:
 
 
 func can_see_target(cand: Node3D) -> bool:
+	if not is_instance_valid(cand):
+		return false
+	
 	var max_distance = max_chase_distance * 2.0
 
 	if tank_rigid.global_position.distance_squared_to(cand.global_position) > max_distance * max_distance:

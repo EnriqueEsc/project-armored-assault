@@ -1,7 +1,7 @@
 extends Vehicle_Rigid
 class_name Drone_Rigid
 
-var distance_to_ground: float = 3.0
+@export var distance_to_ground: float = 3.0
 var corr = 0
 
 @export var is_kamikaze: bool = false
@@ -28,14 +28,12 @@ func _physics_process(delta: float) -> void:
 	check_distance_from_ground()
 	
 	#velocity.y += corr * delta
-	global_position.y = distance_to_ground
+	#global_position.y = distance_to_ground
 	
 	if last_building_impact <= 1:
 		last_building_impact += delta
 	
 	allign_with_floor(delta)
-	
-	calculate_charge(delta)
 	
 	if direction:
 		velocity.x = lerpf(velocity.x, direction.x * current_speed, acceleration * delta)
@@ -53,11 +51,12 @@ func _physics_process(delta: float) -> void:
 	
 	#print(global_position.y)
 	
+	
 	move_and_slide()
 	
-	if global_position.y >= distance_to_ground:
+	if not is_equal_approx(global_position.y , distance_to_ground):
 		
-		global_position.y = distance_to_ground
+		global_position.y = lerpf(global_position.y,distance_to_ground,3.0 * delta)
 		velocity.y = minf(velocity.y, 0.0)
 		#print(global_position.y)
 	
@@ -103,6 +102,33 @@ func _physics_process(delta: float) -> void:
 		if collider is Building:
 			collider.calculate_impact_chunk(5 ,self, global_position)
 			last_building_impact = 0
+
+
+func move(move: Vector2, delta: float) -> void:
+	#rotate_y(-move.x * turn_speed * delta)
+	if staggered:
+		return
+	
+	turning_velocity = lerpf(turning_velocity, -move.x * turn_speed, turning_acceleration * delta)
+	
+	direction = transform.basis.z * move.y
+	
+	var speed = clampf(velocity.dot(global_basis.z) / current_speed,-1.0,1.0)
+	
+	if abs(speed) < 0.8:
+		speed = 0.0
+	
+	#print(direction, " ",transform.basis.z," ",direction.z - transform.basis.z.z)
+	var target = deg_to_rad(25.0 * speed)
+	model[0].rotation.x = lerp_angle(model[0].rotation.x,target,delta)
+	#rotation.z = lerp_angle(rotation.z,rotation.z + deg_to_rad(25.0 * direction.x - transform.basis.z.y),1.0 * delta * allign_speed)
+	model[0].rotation.x = clampf(model[0].rotation.x,-deg_to_rad(25.0),deg_to_rad(25.0))
+	
+	#var current_pos_2d: Vector2 = (Vector2(0,move.y).rotated(-rotation.y))
+	#position += Vector3(current_pos_2d.x,0,current_pos_2d.y) * current_speed
+
+
+
 
 func set_distance_to_ground(dis: float, delta: float) -> void:
 	distance_to_ground += dis * delta

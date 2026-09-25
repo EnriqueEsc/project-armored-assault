@@ -1,6 +1,7 @@
 extends CharacterBody3D
 class_name  Vehicle_Rigid
 
+var current_team: Basic_AI.Team = Basic_AI.Team.ENEMY
 @export var vehicle_pilot_name: String = "Default_Name (Change it)"
 
 signal gets_enabled
@@ -36,12 +37,6 @@ var direction: Vector3 = Vector3.ZERO
 @export var max_armor_points: int = 40
 var armor_points: int = 40
 
-
-var time_controller: Time_Controller
-@export var fire_rate_prim: float = 2
-var last_shoot_prim: float = -10
-
-var time_passed: float = 0
 
 signal shoot_recharge(charge: float)
 signal velocimeter(velocity: float)
@@ -90,14 +85,13 @@ func _ready() -> void:
 		set_physics_process(false)
 		return
 	
-	time_controller = Time_Controller.INSTANCE
 	
 	#if tank_Data:
 	#	tank_Data._apply_values(self)
 	
 	for t in vehicle_turrets:
 		t.recoil.connect(recoil)
-	
+		t.shakes_on_shoot.connect(shakes.emit)
 		t.origin = self
 		await t.create_projectiles()
 		
@@ -106,9 +100,8 @@ func _ready() -> void:
 				t.ignore.append(c as Node3D)
 		
 		shoot_signal.connect(t.shoot)
+		t.shoot_recharge.connect(shoot_recharge.emit)
 	
-	if not vehicle_turrets.is_empty():
-		shoot_signal.connect(shake_on_shoot)
 	
 	if attachment:
 		attachment.master_vehicle = self
@@ -118,7 +111,6 @@ func _ready() -> void:
 	
 	ap_percent.emit(float(armor_points)/float(max_armor_points) * 100.0)
 	
-	time_passed = fire_rate_prim
 	
 	await get_tree().physics_frame
 	if material:
@@ -136,11 +128,6 @@ func _ready() -> void:
 			return
 	boost_last_use = boost_cooldown
 
-func shake_on_shoot() -> void:
-	
-	for t in vehicle_turrets:
-		shakes.emit(0.2,t.projectile.recoil_force/2.0)
-	
 
 func update_stencil(stencil_mode: BaseMaterial3D.StencilMode) -> void:
 	if not material:
@@ -192,12 +179,6 @@ func initialize_effects() -> void:
 	
 	ap_percent.connect(show_visual_damage)
 
-func calculate_charge(delta: float) -> void:
-	time_passed += delta
-	var percent = time_passed / fire_rate_prim
-	percent = clampf(percent,0,1)
-	percent *= 100
-	shoot_recharge.emit(percent)
 
 func recoil(dir: Vector3, force: float) -> void:
 	force = 1
@@ -243,6 +224,9 @@ func allign_with_floor(delta: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	
+	if static_model:
+		return
+
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 	
@@ -357,14 +341,7 @@ func move(move: Vector2, delta: float) -> void:
 	#position += Vector3(current_pos_2d.x,0,current_pos_2d.y) * current_speed
 
 func shoot() -> void:
-	
-	if last_shoot_prim + fire_rate_prim >= time_controller.running_time:
-		return
-	last_shoot_prim = time_controller.running_time
-	
 	shoot_signal.emit()
-	
-	time_passed = 0
 
 
 
@@ -396,10 +373,28 @@ func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> v
 	embraces_damage.emit(damage)
 	got_hit.emit(source, impact_point)
 
+
+func take_heal(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> void:
+	armor_points += damage
+	armor_points = clamp(armor_points,0,max_armor_points)
+	
+	#print("Salud ",armor_points)
+	
+	ap_percent.emit(float(armor_points)/float(max_armor_points) * 100.0)
+	hp_changed.emit(armor_points)
+	
+	
+	#embraces_damage.emit(damage)
+	#got_hit.emit(source, impact_point)
+
 func show_visual_damage(ap: float) -> void:
 	if not damage_effect:
 		return
-	
+	if ap >= 50.0:
+		if damage_effect.emitting:
+			damage_effect.emitting = false
+			damage_effect.hide()
+			damage_effect.process_mode = Node.PROCESS_MODE_DISABLED
 	if ap <= 50.0:
 		if not damage_effect.emitting:
 			damage_effect.emitting = true
@@ -414,9 +409,8 @@ func show_visual_damage(ap: float) -> void:
 
 func activate() -> void:
 	visible = true
-	process_mode = Node.PROCESS_MODE_INHERIT
-	set_deferred("monitoring", true)
-	set_deferred("monitorable", true)
+	
+	_switch_collision(true)
 	
 	gets_enabled.emit()
 	hp_changed.emit(armor_points)
@@ -424,9 +418,14 @@ func activate() -> void:
 
 func deactivate() -> void:
 	visible = false
-	process_mode = Node.PROCESS_MODE_DISABLED
-	set_deferred("monitoring", false)
-	set_deferred("monitorable", false)
+	
+	
+	for t in vehicle_turrets:
+		for w in t.turret_barrel:
+			if w.heat_effect:
+				w.heat_effect.one_shot = true
+	
+	_switch_collision(false)
 	
 	Effects_Manager.INSTANCE.explosion_from_pool(global_position)
 	
@@ -449,6 +448,9 @@ func shake_vehicle(shake_time: float) -> void:
 
 func _process(delta: float) -> void:
 	
+	if static_model:
+		return
+	
 	last_tick += delta
 	if last_tick > tick:
 		update_stencil(2)
@@ -461,3 +463,13 @@ func _process(delta: float) -> void:
 	
 	if boost_last_use < boost_cooldown:
 		boost_last_use += delta
+
+func _switch_collision(b: bool) -> void:
+	if b:
+		process_mode = Node.PROCESS_MODE_INHERIT
+	else:
+		process_mode = Node.PROCESS_MODE_DISABLED
+	
+	static_model = b
+	set_deferred("monitoring", b)
+	set_deferred("monitorable", b)

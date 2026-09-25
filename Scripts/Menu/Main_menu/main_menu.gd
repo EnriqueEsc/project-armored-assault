@@ -176,6 +176,8 @@ func create_tank_selection_buttons() -> void:
 				tank_p = load("res://Prefabs/Player/tank.tscn")
 			"mk_-2inferno":
 				tank_p = load("res://Prefabs/Player/inferno.tscn")
+			"iris":
+				tank_p = load("res://Prefabs/Player/iris.tscn")
 		
 		if tank_p:
 			var tank_clone = tank_p.instantiate() as Tank_Rigid

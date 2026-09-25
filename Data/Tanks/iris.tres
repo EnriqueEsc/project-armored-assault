@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Tank_Data" format=3 uid="uid://c7oxxkbo1kxad"]
+
+[ext_resource type="Script" uid="uid://o0qesee4s8dx" path="res://Data/Tanks/Tank_Data.gd" id="1_o3804"]
+
+[resource]
+script = ExtResource("1_o3804")
+tank_Name = "iris"
+traction = 2.0
+max_armor_points = 400
+metadata/_custom_type_script = "uid://o0qesee4s8dx"

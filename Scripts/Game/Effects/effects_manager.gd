@@ -18,6 +18,16 @@ var fire_prefab = load("res://Prefabs/Effects/fire.tscn")
 var fire_pool: Array[GPUParticles3D] = []
 var fire_active: Array[GPUParticles3D] = []
 
+
+var heat_prefab = load("res://Prefabs/Effects/ground_trail.tscn")
+var heat_pool: Array[GPUParticles3D] = []
+var heat_active: Array[GPUParticles3D] = []
+
+var marker_prefab = load("res://Sprites/Test/lock_on.png")
+var marker_pool: Array[Sprite_Effect] = []
+var marker_active: Array[Sprite_Effect] = []
+
+
 func _ready() -> void:
 	singleton()
 	
@@ -52,6 +62,27 @@ func create_effects() -> void:
 		fire.finished.connect(fire_to_pool.bind(fire))
 		deactivate_effect(fire)
 		fire_pool.append(fire)
+		
+		var heat = heat_prefab.instantiate() as GPUParticles3D
+		get_tree().current_scene.call_deferred("add_child",heat)
+		heat.one_shot = false
+		#heat.lifetime = 10
+		#heat.finished.connect(heat_to_pool.bind(heat))
+		deactivate_effect(heat)
+		heat_pool.append(heat)
+		
+		
+		
+		var marker = Sprite_Effect.new()
+		marker.texture = marker_prefab
+		get_tree().current_scene.call_deferred("add_child",marker)
+		marker.no_depth_test = true
+		marker.modulate = Color.RED
+		marker.modulate.a = 0.5
+		marker.render_priority = 90
+		marker.rotation_degrees.x = 90
+		deactivate_sprite(marker)
+		marker_pool.append(marker)
 
 func explosion_from_pool(position: Vector3) -> void:
 	var explosion: GPUParticles3D = null
@@ -120,3 +151,59 @@ func fire_to_pool(fire: GPUParticles3D) -> void:
 	fire_active.erase(fire)
 	fire_pool.push_back(fire)
 	deactivate_effect(fire)
+
+
+
+
+func heat_from_pool(position: Vector3) -> GPUParticles3D:
+	#print("EXP ",position)
+	#print("Efectos activos: ",heat_active.size())
+	var heat: GPUParticles3D
+	if heat_pool.size() <= 0:
+		heat = heat_active.pop_front()
+	else:
+		heat = heat_pool.pop_front()
+	if heat:
+		heat_active.push_back(heat)
+		heat.process_mode = Node.PROCESS_MODE_ALWAYS
+		heat.global_position = position
+		heat.finished.emit()
+		heat.one_shot = false
+		heat.show()
+		heat.restart()
+	
+	#print("HEAT")
+	return heat
+
+func heat_to_pool(heat: GPUParticles3D) -> void:
+	heat_active.erase(heat)
+	heat_pool.push_back(heat)
+	deactivate_effect(heat)
+
+
+
+
+func marker_from_pool(position: Vector3) -> Sprite_Effect:
+	#print("EXP ",position)
+	#print("Efectos activos: ",marker_active.size())
+	var marker: Sprite_Effect
+	if marker_pool.size() <= 0:
+		marker = marker_active.pop_front()
+	else:
+		marker = marker_pool.pop_front()
+	if marker:
+		marker_active.push_back(marker)
+		marker.visible = true
+		marker.finished.emit()
+		marker.global_position = position
+	
+	#print("marker")
+	return marker
+
+func marker_to_pool(marker: Sprite_Effect) -> void:
+	marker_active.erase(marker)
+	marker_pool.push_back(marker)
+	deactivate_sprite(marker)
+
+func deactivate_sprite(ef: Sprite_Effect) -> void:
+	ef.deactivate()

@@ -15,8 +15,6 @@ func _physics_process(delta: float) -> void:
 	
 	allign_with_floor(delta)
 	
-	calculate_charge(delta)
-	
 	if direction:
 		velocity.x = lerpf(velocity.x, direction.x * current_speed, acceleration * delta)
 		velocity.z = lerpf(velocity.z, direction.z * current_speed, acceleration * delta)

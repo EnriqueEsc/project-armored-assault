@@ -1,10 +1,10 @@
-[gd_scene format=4 uid="uid://u1w6n0iiovft"]
+[gd_scene format=4 uid="uid://vuglbt2gv2sk"]
 
-[ext_resource type="Script" uid="uid://b02j404uo38ap" path="res://Scripts/Vehicles/drone_rigidbody.gd" id="1_v6ne2"]
-[ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Vehicles/vehicle_turret.gd" id="2_53ahr"]
-[ext_resource type="PackedScene" uid="uid://caqoxtxta5muo" path="res://Models/Test/Tank_Test/turret_V3.fbx" id="3_ynatf"]
-[ext_resource type="Script" uid="uid://bjh2nh20l8im4" path="res://Scripts/Vehicles/turret_weapon.gd" id="4_53ahr"]
-[ext_resource type="Script" uid="uid://bs827ehppdp8e" path="res://Scripts/AI/Enemies/enemy_drone.gd" id="4_moeo8"]
+[ext_resource type="Script" uid="uid://b02j404uo38ap" path="res://Scripts/Vehicles/drone_rigidbody.gd" id="1_171r4"]
+[ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Vehicles/vehicle_turret.gd" id="2_nlxax"]
+[ext_resource type="PackedScene" uid="uid://caqoxtxta5muo" path="res://Models/Test/Tank_Test/turret_V3.fbx" id="3_ptt34"]
+[ext_resource type="Script" uid="uid://bjh2nh20l8im4" path="res://Scripts/Vehicles/turret_weapon.gd" id="4_fy2v0"]
+[ext_resource type="Script" uid="uid://bs827ehppdp8e" path="res://Scripts/AI/Enemies/enemy_drone.gd" id="5_ff7xr"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vwfjx"]
 render_priority = 1
@@ -118,47 +118,51 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_j5fwr")
 
-[node name="Enemy_drone" type="CharacterBody3D" unique_id=1424537887 node_paths=PackedStringArray("vehicle_turrets", "model")]
+[node name="Enemy_drone" type="CharacterBody3D" unique_id=664022499 node_paths=PackedStringArray("vehicle_turrets", "model")]
 transform = Transform3D(-2.1855693e-07, 0, -1, 0, 1, 0, 1, 0, -2.1855693e-07, 0, 0, 0)
-script = ExtResource("1_v6ne2")
+script = ExtResource("1_171r4")
 is_kamikaze = true
 vehicle_turrets = [NodePath("Turret")]
 model = [NodePath("Healer/Healer"), NodePath("Turret/Gun/Gun")]
 material = SubResource("StandardMaterial3D_pcmi7")
 
-[node name="Healer" type="Node3D" parent="." unique_id=1745457913]
+[node name="Healer" type="Node3D" parent="." unique_id=1428280352]
 transform = Transform3D(0.75, 0, 0, 0, 0.75, 0, 0, 0, 0.75, 0, 0, 0)
 
-[node name="Healer" type="MeshInstance3D" parent="Healer" unique_id=1222788568]
+[node name="Healer" type="MeshInstance3D" parent="Healer" unique_id=473433848]
 material_override = SubResource("StandardMaterial3D_4qvqo")
 mesh = SubResource("ArrayMesh_11jk0")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1206191062]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1495451092]
 shape = SubResource("BoxShape3D_fuabs")
 debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 
-[node name="Turret" type="Node3D" parent="." unique_id=1501365909 node_paths=PackedStringArray("turret_barrel")]
+[node name="Turret" type="Node3D" parent="." unique_id=675503372 node_paths=PackedStringArray("turret_barrel")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5295446, 0)
-script = ExtResource("2_53ahr")
+script = ExtResource("2_nlxax")
 turret_barrel = [NodePath("Gun")]
+barrel_lower_limit = -30.0
 side_angle_limit = 90.0
 
-[node name="turret_V3" parent="Turret" unique_id=1331242705 instance=ExtResource("3_ynatf")]
+[node name="turret_V3" parent="Turret" unique_id=1331242705 instance=ExtResource("3_ptt34")]
 transform = Transform3D(1.6391772e-07, 0, 1.25, 0, 1.25, 0, -1.25, 0, 1.6391772e-07, 0, -0.29506743, 0)
 visible = false
 
-[node name="Gun" type="Node3D" parent="Turret" unique_id=1192065664]
+[node name="Gun" type="Node3D" parent="Turret" unique_id=1400084908]
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0, 0)
-script = ExtResource("4_53ahr")
+script = ExtResource("4_fy2v0")
+projectile_type = 2
+fire_mode = 1
+fire_rate_prim = 0.2
 
-[node name="Gun" type="MeshInstance3D" parent="Turret/Gun" unique_id=1527743472]
+[node name="Gun" type="MeshInstance3D" parent="Turret/Gun" unique_id=1528815107]
 material_override = SubResource("StandardMaterial3D_4qvqo")
 mesh = SubResource("ArrayMesh_bdpwl")
 
-[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=2026052976]
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1271596892]
 avoidance_enabled = true
 radius = 1.0
-script = ExtResource("4_moeo8")
+script = ExtResource("5_ff7xr")
 max_shoot_angle = 0.5
 max_chase_distance = 100.0
 aggro_max_time = 120.0
