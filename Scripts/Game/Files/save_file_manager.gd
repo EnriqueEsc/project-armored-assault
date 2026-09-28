@@ -57,7 +57,9 @@ func load_game() -> bool:
 			var loaded_data = json.get_data()
 			current_save_data = DEFAULT_SAVE_DATA.duplicate(true)
 			current_save_data.merge(loaded_data,true)
-		
+			
+			
+			
 			load_tanks_data()
 	
 	print("NO EXISTE")
@@ -116,6 +118,30 @@ func load_tanks_data() -> void:
 			file_name = dir.get_next()
 		dir.list_dir_end()
 		load_unlocked_tanks()
+
+
+
+func load_tank_data(str: String) -> Tank_Data:
+	var dir = DirAccess.open("res://Data/Tanks")
+	
+	if dir:
+		#print("ola tanke")
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		
+		while file_name != "":
+			if not dir.current_is_dir():
+				if file_name.ends_with(".tres") or file_name.ends_with(".remap"):
+					var clean_name = file_name.trim_suffix(".remap")
+					var path = "res://Data/Tanks".path_join(clean_name)
+					#print(str," ",clean_name)
+					var tank = ResourceLoader.load(path) as Tank_Data
+					if tank and tank.tank_Name == str:
+						return tank
+			file_name = dir.get_next()
+		dir.list_dir_end()
+	return null
+
 
 func load_unlocked_tanks() -> void:
 	tanks_unlocked.clear()

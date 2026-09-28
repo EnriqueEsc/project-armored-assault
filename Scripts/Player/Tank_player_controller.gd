@@ -35,9 +35,6 @@ var HUD_height_line: Array[Line2D] = []
 
 @export var max_armor_points: int = 120
 
-@onready var HUD_Outline_SubViewport: SubViewport = $Outline_Rect/SubViewport
-@onready var HUD_3D_SubViewport: SubViewport = $UI_3D_Rect/SubViewport
-
 @onready var HUD_Hitmarker: RichTextLabel = $HUD/HUD_Player/Icon/HUD_Hitmarker
 
 @onready var HUD_dialog: HUD_Dialog = $HUD/HUD_Player/HUD_Dialog
@@ -141,13 +138,7 @@ func _ready() -> void:
 	
 	var sub_viewports_scale: int = 1
 	
-	if HUD_3D_SubViewport:
-		HUD_3D_SubViewport.world_3d = get_viewport().world_3d
-		HUD_3D_SubViewport.size = get_viewport().size / sub_viewports_scale
-	if HUD_Outline_SubViewport:
-		HUD_Outline_SubViewport.world_3d = get_viewport().world_3d
-		HUD_Outline_SubViewport.size = get_viewport().size / sub_viewports_scale
-	
+
 	tank_camera.player = tank_rigid
 	
 	
@@ -281,10 +272,6 @@ func shoot_ready(charge: float) -> void:
 func _physics_process(delta: float) -> void:
 	if not third_person:
 		tank_camera.move_cam(tank_rigid.position, delta)
-		$Outline_Rect/SubViewport/Camera3D.global_position = tank_camera.global_position
-		$Outline_Rect/SubViewport/Camera3D.global_rotation = tank_camera.global_rotation
-		$UI_3D_Rect/SubViewport/Camera3D.global_position = tank_camera.global_position
-		$UI_3D_Rect/SubViewport/Camera3D.global_rotation = tank_camera.global_rotation
 	if third_person:
 		var stick_input = Input.get_vector("Aim_Left", "Aim_Right", "Aim_Up", "Aim_Down")
 		if stick_input.length_squared() > 0.04:

@@ -6,7 +6,7 @@ extends Menu
 @onready var quit_game_button: Button = $Main_menu_buttons/Buttons/Quit_game
 
 @onready var mission_list_window: Control = $Mission_list
-@onready var load_mission_button: Button = $Mission_list/Buttons/Load_mission
+@onready var mission_buttons_grid: GridContainer = $Mission_list/Buttons/Mission_selection_container/Mission_button_container
 @onready var back_to_main_menu: Button = $Mission_list/Buttons/Back
 
 @onready var briefing_window: Control = $Mission_Briefing
@@ -64,8 +64,7 @@ func _set_buttons() -> void:
 	credits_back_button.button_down.connect(switch_active.bind(credits_window))
 	
 	#load_mission_button.button_down.connect(select_mission.bind("res://Scenes/test_mission.tscn"))
-	load_mission_button.button_down.connect(select_mission.bind("res://Scenes/mission_zero.tscn"))
-	load_mission_button.button_down.connect(show_briefing)
+
 	back_to_main_menu.button_down.connect(switch_active.bind(mission_list_window))
 	
 	to_tank_selection.button_down.connect(switch_active.bind(tank_selection_window))
@@ -99,6 +98,8 @@ func _set_buttons() -> void:
 		await get_tree().process_frame
 	
 	create_tank_selection_buttons()
+	create_mission_selection_buttons()
+
 
 func load_scene() -> void:
 	if selected_mission != "":
@@ -153,9 +154,39 @@ func show_briefing() -> void:
 ....>> Spread as much chaos as you can.")
 
 
+func create_mission_selection_buttons() -> void:
+	var missions: Array = get_missions("res://Scenes/Missions/")
+	missions.reverse()
+	
+	for t in missions:
+		var mission_button = Button.new()
+		mission_button.text = t
+		mission_button.custom_minimum_size = Vector2(200,50)
+		mission_buttons_grid.add_child(mission_button)
+		mission_button.button_down.connect(select_mission.bind("res://Scenes/Missions/"+t+".tscn"))
+		mission_button.button_down.connect(show_briefing)
+	
+func get_missions(path: String) -> Array:
+	var missions: Array = []
+	var dir = DirAccess.open(path)
+	
+	if dir:
+		dir.list_dir_begin()
+		var mis = dir.get_next()
+		
+		while mis != "":
+			if not dir.current_is_dir() or (mis != "." and mis != ".."):
+				mis = mis.split(".tscn")[0]
+				missions.append(mis)
+			mis = dir.get_next()
+			
+		dir.list_dir_end()
+		
+	return missions
+
+
 func create_tank_selection_buttons() -> void:
 	var tanks: Array = Save_File_Manager.INSTANCE.tanks_unlocked
-	
 	
 	for t in tanks:
 		print(t.tank_Name)

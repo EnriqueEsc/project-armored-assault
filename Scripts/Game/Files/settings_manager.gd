@@ -11,13 +11,13 @@ var current_tank_used_in_game: Tank_Data = null
 
 var fullscreen: bool = false
 
-var aim_3d: bool = false
-var aim_guideline: bool = false
+var aim_3d: bool = true
+var aim_guideline: bool = true
 var aim_limited: bool = false
 var third_person: bool = false
 var use_csg: bool = false
 
-var see_trough_buildings: bool = false
+var see_trough_buildings: bool = true
 var max_effects: int = 30
 var max_shake_strength: float = 0.2
 var mouse_visible: bool = false
@@ -39,6 +39,7 @@ func _ready() -> void:
 	if Save_File_Manager.INSTANCE.load_game():
 		return
 	Save_File_Manager.INSTANCE.save_game()
+	Save_File_Manager.INSTANCE.load_game()
 
 
 func singleton() -> void:

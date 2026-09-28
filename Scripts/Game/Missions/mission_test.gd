@@ -20,6 +20,7 @@ func _set_objectives() -> void:
 			emplacements.append(e)
 			e.gets_disabled.connect(emplacements_kill_count)
 		if is_instance_of(e, Tank_Rigid):
+			#print("SEXOOOO ",e)
 			e.gets_disabled.connect(tanks_kill_count)
 			tanks.append(e)
 			e.vehicle_pilot_name = "Tank #"+str(counter)
@@ -70,7 +71,7 @@ func _update_current_objectives() -> void:
 	
 		objectives_text = ^"[font_size=28]Objectives:[/font_size]
 		
-		> Destroy tanks [{ctk}/{mtk}]
+		> Destroy vehicles [{ctk}/{mtk}]
 		> Destroy emplacements [{cek}/{mek}]
 		> Spread chaos [{cd}/{md}]"
 		

@@ -56,7 +56,7 @@ func _physics_process(delta: float) -> void:
 	
 	if not is_equal_approx(global_position.y , distance_to_ground):
 		
-		global_position.y = lerpf(global_position.y,distance_to_ground,3.0 * delta)
+		global_position.y = lerpf(global_position.y,distance_to_ground,0.5 * delta)
 		velocity.y = minf(velocity.y, 0.0)
 		#print(global_position.y)
 	

@@ -16,7 +16,7 @@ var damage_effect: GPUParticles3D = null
 @export var acceleration: float = 5.0
 @export var turn_speed: float = 1.0
 
-@export var boost_speed: float = 6.0
+@export var boost_speed: float = 2.0
 @export var boost_cooldown: float = 5.0
 var boost_last_use: float = 5.0
 
@@ -75,6 +75,8 @@ var static_model: bool = false
 var stagger_max_time: float = 5.0
 var stagger_timer: float = 5.0
 var staggered: bool = false
+
+var is_destroyed: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -206,7 +208,7 @@ func quick_boost() -> void:
 		dir = global_basis.z
 	var push = Vector3.ZERO.move_toward(dir, friction)
 	#push = Vector3(push.x, 0 ,push.z)
-	velocity += push * boost_speed
+	velocity += push * max_speed * boost_speed
 	boost_last_use = 0.0
 
 func allign_with_floor(delta: float) -> void:
@@ -353,6 +355,8 @@ func get_aim_point_3d_normal(turret_index: int) -> Vector3:
 
 
 func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> void:
+	if armor_points < 1:
+		return
 	armor_points -= damage
 	armor_points = clamp(armor_points,0,max_armor_points)
 	
@@ -430,6 +434,7 @@ func deactivate() -> void:
 	Effects_Manager.INSTANCE.explosion_from_pool(global_position)
 	
 	gets_disabled.emit()
+	
 
 func use_attachment() -> void:
 	if attachment:
@@ -470,6 +475,7 @@ func _switch_collision(b: bool) -> void:
 	else:
 		process_mode = Node.PROCESS_MODE_DISABLED
 	
+	is_destroyed = b
 	static_model = b
 	set_deferred("monitoring", b)
 	set_deferred("monitorable", b)

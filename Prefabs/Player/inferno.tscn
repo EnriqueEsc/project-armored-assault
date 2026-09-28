@@ -236,6 +236,7 @@ transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0
 script = ExtResource("8_niw7e")
 projectile_type = 4
 fire_mode = 1
+fire_rate_prim = 0.2
 
 [node name="Gun" type="MeshInstance3D" parent="Turret/Gun" unique_id=1346115680]
 material_override = SubResource("StandardMaterial3D_vwfjx")
@@ -263,6 +264,7 @@ transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0
 script = ExtResource("8_niw7e")
 projectile_type = 4
 fire_mode = 1
+fire_rate_prim = 0.2
 
 [node name="Gun" type="MeshInstance3D" parent="Turret2/Gun" unique_id=637877119]
 material_override = SubResource("StandardMaterial3D_vwfjx")

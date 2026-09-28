@@ -156,10 +156,10 @@ func get_closest_enemy_to_mouse(mouse_3d: Vector3) -> Vehicle_Rigid:
 	var enemies = get_tree().get_nodes_in_group("Enemy")
 	if enemies.is_empty():
 		return closest
-	var min_dist: float = INF
+	var min_dist: float = 10.0
 	
 	for e in enemies:
-		if e is Vehicle_Rigid and e.armor_points > 0:
+		if e is Vehicle_Rigid and not e.static_model:
 			var dist = mouse_3d.distance_to(e.global_position)
 			if dist < min_dist:
 				min_dist = dist
@@ -174,10 +174,10 @@ func get_closest_enemy_to_pivot(pivot: Vehicle_Rigid) -> Vehicle_Rigid:
 	var enemies = get_tree().get_nodes_in_group("Enemy")
 	if enemies.is_empty():
 		return closest
-	var min_dist: float = INF
+	var min_dist: float = 10.0
 	
 	for e in enemies:
-		if e != pivot and e is Vehicle_Rigid and e.armor_points > 0:
+		if e != pivot and e is Vehicle_Rigid and not e.static_model:
 			var dist = pivot.global_position.distance_to(e.global_position)
 			if dist < min_dist:
 				min_dist = dist

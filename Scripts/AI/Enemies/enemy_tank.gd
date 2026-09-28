@@ -5,6 +5,9 @@ class_name Enemy_Tank_AI
 func _init_rigid() -> void:
 	
 	tank_rigid = get_parent() as Tank_Rigid
+	
+	next_node = Vector3(randf_range(tank_rigid.global_position.x - 2.0,tank_rigid.global_position.x + 2.0),tank_rigid.global_position.y,randf_range(tank_rigid.global_position.z - 2.0,tank_rigid.global_position.z + 2.0))
+
 
 
 
@@ -108,8 +111,15 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 	target_position = target_pos
 	
 	if is_navigation_finished():
-		tank_rigid.move(Vector2.ZERO, delta)
-		return
+		match current_mode:
+			AI_Mode.COMBAT:
+				next_node = Vector3(randf_range(tank_rigid.global_position.x - 2.0,tank_rigid.global_position.x + 2.0),tank_rigid.global_position.y,randf_range(tank_rigid.global_position.z - 2.0,tank_rigid.global_position.z + 2.0))
+				target_position = next_node
+				#tank_rigid.move(Vector2.ZERO, delta)
+				return
+			AI_Mode.DELIEVER:
+				get_next_path_node()
+				target_position = next_node
 	
 	var current_pos: Vector3 = tank_rigid.global_position
 	var next_pos: Vector3 = get_next_path_position()
@@ -132,6 +142,10 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 	
 	var input_y: float = 1.0 if abs(angle) < 1.8 else 0.0
 	
+	#print(get_whisker_steering())
+	
+	#if get_whisker_steering() != 0.0:
+	#	input_y = 0.0
 	
 	tank_rigid.move(Vector2(input_x, input_y), delta)
 

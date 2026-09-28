@@ -21,6 +21,9 @@ var active_count: int = 0
 
 func _ready() -> void:
 	
+	#multimesh_instance.call_deferred("set_global_position",collision.global_position)
+	#multimesh_instance.call_deferred("set_global_rotation",collision.global_rotation)
+	
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exit)
 	area_entered.connect(_on_area_entered)
@@ -45,8 +48,8 @@ func init_grid() -> void:
 
 	tree_grid.resize(col_size_x)
 
-	var start_x = -box.size.x * 0.5 + tree_spacing * 0.5
-	var start_z = -box.size.z * 0.5 + tree_spacing * 0.5
+	var start_x = collision.position.x -box.size.x * 0.5 + tree_spacing * 0.5
+	var start_z = collision.position.z -box.size.z * 0.5 + tree_spacing * 0.5
 
 	var counter := 0
 

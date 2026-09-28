@@ -19,6 +19,10 @@ func _ready() -> void:
 	initialize_effects()
 
 func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> void:
+	
+	if armor_points < 1:
+		return
+	
 	armor_points -= damage
 	armor_points = clamp(armor_points,0,max_armor_points)
 	

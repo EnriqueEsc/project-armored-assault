@@ -92,6 +92,7 @@ blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_6p7xs")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_6blnc"]
+size = Vector3(0.8, 1, 1.4)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mogsj"]
 
@@ -131,6 +132,7 @@ shadow_mesh = SubResource("ArrayMesh_j5fwr")
 transform = Transform3D(1.3113416e-07, 0, 1, 0, 1, 0, -1, 0, 1.3113416e-07, 0, 0, 0)
 script = ExtResource("1_0rbbw")
 vehicle_turrets = [NodePath("Turret")]
+max_armor_points = 80
 model = [NodePath("Minor/Minor"), NodePath("Minor/Gun"), NodePath("Turret/Gun/Gun")]
 material = SubResource("StandardMaterial3D_bwv6e")
 

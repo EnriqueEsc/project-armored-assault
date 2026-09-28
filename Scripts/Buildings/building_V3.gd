@@ -176,7 +176,7 @@ func init_grid() -> void:
 	
 	var radious = ((building_bounds.x+building_bounds.y)/2.0) * 3
 	max_shake_distance = radious * levels.size()
-	print("SAAAAAAAAAAAAA ",max_shake_distance)
+	#print("SAAAAAAAAAAAAA ",max_shake_distance)
 	
 	
 	if using_preexisting_grid:

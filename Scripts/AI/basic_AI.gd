@@ -7,6 +7,11 @@ var current_state: AI_State = AI_State.IDLE
 enum Team {ENEMY, ALLY}
 @export var current_team: Team = Team.ENEMY
 
+enum AI_Mode {COMBAT, PATH, DELIEVER}
+@export var current_mode: AI_Mode = AI_Mode.COMBAT
+
+@export var path_to_follow: Array[Vector3] = [Vector3.ZERO]
+
 @export var engage_time: float = 10.0
 var engage_max_time: float = 10.0
 
@@ -53,6 +58,7 @@ var scan_timer: float = 0.0
 var stagger_max_time: float = 5.0
 var stagger_timer: float = 5.0
 
+var next_node: Vector3 = Vector3.ZERO
 
 func _init_rigid() -> void:
 	
@@ -122,8 +128,8 @@ func _ready() -> void:
 							#continue
 
 	
-	for e in allies:
-		print(e)
+	#for e in allies:
+	#	print(e)
 	
 	#for a in ally_arrays:
 	#	print(a)
@@ -166,22 +172,34 @@ func _ready() -> void:
 
 
 func init_whiskers() -> void:
+	for i in 30:
+		await get_tree().physics_frame
+	if not is_instance_valid(tank_rigid.collision_shape):
+		return
+	
 	left_whisker = RayCast3D.new()
 	center_whisker = RayCast3D.new()
 	right_whisker = RayCast3D.new()
 	
 	
-	left_whisker.target_position = Vector3(1,0,1)
-	center_whisker.target_position = Vector3(0,0,1.5)
-	right_whisker.target_position = Vector3(-1,0,1)
 	
 	tank_rigid.add_child(left_whisker)
 	tank_rigid.add_child(center_whisker)
 	tank_rigid.add_child(right_whisker)
 	
-	left_whisker.global_position = tank_rigid.global_position
-	center_whisker.global_position = tank_rigid.global_position
-	right_whisker.global_position = tank_rigid.global_position
+	left_whisker.name = "left_whisker"
+	center_whisker.name = "center_whisker"
+	right_whisker.name = "right_whisker"
+	
+	left_whisker.position = Vector3(tank_rigid.collision_shape.size.x/2.0,0.0,tank_rigid.collision_shape.size.z/2.0)
+	center_whisker.position = Vector3(0.0,0.0,tank_rigid.collision_shape.size.z/2.0)
+	right_whisker.position = Vector3(-tank_rigid.collision_shape.size.x/2.0,0.0,tank_rigid.collision_shape.size.z/2.0)
+	
+	
+	
+	left_whisker.target_position = left_whisker.position + Vector3(1,0,1)
+	center_whisker.target_position = center_whisker.position + Vector3(0,0,1.5)
+	right_whisker.target_position = right_whisker.position + Vector3(-1,0,1)
 	
 	var tank_rid = tank_rigid.get_rid()
 	left_whisker.add_exception_rid(tank_rid)
@@ -194,6 +212,12 @@ func init_whiskers() -> void:
 	
 
 func get_whisker_steering() -> float:
+	if not is_instance_valid(center_whisker) or not is_instance_valid(left_whisker) or not is_instance_valid(right_whisker):
+		#print("PUTA MADRE")
+		return 0.0
+	
+	#print(left_whisker.get_collider()," ",center_whisker.get_collider()," ",right_whisker.get_collider())
+	
 	var steering_offset: float = 0.0
 	
 	if center_whisker.is_colliding():
@@ -245,6 +269,9 @@ func get_report(source: Node3D, impact_point: Vector3) -> void:
 	#alerted = false
 	current_state = AI_State.ENGAGED
 	
+	if is_boss:
+		HUD_boss_info.update_boss_active(true)
+	
 	last_known_position = source.global_position
 	
 	engage_time = engage_max_time
@@ -289,8 +316,8 @@ func destroyed_dialog() -> void:
 func _physics_process(delta: float) -> void:
 	
 	var static_model: bool = false
-	if player_ref is Vehicle_Rigid:
-		static_model = player_ref.static_model
+	if is_instance_valid(tank_rigid) and tank_rigid is Vehicle_Rigid:
+		static_model = tank_rigid.static_model
 	
 	if not is_instance_valid(player_ref) or not player_ref.visible or static_model:
 		current_state = AI_State.IDLE
@@ -374,6 +401,7 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 					if current_team == Team.ALLY:
 						tank_rigid.update_stencil_color(Color.GREEN)
 					else:
+						next_node = Vector3(randf_range(tank_rigid.global_position.x - 2.0,tank_rigid.global_position.x + 2.0),tank_rigid.global_position.y,randf_range(tank_rigid.global_position.z - 2.0,tank_rigid.global_position.z + 2.0))
 						tank_rigid.update_stencil_color(Color.YELLOW)
 					if alerted:
 						alerted = false
@@ -409,27 +437,54 @@ func update_detection_meter(delta: float, can_see_player: bool, distance_to_play
 
 
 func execute_current_state(delta: float, can_see_player: bool) -> void:
-	match current_state:
-		AI_State.IDLE:
-			tank_rigid.move(Vector2.ZERO, delta)
-			if detection_meter > 0.0 and can_see_player:
-				handle_turret_and_shooting(player_ref.global_position, false, can_see_player)
-				
-		AI_State.ENGAGED:
-			navigate_to_position(player_ref.global_position, delta)
-			handle_turret_and_shooting(player_ref.global_position, true, can_see_player)
-			
-		AI_State.INVESTIGATING:
-			navigate_to_position(last_known_position, delta)
-			handle_turret_and_shooting(last_known_position, false, can_see_player)
+	var target_pos: Vector3 = Vector3.ZERO
+	
+	match current_mode:
+		AI_Mode.COMBAT:
+			match current_state:
+				AI_State.IDLE:
+					navigate_to_position(next_node,delta)
+					#tank_rigid.move(Vector2.ZERO, delta)
+					if detection_meter > 0.0 and can_see_player:
+						handle_turret_and_shooting(player_ref.global_position, false, can_see_player)
+						
+				AI_State.ENGAGED:
+					navigate_to_position(player_ref.global_position, delta)
+					handle_turret_and_shooting(player_ref.global_position, true, can_see_player)
+					
+				AI_State.INVESTIGATING:
+					navigate_to_position(last_known_position, delta)
+					handle_turret_and_shooting(last_known_position, false, can_see_player)
+
+		AI_Mode.DELIEVER:
+			match current_state:
+				AI_State.IDLE:
+					navigate_to_position(next_node, delta)
+					if detection_meter > 0.0 and can_see_player:
+						handle_turret_and_shooting(player_ref.global_position, false, can_see_player)
+						
+				AI_State.ENGAGED:
+					navigate_to_position(next_node, delta)
+					handle_turret_and_shooting(player_ref.global_position, true, can_see_player)
+					
+				AI_State.INVESTIGATING:
+					navigate_to_position(next_node, delta)
+					handle_turret_and_shooting(last_known_position, false, can_see_player)
 
 
 func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 	target_position = target_pos
 	
 	if is_navigation_finished():
-		tank_rigid.move(Vector2.ZERO, delta)
-		return
+		match current_mode:
+			AI_Mode.COMBAT:
+				next_node = Vector3(randf_range(tank_rigid.global_position.x - 2.0,tank_rigid.global_position.x + 2.0),tank_rigid.global_position.y,randf_range(tank_rigid.global_position.z - 2.0,tank_rigid.global_position.z + 2.0))
+				target_position = next_node
+				#tank_rigid.move(Vector2.ZERO, delta)
+				return
+			AI_Mode.DELIEVER:
+				get_next_path_node()
+				target_position = next_node
 	
 	var current_pos: Vector3 = tank_rigid.global_position
 	var next_pos: Vector3 = get_next_path_position()
@@ -730,3 +785,9 @@ func can_see_target(cand: Node3D) -> bool:
 	query.exclude = [tank_rigid.get_rid()]
 	var result = tank_rigid.get_world_3d().direct_space_state.intersect_ray(query)
 	return not result.is_empty() and result.collider == cand
+
+func get_next_path_node() -> void:
+	if path_to_follow.is_empty():
+		next_node = Vector3.ZERO
+		return
+	next_node = path_to_follow.pop_front()

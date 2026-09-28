@@ -1,6 +1,8 @@
 extends Basic_AI
 class_name Drone_AI
 
+var tank = load("res://Prefabs/Enemy/enemy_tank.tscn")
+
 
 @export var is_kamikaze: bool = false
 
@@ -28,11 +30,31 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 	
 	
 	
-	var dir_to_path := target_position - tank_rigid.global_position
+	var dir_to_path = target_position - tank_rigid.global_position
 	
-	if dir_to_path.length_squared() < 2:
-		tank_rigid.move(Vector2.ZERO, delta)
-		return
+	#print(tank_rigid.global_position.y - target_pos.y," ",tank_rigid.distance_to_ground," ",dir_to_path.length_squared())
+	if dir_to_path.length_squared() < 2.0:
+		match current_mode:
+			AI_Mode.COMBAT:
+				tank_rigid.move(Vector2.ZERO, delta)
+				return
+			AI_Mode.DELIEVER:
+				if tank_rigid.global_position.y - target_pos.y < 4.0:
+					deliver_package()
+					return
+				else:
+					tank_rigid.distance_to_ground = 1.0
+					return
+	elif current_mode == AI_Mode.DELIEVER:
+		if tank_rigid.distance_to_ground == 1.0:
+			var dir = clampf(-dir_to_path.length(),-1.0,1.0)
+			tank_rigid.move(Vector2(0.0,dir), delta)
+			return
+					
+		if tank_rigid.attachment:
+			tank_rigid.attachment.objective = target_pos + Vector3(randi_range(-5,5),-2.0,randi_range(-5,5))
+			tank_rigid.attachment._use_attachment()
+		tank_rigid.distance_to_ground = 10.0
 	
 	var distance_to_target = dir_to_path.length()
 	dir_to_path = dir_to_path.normalized()
@@ -61,6 +83,10 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 	input_x += get_whisker_steering()
 	input_x = clamp(input_x, -1.0, 1.0)
 	
+	if current_mode != AI_Mode.COMBAT:
+		var input_y: float = 1.0 if abs(angle) < 1.8 else 0.0
+		tank_rigid.move(Vector2(input_x, input_y), delta)
+		return
 	
 	
 	if distance_to_target < 5:
@@ -74,7 +100,7 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 			#tank_rigid.set_distance_to_ground(-3.0,delta)
 			return
 	
-	if tank_rigid.attachment and distance_to_target > 5.5:
+	if tank_rigid.attachment and current_state == AI_State.ENGAGED and distance_to_target > 5.5:
 		#print(distance_to_target)
 		tank_rigid.use_attachment()
 	
@@ -89,3 +115,14 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 	tank_rigid.move(Vector2(input_x, input_y), delta)
 	
 	#print("Inputs: ",Vector2(input_x, input_y))
+
+
+func deliver_package() -> void:
+	for i in 5:
+		var c_tank = tank.instantiate() as Vehicle_Rigid
+		get_tree().current_scene.call_deferred("add_child",(c_tank))
+		c_tank.call_deferred("set_global_position",tank_rigid.global_position + Vector3(randi_range(-5,5),-2.0,randi_range(-5,5)))
+		#tank_rigid.move(Vector2.ZERO, delta)
+	get_next_path_node()
+	target_position = next_node
+	tank_rigid.distance_to_ground = 10.0

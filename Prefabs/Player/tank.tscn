@@ -8,7 +8,6 @@
 [ext_resource type="Script" uid="uid://bjh2nh20l8im4" path="res://Scripts/Vehicles/turret_weapon.gd" id="8_6k30k"]
 [ext_resource type="Script" uid="uid://c3oyimeh00poi" path="res://Scripts/Vehicles/vehicle_turret.gd" id="8_m1iq8"]
 [ext_resource type="PackedScene" uid="uid://cc8wea7bn5t8e" path="res://Models/Test/Barrage_Attachment.fbx" id="10_6k30k"]
-[ext_resource type="Script" uid="uid://cdr4qfdmc2brj" path="res://Scripts/Vehicles/auto_drone_atch.gd" id="10_c06xr"]
 [ext_resource type="PackedScene" uid="uid://b8u4pylde5yu4" path="res://Models/Test/torreta_V2.fbx" id="11_kqa3r"]
 [ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="13_jxxtf"]
 
@@ -304,8 +303,7 @@ mesh = SubResource("ArrayMesh_48xej")
 
 [node name="Node3D" type="Node3D" parent="." unique_id=58369107]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2019929e-08, -0.21309257, -0.50375724)
-script = ExtResource("10_c06xr")
-cooldown = 60.0
+visible = false
 
 [node name="Barrage_Attachment" parent="Node3D" unique_id=2073670498 instance=ExtResource("10_6k30k")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5694368e-08, 0, 0.35904527)
