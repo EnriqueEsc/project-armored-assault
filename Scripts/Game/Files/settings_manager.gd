@@ -22,7 +22,7 @@ var max_effects: int = 30
 var max_shake_strength: float = 0.2
 var mouse_visible: bool = false
 
-var controller_move: bool = false
+var move_type: Tank_player_controller.Move_Types = Tank_player_controller.Move_Types.Axial
 var controller_aim: bool = false
 var use_vibration: bool = false
 
@@ -60,7 +60,7 @@ func save_settings() -> void:
 	settings_file.set_value("Game","max_effects",max_effects)
 	settings_file.set_value("Game","mouse_visible",mouse_visible)
 	settings_file.set_value("Controls","controller_aim",controller_aim)
-	settings_file.set_value("Controls","controller_move",controller_move)
+	settings_file.set_value("Controls","move_type",move_type)
 	settings_file.set_value("Controls","use_vibration",use_vibration)
 	settings_file.save(SETTINGS_PATH)
 	print("SETTINGS GUARDADOS")
@@ -83,7 +83,7 @@ func load_settings() -> void:
 		mouse_visible = settings_file.get_value("Game","mouse_visible",mouse_visible)
 		
 		controller_aim = settings_file.get_value("Controls","controller_aim",controller_aim)
-		controller_move = settings_file.get_value("Controls","controller_move",controller_move)
+		move_type = settings_file.get_value("Controls","move_type",move_type)
 		use_vibration = settings_file.get_value("Controls","use_vibration",use_vibration)
 		apply_settings()
 	else:

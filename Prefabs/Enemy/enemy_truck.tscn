@@ -256,7 +256,6 @@ blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_j5fwr")
 
 [node name="Enemy_tank13" type="CharacterBody3D" unique_id=160921655 node_paths=PackedStringArray("vehicle_turrets", "model")]
-transform = Transform3D(-0.8718056, 0, -0.48985207, 0, 1, 0, 0.48985207, 0, -0.8718056, 0, 0, 0)
 script = ExtResource("1_3wmue")
 max_speed = 5.0
 turn_speed = 3.0

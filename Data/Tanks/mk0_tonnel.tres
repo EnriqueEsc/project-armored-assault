@@ -7,4 +7,5 @@ script = ExtResource("1_ce4cm")
 max_speed = 1.5
 acceleration = 1.0
 friction = 1.2
+max_armor_points = 120
 metadata/_custom_type_script = "uid://o0qesee4s8dx"

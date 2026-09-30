@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://caqoxtxta5muo" path="res://Models/Test/Tank_Test/turret_V3.fbx" id="4_r2psv"]
 [ext_resource type="Script" uid="uid://cxxlffo81ypm" path="res://Scripts/AI/Enemies/enemy_tank.gd" id="5_gl1xq"]
 [ext_resource type="Script" uid="uid://bjh2nh20l8im4" path="res://Scripts/Vehicles/turret_weapon.gd" id="5_guyko"]
+[ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="7_qjmwd"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bwv6e"]
 stencil_flags = 2
@@ -179,3 +180,8 @@ avoidance_enabled = true
 radius = 1.0
 script = ExtResource("5_gl1xq")
 aggro_max_time = 20.0
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=1021227254]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 1, 0)
+layers = 524288
+texture = ExtResource("7_qjmwd")

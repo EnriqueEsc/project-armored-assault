@@ -2,6 +2,7 @@ extends TextureRect
 class_name Map_Visualization
 
 @onready var viewport: SubViewport = $SubViewport
+@onready var map_camera: Camera3D = $SubViewport/Map_Camera
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:

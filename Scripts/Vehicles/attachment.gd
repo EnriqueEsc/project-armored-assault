@@ -5,6 +5,7 @@ var objective: Vector3 = Vector3.ZERO
 
 @export var cooldown: float = 0.0
 @export var min_percent_to_use: float = 100.0
+@export var attachment_name: String = "Attachment"
 var time_passed: float = 0.0
 var percent: float = 100
 signal shoot_recharge(charge: float)

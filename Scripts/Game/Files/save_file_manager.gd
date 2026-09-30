@@ -16,7 +16,17 @@ var all_tanks: Array[Tank_Data] = []
 var tanks_unlocked: Array[Tank_Data] = []
 var tanks_locked: Array[Tank_Data] = []
 
+
+
+var all_missions: Array[Mission_Data] = []
+var missions_unlocked: Array[Mission_Data] = []
+var missions_locked: Array[Mission_Data] = []
+
+
 var LAST_MISSION_RESULTS: Dictionary = {}
+
+var current_mission: Mission_Data = null
+var current_attachment: Attachment = null
 
 func _ready() -> void:
 	singleton()
@@ -50,6 +60,7 @@ func load_game() -> bool:
 			print("EXISTE SAVE FILE --- TANK KILLS: ",current_save_data["tank_kills_record"]," --- SCORE: ",current_save_data["total_score"])
 			
 			load_tanks_data()
+			load_missions_data()
 			print("ola, ",current_save_data["tanks_unlocked"])
 			print(tanks_unlocked)
 			return true
@@ -61,6 +72,7 @@ func load_game() -> bool:
 			
 			
 			load_tanks_data()
+			load_missions_data()
 	
 	print("NO EXISTE")
 	return false
@@ -78,11 +90,12 @@ func check_has_tank(tank: String) -> bool:
 
 func get_random_tank_reward() -> String:
 	var res: String = ""
+	if not tanks_locked.is_empty():
+		res = tanks_locked[randi_range(0,tanks_locked.size()-1)].tank_Name
+		return res
 	if not all_tanks.is_empty():
 		res = all_tanks[randi_range(0,all_tanks.size()-1)].tank_Name
 		return res
-	if not tanks_locked.is_empty():
-		res = tanks_locked[randi_range(0,tanks_locked.size()-1)].tank_Name
 	return res
 
 func unlock_tank(tank: String) -> void:
@@ -141,6 +154,35 @@ func load_tank_data(str: String) -> Tank_Data:
 			file_name = dir.get_next()
 		dir.list_dir_end()
 	return null
+
+
+
+
+
+
+func load_missions_data() -> void:
+	all_missions.clear()
+	var dir = DirAccess.open("res://Data/Missions")
+	
+	if dir:
+		#print("ola Missione")
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		
+		while file_name != "":
+			if not dir.current_is_dir():
+				if file_name.ends_with(".tres") or file_name.ends_with(".remap"):
+					var clean_name = file_name.trim_suffix(".remap")
+					var path = "res://Data/missions".path_join(clean_name)
+					var mission = ResourceLoader.load(path) as Mission_Data
+					if mission:
+						all_missions.append(mission)
+			file_name = dir.get_next()
+		dir.list_dir_end()
+		#load_unlocked_missions()
+
+
+
 
 
 func load_unlocked_tanks() -> void:

@@ -213,7 +213,7 @@ func get_aim_point_3d(distance: float) -> Vector3:
 			target.emit(null)
 	else:
 		res = from + forward * distance
-		aim_point_normal = global_basis.z
+		aim_point_normal = -global_basis.z
 		target.emit(null)
 	
 	

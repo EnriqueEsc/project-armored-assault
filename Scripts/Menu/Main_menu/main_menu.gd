@@ -16,6 +16,7 @@ extends Menu
 
 @onready var tank_selection_window: Control = $Tank_selection_menu
 @onready var tank_buttons_grid: GridContainer = $Tank_selection_menu/Tank_selection_container/Tank_button_container
+@onready var attachment_selection: OptionButton = $Tank_selection_menu/Buttons/Attachment_selection
 @onready var tank_info_text: RichTextLabel = $Tank_selection_menu/Tank_info
 @onready var tank_preview_rect: TextureRect = $Tank_selection_menu/Preview_Rect
 @onready var tank_selection_back: Button = $Tank_selection_menu/Buttons/Back
@@ -42,16 +43,21 @@ extends Menu
 @onready var use_controller: CheckButton = $Settings_Menu/Buttons/Use_Controller
 @onready var use_controller_vibration: CheckButton = $Settings_Menu/Buttons/Controller_Vibration
 
+@onready var move_type_text: RichTextLabel = $Settings_Menu/Buttons/Move_type_text
+@onready var move_type_option: OptionButton = $Settings_Menu/Buttons/Move_type_option
+
 @onready var save_settings_button: Button = $Settings_Menu/Buttons/Save
 @onready var settings_back: Button = $Settings_Menu/Buttons/Back
 
 
-var selected_mission: String = ""
+var selected_mission: Mission_Data = null
 var selected_tank: Tank_Data = null
 
 var tanks_preview_models: Array[Node3D] = []
 
 @onready var tank_point: Node3D = $Tank_Preview/SubViewport/Point
+
+var attachments: Array[Attachment] = []
 
 func _set_buttons() -> void:
 	#mission_list_button.button_down.connect(show_briefing)
@@ -97,20 +103,28 @@ func _set_buttons() -> void:
 	for i in 10:
 		await get_tree().process_frame
 	
+	create_move_options()
 	create_tank_selection_buttons()
 	create_mission_selection_buttons()
+	create_attachments_options()
 
 
 func load_scene() -> void:
-	if selected_mission != "":
+	if selected_mission != null:
 		Settings_Manager.INSTANCE.current_tank_used_in_game = selected_tank
-		get_tree().change_scene_to_file(selected_mission)
+		Save_File_Manager.INSTANCE.current_mission = selected_mission
+		get_tree().change_scene_to_file("res://Scenes/Missions/"+selected_mission.mission_file_path_name+".tscn")
 
-func select_mission(mission: String) -> void:
+func select_mission(mission: Mission_Data) -> void:
 	selected_mission = mission
 
 func switch_active(window: Control) -> void:
 	window.visible = not window.visible
+
+func create_move_options() -> void:
+	for m in Tank_player_controller.Move_Types:
+		move_type_option.add_item(m)
+
 
 func update_settings_window() -> void:
 	fullscreen_button.button_pressed = Settings_Manager.INSTANCE.fullscreen
@@ -126,46 +140,75 @@ func update_settings_window() -> void:
 	mouse_visible_button.button_pressed = Settings_Manager.INSTANCE.mouse_visible
 	
 	use_controller.button_pressed = Settings_Manager.INSTANCE.controller_aim
-	use_controller.button_pressed = Settings_Manager.INSTANCE.controller_aim
+	move_type_option.selected = Settings_Manager.INSTANCE.move_type
 	use_controller_vibration.button_pressed = Settings_Manager.INSTANCE.use_vibration 
 
 func check_mission_can_start() -> void:
-	start_mission_button.visible = selected_mission != "" and selected_tank
+	start_mission_button.visible = selected_mission != null and selected_tank
 
-func show_briefing() -> void:
+func show_briefing(text: String) -> void:
 	briefing_window.visible = true
-	briefing_text.set_text_to_type("....
-....
-.>>> Message recieved...
-.
-.[20/12/2029]
-.
-.We've recieve some intel about a militia's outpost hidden within the coastal ghost town, it's an isolated group, so it's a mission of a sole man, intel says they have tanks tho, so don't be overconfident.
-.
-.We need you to destroy the outpost, the garrison and spread as much chaos as possible, we need to keep the upper hand on psychological warfare.
-.
-.Good luck out there.
-.
-.This are your orders today, pilot.
-....
-....
-....>> Destroy all the tanks on the surrounding area.
-....>> Destroy the outpost's structures.
-....>> Spread as much chaos as you can.")
+	briefing_text.set_text_to_type(text)
+	briefing_text.show_skip_text(true)
 
+
+
+func load_attachments() -> void:
+	attachments.clear()
+	var dir = DirAccess.open("res://Prefabs/Attachments")
+	
+	if dir:
+		#print("ola Missione")
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		
+		while file_name != "":
+			if not dir.current_is_dir():
+				if file_name.ends_with(".tscn") or file_name.ends_with(".remap"):
+					var clean_name = file_name.trim_suffix(".remap")
+					var path = "res://Prefabs/Attachments".path_join(clean_name)
+					var attachment = load(path) as PackedScene
+					attachment = attachment.instantiate() as Attachment
+					if attachment:
+						#print("olasi ",file_name)
+						attachments.append(attachment)
+			file_name = dir.get_next()
+		dir.list_dir_end()
+		#load_unlocked_missions()
+
+func create_attachments_options() -> void:
+	load_attachments()
+	attachment_selection.add_item("None")
+	for a in attachments:
+		attachment_selection.add_item(a.attachment_name)
+	attachment_selection.item_selected.connect(select_attachment)
+
+func select_attachment(i: int) -> void:
+	if i > attachments.size():
+		return
+	if i == 0:
+		Save_File_Manager.INSTANCE.current_attachment = null
+		print(null)
+		return
+	i -= 1
+	Save_File_Manager.INSTANCE.current_attachment = attachments[i]
+	print(attachments[i])
 
 func create_mission_selection_buttons() -> void:
-	var missions: Array = get_missions("res://Scenes/Missions/")
+	#var missions: Array = get_missions("res://Scenes/Missions/")
+	var missions: Array[Mission_Data] = Save_File_Manager.INSTANCE.all_missions
+	
 	missions.reverse()
 	
 	for t in missions:
+		
 		var mission_button = Button.new()
-		mission_button.text = t
+		mission_button.text = t.mission_name
 		mission_button.custom_minimum_size = Vector2(200,50)
 		mission_buttons_grid.add_child(mission_button)
-		mission_button.button_down.connect(select_mission.bind("res://Scenes/Missions/"+t+".tscn"))
-		mission_button.button_down.connect(show_briefing)
-	
+		mission_button.button_down.connect(select_mission.bind(t))
+		mission_button.button_down.connect(show_briefing.bind(t.briefing))
+
 func get_missions(path: String) -> Array:
 	var missions: Array = []
 	var dir = DirAccess.open(path)
@@ -231,12 +274,15 @@ func restart_tank_selection() -> void:
 	tank_info_text.text = ""
 	tank_preview_rect.visible = false
 	show_tank(null)
+	attachment_selection.selected = 0
+	attachment_selection.visible = false
 
 func select_tank(tank: Tank_Data) -> void:
 	selected_tank = tank
 	print(tank.tank_Name)
 	show_tank_info()
 	check_mission_can_start()
+	attachment_selection.visible = true
 
 func show_tank(tank: Tank_Rigid) -> void:
 	for t in tanks_preview_models:
@@ -276,7 +322,7 @@ func save_settings() -> void:
 	Settings_Manager.INSTANCE.mouse_visible = mouse_visible_button.button_pressed
 	
 	Settings_Manager.INSTANCE.controller_aim = use_controller.button_pressed
-	Settings_Manager.INSTANCE.controller_move = use_controller.button_pressed
+	Settings_Manager.INSTANCE.move_type = move_type_option.selected
 	Settings_Manager.INSTANCE.use_vibration = use_controller_vibration.button_pressed
 	
 	Settings_Manager.INSTANCE.save_settings()

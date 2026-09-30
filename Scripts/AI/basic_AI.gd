@@ -60,6 +60,8 @@ var stagger_timer: float = 5.0
 
 var next_node: Vector3 = Vector3.ZERO
 
+var map_icon: Sprite3D = null
+
 func _init_rigid() -> void:
 	
 	tank_rigid = get_parent() as Vehicle_Rigid
@@ -162,13 +164,21 @@ func _ready() -> void:
 			HUD_boss_info.update_boss_current_ap(tank_rigid.armor_points)
 	
 	tank_rigid.gets_disabled.connect(destroyed_dialog)
-	if current_team == Team.ALLY:
-		tank_rigid.update_stencil_color(Color.GREEN)
-	else:
-		tank_rigid.update_stencil_color(Color.YELLOW)
 	
+	if current_team == Team.ALLY:
+		message_color = (Color.GREEN)
+	else:
+		message_color = (Color.YELLOW)
+	
+	tank_rigid.update_stencil_color(message_color)
 	
 	set_physics_process(true)
+	
+	for i in 10:
+		await get_tree().physics_frame
+	
+	map_icon = tank_rigid.create_map_icon()
+	map_icon.modulate = message_color
 
 
 func init_whiskers() -> void:
@@ -250,12 +260,9 @@ func got_hit(source: Node3D, impact_point: Vector3) -> void:
 	if source and source.is_in_group(enemy_group):
 		player_ref = source
 		alerted = false
-		current_state = AI_State.ENGAGED
-		if current_team == Team.ALLY:
-			tank_rigid.update_stencil_color(Color.GREEN)
-		else:
-			tank_rigid.update_stencil_color(Color.RED)
-		detection_meter = 1.0
+		
+		update_current_state(AI_State.ENGAGED)
+		
 		if not alerted:
 			alert_closest_ally()
 	elif source and not source.is_in_group(enemy_group):
@@ -267,20 +274,13 @@ func get_report(source: Node3D, impact_point: Vector3) -> void:
 	if source != player_ref:
 		player_ref = source
 	#alerted = false
-	current_state = AI_State.ENGAGED
+	update_current_state(AI_State.ENGAGED)
 	
 	if is_boss:
 		HUD_boss_info.update_boss_active(true)
 	
 	last_known_position = source.global_position
 	
-	engage_time = engage_max_time
-	
-	if current_team == Team.ALLY:
-			tank_rigid.update_stencil_color(Color.GREEN)
-	else:
-		tank_rigid.update_stencil_color(Color.RED)
-	detection_meter = 1.0
 	if not alerted:
 		alert_closest_ally()
 
@@ -288,18 +288,15 @@ func get_report(source: Node3D, impact_point: Vector3) -> void:
 func network_collapse(source: Node3D, impact_point: Vector3) -> void:
 	
 	player_ref = null
-	current_state = AI_State.IDLE
+	
+	update_current_state(AI_State.IDLE)
 	
 	last_known_position = source.global_position
 	
 	engage_time = 0.0
 	current_aggro_time = 0.0
-	
-	if current_team == Team.ALLY:
-		tank_rigid.update_stencil_color(Color.GREEN)
-	else:
-		tank_rigid.update_stencil_color(Color.YELLOW)
 	detection_meter = 0.0
+	
 	if not alerted:
 		alert_closest_ally()
 	
@@ -320,11 +317,7 @@ func _physics_process(delta: float) -> void:
 		static_model = tank_rigid.static_model
 	
 	if not is_instance_valid(player_ref) or not player_ref.visible or static_model:
-		current_state = AI_State.IDLE
-		if current_team == Team.ALLY:
-			tank_rigid.update_stencil_color(Color.GREEN)
-		else:
-			tank_rigid.update_stencil_color(Color.YELLOW)
+		update_current_state(AI_State.IDLE)
 		if is_instance_valid(tank_rigid):
 			tank_rigid.move(Vector2.ZERO, delta)
 		return
@@ -351,11 +344,7 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 			update_detection_meter(delta, can_see_player, distance_to_player)
 			
 			if detection_meter >= 1.0:
-				current_state = AI_State.ENGAGED
-				if current_team == Team.ALLY:
-					tank_rigid.update_stencil_color(Color.GREEN)
-				else:
-					tank_rigid.update_stencil_color(Color.RED)
+				update_current_state(AI_State.ENGAGED)
 				if not alerted:
 					alert_closest_ally()
 				if is_boss:
@@ -374,22 +363,14 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 				if engage_time > 0:
 					return
 				current_aggro_time = aggro_max_time
-				current_state = AI_State.INVESTIGATING
-				if current_team == Team.ALLY:
-					tank_rigid.update_stencil_color(Color.GREEN)
-				else:
-					tank_rigid.update_stencil_color(Color.ORANGE)
+				update_current_state(AI_State.INVESTIGATING)
 				
 				
 		AI_State.INVESTIGATING:
 			update_detection_meter(delta, can_see_player, distance_to_player)
 			
 			if detection_meter >= 1.0:
-				current_state = AI_State.ENGAGED
-				if current_team == Team.ALLY:
-					tank_rigid.update_stencil_color(Color.GREEN)
-				else:
-					tank_rigid.update_stencil_color(Color.RED)
+				update_current_state(AI_State.ENGAGED)
 				if not alerted:
 					alert_closest_ally()
 				if is_boss:
@@ -397,12 +378,8 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 			else: 
 				current_aggro_time -= delta
 				if current_aggro_time <= 0:
-					current_state = AI_State.IDLE
-					if current_team == Team.ALLY:
-						tank_rigid.update_stencil_color(Color.GREEN)
-					else:
-						next_node = Vector3(randf_range(tank_rigid.global_position.x - 2.0,tank_rigid.global_position.x + 2.0),tank_rigid.global_position.y,randf_range(tank_rigid.global_position.z - 2.0,tank_rigid.global_position.z + 2.0))
-						tank_rigid.update_stencil_color(Color.YELLOW)
+					update_current_state(AI_State.IDLE)
+					next_node = Vector3(randf_range(tank_rigid.global_position.x - 2.0,tank_rigid.global_position.x + 2.0),tank_rigid.global_position.y,randf_range(tank_rigid.global_position.z - 2.0,tank_rigid.global_position.z + 2.0))
 					if alerted:
 						alerted = false
 					if is_boss:
@@ -708,12 +685,7 @@ func get_closest_foe_old() -> void:
 	player_ref = closest_foe
 	if is_on_sight_range():
 		
-		current_state = AI_State.ENGAGED
-		if current_team == Team.ALLY:
-			tank_rigid.update_stencil_color(Color.GREEN)
-		else:
-			tank_rigid.update_stencil_color(Color.RED)
-		detection_meter = 1.0
+		update_current_state(AI_State.ENGAGED)
 	#print("Closest foe: ",player_ref)
 	
 	
@@ -791,3 +763,30 @@ func get_next_path_node() -> void:
 		next_node = Vector3.ZERO
 		return
 	next_node = path_to_follow.pop_front()
+
+func update_current_state(state: AI_State) -> void:
+	if state == current_state:
+		return
+	
+	
+	current_state = state
+	message_color = Color.GREEN
+	if current_team == Team.ALLY:
+		tank_rigid.update_stencil_color(message_color)
+		if map_icon:
+			map_icon.modulate = message_color
+		return
+	
+	match current_state:
+		AI_State.IDLE:
+			message_color = Color.YELLOW
+		AI_State.INVESTIGATING:
+			message_color = Color.ORANGE
+		AI_State.ENGAGED:
+			message_color = Color.RED
+			detection_meter = 1.0
+			engage_time = engage_max_time
+	
+	tank_rigid.update_stencil_color(message_color)
+	if map_icon:
+		map_icon.modulate = message_color

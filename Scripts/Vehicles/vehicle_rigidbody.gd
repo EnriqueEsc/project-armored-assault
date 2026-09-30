@@ -16,7 +16,7 @@ var damage_effect: GPUParticles3D = null
 @export var acceleration: float = 5.0
 @export var turn_speed: float = 1.0
 
-@export var boost_speed: float = 2.0
+@export var boost_speed: float = 3.0
 @export var boost_cooldown: float = 5.0
 var boost_last_use: float = 5.0
 
@@ -77,6 +77,9 @@ var stagger_timer: float = 5.0
 var staggered: bool = false
 
 var is_destroyed: bool = false
+
+var map_icon: Sprite3D = null
+var icon_pref = preload("res://Sprites/Test/1771646306126.png")
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -479,3 +482,22 @@ func _switch_collision(b: bool) -> void:
 	static_model = b
 	set_deferred("monitoring", b)
 	set_deferred("monitorable", b)
+
+
+
+func create_map_icon() -> Sprite3D:
+	if static_model:
+		return null
+	if map_icon:
+		return map_icon
+	map_icon = Sprite3D.new()
+	map_icon.texture = icon_pref
+	
+	call_deferred("add_child",map_icon)
+	map_icon.call_deferred("set_rotation",Vector3(deg_to_rad(90),0,0))
+	if collision_shape:
+		map_icon.scale *= collision_shape.size.length()
+	map_icon.no_depth_test = true
+	map_icon.render_priority = 98
+	map_icon.layers = 1 << 19
+	return map_icon

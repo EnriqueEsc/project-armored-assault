@@ -11,6 +11,7 @@ signal aim_to(point: Vector3)
 var HUD_aim: Array[Sprite2D] = []
 var HUD_aim_3D: Array[Sprite3D] = []
 var HUD_Shoot_Ready: Array[TextureProgressBar] = []
+var HUD_Shoot_Ready_3D: Array[Sprite3D] = []
 var HUD_height_line: Array[Line2D] = []
 
 
@@ -70,6 +71,8 @@ var ready_to_shoot: bool = true
 
 var transition_to_game: bool = false
 
+enum Move_Types {Axial,Directional,To_Pointer}
+var move_type: Move_Types = Move_Types.Axial
 
 var controller_move: bool = false
 var controller_aim: bool = false
@@ -77,6 +80,10 @@ var aim_dir_input: Vector2 = Vector2(3.0,0.0)
 var aim_dir_3d: Vector3 = Vector3.ZERO
 
 var mouse_visible: bool = false
+
+const PROGRESS_RADIAL = preload("res://Shaders/progress_bar_radial_3d.gdshader")
+
+var map_icon: Sprite3D = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -159,8 +166,9 @@ func _ready() -> void:
 	aim_3d = Settings_Manager.INSTANCE.aim_3d
 	third_person = Settings_Manager.INSTANCE.third_person
 	
+	move_type = Settings_Manager.INSTANCE.move_type
+	
 	controller_aim = Settings_Manager.INSTANCE.controller_aim
-	controller_move = Settings_Manager.INSTANCE.controller_move
 	
 	mouse_visible = Settings_Manager.INSTANCE.mouse_visible
 	
@@ -202,12 +210,26 @@ func _ready() -> void:
 		new_aim_3d.scale = Vector3(0.4,0.4,0.4)
 		new_aim_3d.no_depth_test = true
 		
+		var new_ready_3d = Sprite3D.new()
+		new_ready_3d.texture = load("res://Sprites/Test/ShootingPoint.png")
+		new_ready_3d.scale = Vector3(1.2,1.2,1.2)
+		new_ready_3d.no_depth_test = true
+		
 		#new_aim_3d.set_layer_mask_value(1, false)
 		#new_aim_3d.set_layer_mask_value(11, true)
 		new_aim_3d.render_priority = 100
+		new_ready_3d.render_priority = 99
 		
 		get_tree().current_scene.add_child(new_aim_3d)
+		new_aim_3d.add_child(new_ready_3d)
 		HUD_aim_3D.append(new_aim_3d)
+		var mat = ShaderMaterial.new()
+		mat.shader = PROGRESS_RADIAL
+		mat.render_priority = 99
+		mat.set_shader_parameter("texture_albedo", new_ready_3d.texture)
+		new_ready_3d.material_override = mat
+		new_ready_3d.rotation.x = deg_to_rad(180)
+		HUD_Shoot_Ready_3D.append(new_ready_3d)
 		
 		
 		if aim_3d:
@@ -232,8 +254,24 @@ func _ready() -> void:
 
 	tank_rigid.hits_enemy.connect(hits_enemy)
 	
+	
 	await get_tree().process_frame
 	HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","Activating combat mode.",color,"main_systems"))
+	
+	for i in 10:
+		await get_tree().physics_frame
+	map_icon = tank_rigid.create_map_icon()
+	map_icon.modulate = color
+	
+	var atch = Save_File_Manager.INSTANCE.current_attachment
+	if atch:
+		tank_rigid.add_child(atch)
+		tank_rigid.attachment = atch
+		atch.position -= Vector3(0,0,0.5)
+		if tank_rigid.attachment:
+			tank_rigid.attachment.master_vehicle = tank_rigid
+			tank_rigid.attachment.shakes.connect(tank_rigid.shakes.emit)
+
 
 func color_HUD() -> void:
 		#HUD_aim.modulate = color
@@ -254,12 +292,19 @@ func color_HUD() -> void:
 		
 		for a in HUD_aim_3D:
 			a.modulate = color
-	
+		
+		for s in HUD_Shoot_Ready_3D:
+			s.material_override.set_shader_parameter("tint", color)
 
 func shoot_ready(charge: float) -> void:
 	#print("SOOOT ",charge)
 	for s in HUD_Shoot_Ready:
 		s.value = charge
+	
+	for s in HUD_Shoot_Ready_3D:
+		#print(charge)
+		s.material_override.set_shader_parameter("progress", charge/100.0)
+		#s.value = charge
 	if charge > 99 and not ready_to_shoot:
 		ready_to_shoot = true
 		var crew_speak: int = randi_range(0,4)
@@ -420,10 +465,14 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("Attachment"):
 		tank_rigid.use_attachment()
 	
-	if controller_move:
-		controller_movement(input_dir,delta)
-	else:
-		tank_rigid.move(input_dir, delta)
+	
+	match move_type:
+		Move_Types.Axial:
+			tank_rigid.move(input_dir, delta)
+		Move_Types.Directional:
+			controller_movement(input_dir,delta)
+		Move_Types.To_Pointer:
+			movement_towards_point(input_dir,delta)
 	
 	
 	#tank_rigid.rotate_turret_to_point(get_viewport().get_mouse_position())
@@ -495,6 +544,41 @@ func controller_movement(target_pos: Vector2, delta: float) -> void:
 	
 	#print(input_x,",",input_y)
 	tank_rigid.move(Vector2(input_x, -input_y), delta)
+
+
+func movement_towards_point(target_pos: Vector2, delta: float) -> void:
+	
+	if target_pos == Vector2.ZERO:
+		tank_rigid.move(Vector2.ZERO, delta)
+		return
+	
+	var mouse_pos = tank_camera.get_mouse_3d_pos()
+	mouse_pos.y = tank_rigid.global_position.y
+	var aux = tank_rigid.global_position.direction_to(mouse_pos)
+	aux.y = 0.0
+	aux = aux.normalized()
+	var ang = Vector3.FORWARD.signed_angle_to(aux,Vector3.UP)
+	var next_pos: Vector3 = Vector3(target_pos.x,0.0,target_pos.y).rotated(tank_rigid.global_basis.y.normalized(),ang).normalized()
+	#var next_pos: Vector3 = tank_rigid.global_position + Vector3(target_pos.x,0.0,target_pos.y) + mouse_pos
+	#print(target_pos)
+
+	
+	var forward = tank_rigid.global_transform.basis.z.normalized()
+	var angle = forward.signed_angle_to(next_pos, tank_rigid.global_basis.y)
+	
+	
+	var input_x: float = -clamp(angle, -1.0, 1.0)
+	
+	input_x = clamp(input_x, -1.0, 1.0)
+	
+	
+	var input_y: float = 1.0 if abs(angle) < 1.8 else 0.0
+	
+	
+	#print(input_x,",",input_y,""," ",rad_to_deg(y_angle))
+	tank_rigid.move(Vector2(input_x, -input_y), delta)
+
+
 
 
 func update_HUD() -> void:
@@ -670,12 +754,21 @@ func target_enemy(e: Node3D, aim: Node3D) -> void:
 	if not e:
 		if aim.modulate != color:
 			aim.modulate = color
+			for c in aim.get_children():
+				if not c is Sprite3D:
+					continue
+				c.material_override.set_shader_parameter("tint", aim.modulate)
+	
 		return
 	e = e as Vehicle_Rigid
 	
 	
 	if e.current_team != tank_rigid.current_team and aim.modulate != Color.RED:
 		aim.modulate = Color.RED
+		for c in aim.get_children():
+			if not c is Sprite3D:
+				continue
+			c.material_override.set_shader_parameter("tint", aim.modulate)
 	
 	if tank_camera.check_enemy_visibility(e):
 		e.update_stencil(2)

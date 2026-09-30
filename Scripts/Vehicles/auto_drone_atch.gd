@@ -33,7 +33,7 @@ func _ready() -> void:
 	drone_pref.gets_disabled.connect(reparent_drone.bind(false))
 
 func reparent_drone(b: bool) -> void:
-	
+	print(b)
 	#print("HP ",drone_pref.max_armor_points, " ",drone_pref.max_armor_points)
 	
 	drone_pref.call_deferred("set_process",b)
@@ -91,7 +91,7 @@ func calculate_charge(delta: float) -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _use_attachment() -> void:
-	
+	print(percent," ",min_percent_to_use)
 	if percent < min_percent_to_use:
 		return
 	#if master_vehicle:

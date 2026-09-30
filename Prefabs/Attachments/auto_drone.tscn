@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://clya8d7ieeh22"]
+
+[ext_resource type="Script" uid="uid://cdr4qfdmc2brj" path="res://Scripts/Vehicles/auto_drone_atch.gd" id="1_1uvr3"]
+[ext_resource type="PackedScene" uid="uid://cc8wea7bn5t8e" path="res://Models/Test/Barrage_Attachment.fbx" id="2_wqlyp"]
+
+[node name="Attachment" type="Node3D" unique_id=458141515]
+script = ExtResource("1_1uvr3")
+cooldown = 60.0
+attachment_name = "Auto_Drone"
+
+[node name="Barrage_Attachment" parent="." unique_id=2073670498 instance=ExtResource("2_wqlyp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5694368e-08, 0, 0.35904527)

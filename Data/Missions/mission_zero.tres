@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="Mission_Data" format=3 uid="uid://ddbcniwhqmfrf"]
+
+[ext_resource type="Script" uid="uid://cr06jp8ii6f0x" path="res://Data/Missions/Mission_Data.gd" id="1_s45wc"]
+
+[resource]
+script = ExtResource("1_s45wc")
+mission_name = "Mission Test"
+mission_file_path_name = "mission_zero"
+operation_date = "Today, Duh"
+briefing = "....
+....
+.>>> Message recieved...
+.
+.[20/12/2029]
+.
+.We've recieve some intel about a militia's outpost hidden within the coastal ghost town, it's an isolated group, so it's a mission of a sole man, intel says they have tanks tho, so don't be overconfident.
+.
+.We need you to destroy the outpost, the garrison and spread as much chaos as possible, we need to keep the upper hand on psychological warfare.
+.
+.Good luck out there.
+.
+.This are your orders today, pilot.
+....
+....
+....>> Destroy all the tanks on the surrounding area.
+....>> Destroy the outpost's structures.
+....>> Spread as much chaos as you can."
+metadata/_custom_type_script = "uid://cr06jp8ii6f0x"

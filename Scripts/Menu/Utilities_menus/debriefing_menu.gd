@@ -12,10 +12,9 @@ func _ready() -> void:
 	briefing_text.finished_typing.connect(finish_debrief)
 	briefing_text.set_process(true)
 	
-	var text_to_show = "Mission completed succesfully
-....
-....
-....
+	briefing_text.min_clicks_to_skip = 0
+	
+	var text_to_show = Save_File_Manager.INSTANCE.current_mission.debriefing+"
 STATS:
 "
 	var results: Dictionary = Save_File_Manager.INSTANCE.LAST_MISSION_RESULTS

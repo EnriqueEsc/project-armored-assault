@@ -29,6 +29,8 @@ var player_dialog: HUD_Dialog = null
 
 var mission_results: Dictionary = {}
 
+var mission_data: Mission_Data = null
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	set_process(false)
@@ -116,8 +118,10 @@ func _link_player() -> void:
 	player.set_process(false)
 	player.transition_to_game = true
 	
+	mission_data = Save_File_Manager.INSTANCE.current_mission
+	
 	#set_process(true)
-	if mission_info_text:
+	if mission_data and mission_info_text:
 		_show_mission_info()
 		mission_info_text.finished_typing.connect(set_process.bind(true))
 	
@@ -125,8 +129,8 @@ func _link_player() -> void:
 func _show_mission_info() -> void:
 	mission_info_text.set_text_to_type("Mission intel:
 
-Operation: Default shit
-Date: Today, duh
+Operation: "+mission_data.operation_name+"
+Date: "+mission_data.operation_date+"
 			  ")
 
 func _check_success_conditions() -> void:

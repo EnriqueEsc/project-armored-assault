@@ -58,12 +58,6 @@ Proceed carefully, all of you.","commander")
 	dialog_manager.add_text_to_buffer("Rhino 3","So funny...
 Weapons hot.","rhino3")
 
-func _show_mission_info() -> void:
-	mission_info_text.set_text_to_type("Mission intel:
-
-Operation: Default shit
-Date: Today, duh
-			  ")
 
 func _update_current_objectives() -> void:
 	

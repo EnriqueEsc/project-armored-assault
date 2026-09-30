@@ -25,11 +25,8 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 			update_detection_meter(delta, can_see_player, distance_to_player)
 			
 			if detection_meter >= 1.0:
-				current_state = AI_State.ENGAGED
-				if current_team == Team.ALLY:
-					tank_rigid.update_stencil_color(Color.GREEN)
-				else:
-					tank_rigid.update_stencil_color(Color.RED)
+				update_current_state(AI_State.ENGAGED)
+				
 				if not alerted:
 					alert_closest_ally()
 				if is_boss:
@@ -48,22 +45,14 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 				if engage_time > 0:
 					return
 				current_aggro_time = aggro_max_time
-				current_state = AI_State.INVESTIGATING
-				if current_team == Team.ALLY:
-					tank_rigid.update_stencil_color(Color.GREEN)
-				else:
-					tank_rigid.update_stencil_color(Color.ORANGE)
+				update_current_state(AI_State.INVESTIGATING)
 				
 				
 		AI_State.INVESTIGATING:
 			update_detection_meter(delta, can_see_player, distance_to_player)
 			
 			if detection_meter >= 1.0:
-				current_state = AI_State.ENGAGED
-				if current_team == Team.ALLY:
-					tank_rigid.update_stencil_color(Color.GREEN)
-				else:
-					tank_rigid.update_stencil_color(Color.RED)
+				update_current_state(AI_State.ENGAGED)
 				if not alerted:
 					alert_closest_ally()
 				if is_boss:
@@ -71,11 +60,7 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 			else: 
 				current_aggro_time -= delta
 				if current_aggro_time <= 0:
-					current_state = AI_State.IDLE
-					if current_team == Team.ALLY:
-						tank_rigid.update_stencil_color(Color.GREEN)
-					else:
-						tank_rigid.update_stencil_color(Color.YELLOW)
+					update_current_state(AI_State.IDLE)
 					if is_boss:
 						Dialog_Manager.INSTANCE.add_dialog_to_buffer(Dialog_data.new(tank_rigid.vehicle_pilot_name,"Nah, nevermind.",Color.RED))
 					

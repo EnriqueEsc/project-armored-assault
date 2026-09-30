@@ -6,9 +6,14 @@ var current_text: String = ""
 var buffer = []
 var additional_tags: String = "[color=green]"
 
+var click_count: int = 0
+
 var timer = Timer.new()
 
 signal finished_typing()
+
+var skip_text: RichTextLabel = null
+@export var min_clicks_to_skip: int = 1
 
 func _ready() -> void:
 	current_text = ""
@@ -19,8 +24,20 @@ func _ready() -> void:
 	timer.timeout.connect(type_text)
 	add_child(timer)
 	
+	
 	set_process(false)
 	
+	if skip_text:
+		return
+	
+	
+	for c in get_children():
+		if skip_text:
+			continue
+		if c is RichTextLabel:
+			skip_text = c
+			finished_typing.connect(show_skip_text.bind(false))
+			show_skip_text(true)
 
 func show_text(activated: bool) -> void:
 	visible = activated
@@ -34,7 +51,9 @@ func _process(delta: float) -> void:
 		get_parent_control().visible = false
 	
 	if Input.is_action_just_pressed("Shoot"):
-		stop_typing()
+		click_count += 1
+		if click_count > min_clicks_to_skip:
+			stop_typing()
 
 func break_typing() -> void:
 		stop_typing()
@@ -46,6 +65,7 @@ func stop_typing() -> void:
 	finished_typing.emit()
 
 func start_typing() -> void:
+	click_count = 0
 	timer.start()
 
 func set_text_to_type(s: String) -> void:
@@ -67,3 +87,8 @@ func type_text() -> void:
 	
 	if buffer.is_empty():
 		finished_typing.emit()
+
+func show_skip_text(b: bool) -> void:
+	if not skip_text:
+		return
+	skip_text.visible = b

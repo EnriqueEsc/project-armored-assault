@@ -32,12 +32,7 @@ func _set_objectives() -> void:
 	get_tree().root.find_child("HUD_Boss_Info", true, false)
 
 
-func _show_mission_info() -> void:
-	mission_info_text.set_text_to_type("Mission intel:
 
-Operation: Francis Invictus
-Date: Yesterday hehe
-			  ")
 
 func _update_current_objectives() -> void:
 	

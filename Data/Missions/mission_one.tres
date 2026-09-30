@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="Mission_Data" format=3 uid="uid://qjv8n73w8ogx"]
+
+[ext_resource type="Script" uid="uid://cr06jp8ii6f0x" path="res://Data/Missions/Mission_Data.gd" id="1_tdudf"]
+
+[resource]
+script = ExtResource("1_tdudf")
+mission_name = "Mission Test Boss"
+mission_file_path_name = "mission__one"
+operation_name = "Francis Invictus"
+operation_date = "Yesterday, hehe"
+briefing = "....
+....
+.>>> Message recieved...
+.
+.[21/12/2029]
+.
+.We just got some intel  about Francis being around.
+.
+.Let's make this brief, just go and kill Francis.
+.
+.Lock in.
+.
+.This are your orders today, pilot.
+....
+....
+....>> Just go and kill Francis.
+...
+..."
+debriefing = "Francis has been destroyed succesfully
+....
+....
+...."
+metadata/_custom_type_script = "uid://cr06jp8ii6f0x"
