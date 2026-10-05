@@ -38,6 +38,8 @@ func update_steps(move_input: Vector2, delta: float) -> float:
 		if is_on_floor():
 			shakes.emit(0.5, 0.1)
 			
+			if Effects_Manager.INSTANCE:
+				Effects_Manager.INSTANCE.failded_sparks_from_pool(global_position)
 			move_effect.one_shot = true
 			move_effect.emitting = true
 			move_effect.lifetime = original_effect_time

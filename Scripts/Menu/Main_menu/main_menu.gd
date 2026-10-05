@@ -16,6 +16,7 @@ extends Menu
 
 @onready var tank_selection_window: Control = $Tank_selection_menu
 @onready var tank_buttons_grid: GridContainer = $Tank_selection_menu/Tank_selection_container/Tank_button_container
+@onready var attachment_selection_text: RichTextLabel = $Tank_selection_menu/Buttons/Attachment_text
 @onready var attachment_selection: OptionButton = $Tank_selection_menu/Buttons/Attachment_selection
 @onready var tank_info_text: RichTextLabel = $Tank_selection_menu/Tank_info
 @onready var tank_preview_rect: TextureRect = $Tank_selection_menu/Preview_Rect
@@ -39,6 +40,13 @@ extends Menu
 @onready var max_effects_text: RichTextLabel = $Settings_Menu/Buttons/Max_effects_text
 @onready var max_effects_bar: HScrollBar = $Settings_Menu/Buttons/Max_effects_bar
 @onready var mouse_visible_button: CheckButton = $Settings_Menu/Buttons/Mouse_Visible
+
+
+@onready var destruction_effects_text: RichTextLabel = $Settings_Menu/Buttons/Destruction_effect_text
+@onready var destruction_effects_option: OptionButton = $Settings_Menu/Buttons/Destruction_effect_option
+
+
+@onready var enable_emmisions_button: CheckButton = $Settings_Menu/Buttons/Enable_Emmision
 
 @onready var use_controller: CheckButton = $Settings_Menu/Buttons/Use_Controller
 @onready var use_controller_vibration: CheckButton = $Settings_Menu/Buttons/Controller_Vibration
@@ -104,6 +112,8 @@ func _set_buttons() -> void:
 		await get_tree().process_frame
 	
 	create_move_options()
+	create_destruction_effects_options()
+	
 	create_tank_selection_buttons()
 	create_mission_selection_buttons()
 	create_attachments_options()
@@ -124,6 +134,10 @@ func switch_active(window: Control) -> void:
 func create_move_options() -> void:
 	for m in Tank_player_controller.Move_Types:
 		move_type_option.add_item(m)
+		
+func create_destruction_effects_options() -> void:
+	for m in Settings_Manager.INSTANCE.Destruction_Effects_Mode:
+		destruction_effects_option.add_item(m)
 
 
 func update_settings_window() -> void:
@@ -136,6 +150,10 @@ func update_settings_window() -> void:
 	see_trough.button_pressed = Settings_Manager.INSTANCE.see_trough_buildings
 	max_effects_bar.value = Settings_Manager.INSTANCE.max_effects
 	update_max_effects_text(max_effects_bar.value)
+	
+	enable_emmisions_button.button_pressed = Settings_Manager.INSTANCE.enable_emmisions
+	
+	destruction_effects_option.selected = Settings_Manager.INSTANCE.destruction_effects_mode
 	
 	mouse_visible_button.button_pressed = Settings_Manager.INSTANCE.mouse_visible
 	
@@ -276,6 +294,7 @@ func restart_tank_selection() -> void:
 	show_tank(null)
 	attachment_selection.selected = 0
 	attachment_selection.visible = false
+	attachment_selection_text.visible = false
 
 func select_tank(tank: Tank_Data) -> void:
 	selected_tank = tank
@@ -283,6 +302,7 @@ func select_tank(tank: Tank_Data) -> void:
 	show_tank_info()
 	check_mission_can_start()
 	attachment_selection.visible = true
+	attachment_selection_text.visible = true
 
 func show_tank(tank: Tank_Rigid) -> void:
 	for t in tanks_preview_models:
@@ -318,6 +338,10 @@ func save_settings() -> void:
 	Settings_Manager.INSTANCE.use_csg = use_csg_button.button_pressed
 	Settings_Manager.INSTANCE.see_trough_buildings = see_trough.button_pressed
 	Settings_Manager.INSTANCE.max_effects = max_effects_bar.value
+	
+	Settings_Manager.INSTANCE.destruction_effects_mode = destruction_effects_option.selected
+	
+	Settings_Manager.INSTANCE.enable_emmisions = enable_emmisions_button.button_pressed
 	
 	Settings_Manager.INSTANCE.mouse_visible = mouse_visible_button.button_pressed
 	

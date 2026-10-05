@@ -173,7 +173,10 @@ func load_missions_data() -> void:
 			if not dir.current_is_dir():
 				if file_name.ends_with(".tres") or file_name.ends_with(".remap"):
 					var clean_name = file_name.trim_suffix(".remap")
-					var path = "res://Data/missions".path_join(clean_name)
+					if clean_name == "Mission_Data":
+						continue
+					#print(clean_name)
+					var path = "res://Data/Missions".path_join(clean_name)
 					var mission = ResourceLoader.load(path) as Mission_Data
 					if mission:
 						all_missions.append(mission)

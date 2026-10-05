@@ -10,7 +10,7 @@ signal hp_changed (hp: int)
 signal score_changed (score: int)
 signal ap_percent (ap: float)
 
-var damage_effect: GPUParticles3D = null
+var damage_effect: Fire_Effect = null
 
 @export var max_speed: float = 3.0
 @export var acceleration: float = 5.0
@@ -81,6 +81,8 @@ var is_destroyed: bool = false
 var map_icon: Sprite3D = null
 var icon_pref = preload("res://Sprites/Test/1771646306126.png")
 
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	
@@ -93,6 +95,11 @@ func _ready() -> void:
 	
 	#if tank_Data:
 	#	tank_Data._apply_values(self)
+	
+	if vehicle_turrets.is_empty():
+		for c in get_children():
+			if c is Vehicle_turret and not vehicle_turrets.has(c):
+				vehicle_turrets.append(c)
 	
 	for t in vehicle_turrets:
 		t.recoil.connect(recoil)
@@ -132,7 +139,7 @@ func _ready() -> void:
 			collision_shape = c.shape
 			return
 	boost_last_use = boost_cooldown
-
+	
 
 func update_stencil(stencil_mode: BaseMaterial3D.StencilMode) -> void:
 	if not material:
@@ -160,13 +167,15 @@ func update_stencil_color(color: Color) -> void:
 func initialize_effects() -> void:
 	var damage_prefab = load("res://Prefabs/Effects/fire.tscn")
 	if damage_prefab:
-		damage_effect = damage_prefab.instantiate() as GPUParticles3D
+		damage_effect = damage_prefab.instantiate() as Fire_Effect
 		add_child(damage_effect)
 		damage_effect.one_shot = false
 		damage_effect.emitting = false
 		damage_effect.amount = 1
 		damage_effect.hide()
 		damage_effect.process_mode = Node.PROCESS_MODE_DISABLED
+		if damage_effect.fake_light_effect:
+			damage_effect.fake_light_effect.mesh.size = Vector2.ZERO
 	
 	var move_trail_prefab = load("res://Prefabs/Effects/ground_trail.tscn")
 	if move_trail_prefab:
@@ -199,6 +208,7 @@ func boost(force: float) -> void:
 	var push = Vector3.ZERO.move_toward(dir, friction)
 	#push = Vector3(push.x, 0 ,push.z)
 	velocity += push * force
+	Effects_Manager.INSTANCE.fake_light_from_pool(attachment.global_position,Vector2.ONE * velocity.length() * 0.3,Color.BLUE_VIOLET)
 
 
 
@@ -213,6 +223,8 @@ func quick_boost() -> void:
 	#push = Vector3(push.x, 0 ,push.z)
 	velocity += push * max_speed * boost_speed
 	boost_last_use = 0.0
+	Effects_Manager.INSTANCE.fake_light_from_pool(global_position, Vector2.ONE * velocity.length() * 0.2,Color.ORANGE)
+
 
 func allign_with_floor(delta: float) -> void:
 	var normal: Vector3 = Vector3.UP
@@ -281,11 +293,16 @@ func _physics_process(delta: float) -> void:
 			if collider.has_method("calculate_impact_chunk"):
 				var impact_damage = (armor_points/20.0) * impact
 				collider.calculate_impact_chunk(impact_damage, self, global_position)
+				if Effects_Manager.INSTANCE:
+					Effects_Manager.INSTANCE.sparks_from_pool(global_position)
 		
 			
 			elif collider.has_method("take_damage"):
 				var impact_damage = (armor_points/20.0) * impact
 				collider.take_damage(impact_damage, self, global_position)
+				if Effects_Manager.INSTANCE:
+					Effects_Manager.INSTANCE.sparks_from_pool(global_position)
+				
 			
 		#print(last_building_impact)
 		if last_building_impact < 1:
@@ -295,6 +312,8 @@ func _physics_process(delta: float) -> void:
 		if collider is Building:
 			collider.calculate_impact_chunk(5 ,self, global_position)
 			last_building_impact = 0
+			if Effects_Manager.INSTANCE:
+				Effects_Manager.INSTANCE.failed_sparks_from_pool(global_position)
 
 func stagger() -> void:
 	staggered = true
@@ -407,6 +426,7 @@ func show_visual_damage(ap: float) -> void:
 			damage_effect.emitting = true
 			damage_effect.show()
 			damage_effect.process_mode = Node.PROCESS_MODE_ALWAYS
+			damage_effect.set_process(false)
 		
 		var particles_ammount:float = remap(ap, 50.0, 10.0, 1.0, 10)
 		var final_particles: int = clampi(roundi(particles_ammount),1,10)
@@ -434,7 +454,13 @@ func deactivate() -> void:
 	
 	_switch_collision(false)
 	
-	Effects_Manager.INSTANCE.explosion_from_pool(global_position)
+	var scale: float = 1.0
+	
+	for c in get_children():
+		if c is CollisionShape3D and c.shape is BoxShape3D:
+			scale += c.shape.size.length() * 5
+	
+	Effects_Manager.INSTANCE.explosion_from_pool(global_position, scale)
 	
 	gets_disabled.emit()
 	

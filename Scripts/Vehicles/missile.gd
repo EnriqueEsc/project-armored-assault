@@ -13,6 +13,7 @@ func _additional_deactivate_process() -> void:
 	impact.emit()
 
 func _additional_shoot_process() -> void:
+	
 	impact_preview = Effects_Manager.INSTANCE.marker_from_pool(objective)
 	if not impact_preview:
 		return
@@ -37,10 +38,13 @@ func disconnect_heat_effect() -> void:
 func move(delta: float) -> void:
 	
 	var target_direction = global_position.direction_to(objective)
+
 	
 	if global_position.distance_to(objective) < 1.0:
 		detonate()
 		return
+	
+	update_fake_light()
 	
 	if target_direction == Vector3.ZERO:
 		return
@@ -58,3 +62,9 @@ func move(delta: float) -> void:
 	
 	
 	global_position += -global_basis.z * speed * delta
+
+func update_fake_light() -> void:
+	if not fake_light:
+		return
+	var scale = fake_light_original_size * randf_range(0.5,2.0)
+	fake_light.mesh.size = scale

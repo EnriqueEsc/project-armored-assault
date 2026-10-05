@@ -48,7 +48,7 @@ var last_shoot_prim: float = -10
 var time_passed: float = 0
 
 
-var max_heat: float = 100.0
+@export var max_heat: float = 100.0
 var current_heat: float = 0.0
 @export var cooling_factor: float = 10.0
 var overheat: bool = false
@@ -72,6 +72,7 @@ signal shakes_on_shoot(intensity: float, duration: float)
 
 var effects_manager: Effects_Manager = null
 var heat_effect: GPUParticles3D = null
+
 
 func spawn() -> void:
 	
@@ -132,7 +133,7 @@ func _ready() -> void:
 
 func show_heat_effects(vel: float) -> void:
 	if overheat and not heat_effect:
-		heat_effect = effects_manager.heat_from_pool(global_position)
+		heat_effect = effects_manager.heat_from_pool(to_global(muzzle_pos))
 		if heat_effect:
 			if heat_effect.finished.is_connected(disconnect_heat_effect):
 				heat_effect.finished.disconnect(disconnect_heat_effect)
@@ -140,7 +141,7 @@ func show_heat_effects(vel: float) -> void:
 		return
 	
 	if heat_effect:
-		heat_effect.global_position = global_position
+		heat_effect.global_position = to_global(muzzle_pos)
 	
 	if not overheat and heat_effect:
 		heat_effect.one_shot = true
@@ -218,7 +219,7 @@ func create_projectiles() -> void:
 		case_pool.append(case)
 		ignore.append(case)
 
-func shoot() -> void:
+func shoot(shake_mult: float = 1.0) -> void:
 	
 	if not can_shoot():
 		return
@@ -247,10 +248,12 @@ func shoot() -> void:
 	#rotation.y = lerp_angle(rotation.y,rotation.y+randf_range(deg_to_rad(-10),deg_to_rad(10)),1)
 	
 	last_shoot_prim = time_controller.running_time
+	if projectile_type != Projectile_Type.Flamethrower:
+		effects_manager.shoot_from_pool(to_global(muzzle_pos), global_rotation, projectile.muzzle_flash_scale)
 	
 	recoil.emit(forward,recoil_force)
 	
-	shakes_on_shoot.emit(0.2,projectile.recoil_force/2.0)
+	shakes_on_shoot.emit(0.2,projectile.recoil_force * shake_mult/2.0)
 	
 	if fire_mode == Fire_Mode.Auto:
 		current_heat += heat

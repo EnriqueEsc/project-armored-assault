@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://ck7bkwrblsaia" path="res://Prefabs/Test/Buildings/big_building.tscn" id="5_mie3u"]
 [ext_resource type="Script" uid="uid://coflapngtlfyb" path="res://Scripts/Emplacements/emplacement.gd" id="8_n0wup"]
 [ext_resource type="PackedScene" uid="uid://6vggcgtbiq4i" path="res://Prefabs/Test/Buildings/small_building.tscn" id="11_0qy5o"]
+[ext_resource type="PackedScene" uid="uid://pg5f3rmaed7x" path="res://Prefabs/Effects/sparks.tscn" id="13_wjyqs"]
 [ext_resource type="Script" uid="uid://cblxmspvt3yxm" path="res://Scripts/Buildings/gridmap_to_building.gd" id="16_7nf3m"]
 [ext_resource type="PackedScene" uid="uid://cyt63xjcvvdgs" path="res://Prefabs/Player/endavour.tscn" id="16_wojap"]
 [ext_resource type="Script" uid="uid://b02j404uo38ap" path="res://Scripts/Vehicles/drone_rigidbody.gd" id="17_copon"]
@@ -115,6 +116,45 @@ albedo_color = Color(0.2, 0.18431373, 0.19215687, 1)
 [sub_resource type="BoxMesh" id="BoxMesh_sn0t7"]
 material = SubResource("StandardMaterial3D_55gk5")
 size = Vector3(100, 1, 100)
+
+[sub_resource type="Gradient" id="Gradient_2mh7v"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 0.69803923)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_f4l6q"]
+gradient = SubResource("Gradient_2mh7v")
+
+[sub_resource type="Curve" id="Curve_j1ewg"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.99999, 0.38392866), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_2ucng"]
+curve = SubResource("Curve_j1ewg")
+
+[sub_resource type="Curve" id="Curve_vunn8"]
+_limits = [0.0, 3.0, 0.0, 1.0]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.80645156, 0.80357146), 0.0, 0.0, 0, 0, Vector2(1, 2.169643), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_2lhqt"]
+curve = SubResource("Curve_vunn8")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_kxtw2"]
+emission_shape = 1
+emission_sphere_radius = 1.0
+gravity = Vector3(0, 2, 0)
+scale_min = 0.0
+scale_curve = SubResource("CurveTexture_2ucng")
+scale_over_velocity_curve = SubResource("CurveTexture_2lhqt")
+color = Color(0.9490196, 0.76862746, 0, 1)
+color_ramp = SubResource("GradientTexture1D_f4l6q")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l5jv8"]
+emission_enabled = true
+emission = Color(1, 0.5882353, 0, 1)
+emission_energy_multiplier = 11.31
+
+[sub_resource type="PrismMesh" id="PrismMesh_j3v34"]
+material = SubResource("StandardMaterial3D_l5jv8")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_aceod"]
 
@@ -2321,8 +2361,22 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -43, 1.5345898, -5)
 [node name="Explosion" parent="." unique_id=447795717 instance=ExtResource("19_q8sys")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0660223, 0)
 
+[node name="Spark" parent="." unique_id=130900469 instance=ExtResource("13_wjyqs")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0660223, 0)
+
 [node name="Fire" parent="." unique_id=1829018680 instance=ExtResource("20_wojap")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0660223, 0)
+
+[node name="Fire2" type="GPUParticles3D" parent="." unique_id=794065780]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8815272, 1.0660223, 0)
+emitting = false
+amount = 10
+lifetime = 1.5
+explosiveness = 1.0
+randomness = 0.7
+collision_base_size = 1.0
+process_material = SubResource("ParticleProcessMaterial_kxtw2")
+draw_pass_1 = SubResource("PrismMesh_j3v34")
 
 [node name="Collapse" parent="." unique_id=1813737619 instance=ExtResource("20_n0wup")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0660223, 0)

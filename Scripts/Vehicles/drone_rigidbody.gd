@@ -171,7 +171,7 @@ func detonate() -> void:
 	explodes.emit(global_position,blast_rad,blast_damage)
 	
 	if effects_manager:
-		effects_manager.explosion_from_pool(global_position)
+		effects_manager.explosion_from_pool(global_position,blast_rad)
 	
 	var explosion = SphereShape3D.new()
 	explosion.radius = blast_rad
@@ -223,6 +223,7 @@ func detonate() -> void:
 				var res = space.intersect_ray(raycast)
 				
 				if res and res.collider == current_collider:
+					Effects_Manager.INSTANCE.sparks_from_pool(res.position)
 					hitted_enemies.append(current_collider)
 					#print(current_collider)
 					if current_collider.has_method("take_damage"):

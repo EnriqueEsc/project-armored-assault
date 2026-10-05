@@ -85,6 +85,16 @@ const PROGRESS_RADIAL = preload("res://Shaders/progress_bar_radial_3d.gdshader")
 
 var map_icon: Sprite3D = null
 
+
+signal main_weapon_shoot
+signal secondary_weapon_shoot
+
+signal main_shoot_signal_auto
+signal main_shoot_signal_semi
+
+signal secondary_shoot_signal_auto
+signal secondary_shoot_signal_semi
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	var tank_load
@@ -132,7 +142,7 @@ func _ready() -> void:
 	last_time_hit_shown = hit_marker_time
 	HUD_Lock_on.visible = lock_on
 	
-	tank_rigid.shoot_recharge.connect(shoot_ready)
+	#tank_rigid.shoot_recharge.connect(shoot_ready)
 	
 	tank_rigid.shakes.connect(tank_camera.start_shake)
 	
@@ -177,8 +187,11 @@ func _ready() -> void:
 	
 	for t in tank_rigid.vehicle_turrets:
 		
-		
 		aim_to.connect(t.rotate_turret_to_point_3d)
+		
+		if t.turret_priority == Vehicle_turret.Turret_Priority.Secondary:
+			continue
+		
 		var new_aim = Sprite2D.new()
 		new_aim.texture = load("res://Sprites/Test/MousePointer.png")
 		var new_ready = TextureProgressBar.new()
@@ -231,7 +244,6 @@ func _ready() -> void:
 		new_ready_3d.rotation.x = deg_to_rad(180)
 		HUD_Shoot_Ready_3D.append(new_ready_3d)
 		
-		
 		if aim_3d:
 			new_aim.visible = false
 			t.target.connect(target_enemy.bind(new_aim_3d))
@@ -239,6 +251,30 @@ func _ready() -> void:
 		else:
 			new_aim_3d.visible = false
 			t.target.connect(target_enemy_2d.bind(new_aim))
+		
+		t.shoot_recharge.connect(shoot_ready.bind(HUD_aim_3D.size()-1))
+	
+	for t in tank_rigid.vehicle_turrets:
+		if not t.turret_barrel.is_empty():
+			match t.turret_barrel[0].fire_mode:
+				Turret_Weapon.Fire_Mode.Auto:
+					match t.turret_priority:
+						Vehicle_turret.Turret_Priority.Main:
+							main_shoot_signal_auto.connect(t.shoot)
+						Vehicle_turret.Turret_Priority.Secondary:
+							secondary_shoot_signal_auto.connect(t.shoot)
+						_:
+							secondary_shoot_signal_auto.connect(t.shoot)
+				_:
+					match t.turret_priority:
+						Vehicle_turret.Turret_Priority.Main:
+							main_shoot_signal_semi.connect(t.shoot)
+						Vehicle_turret.Turret_Priority.Secondary:
+							secondary_shoot_signal_semi.connect(t.shoot)
+						_:
+							secondary_shoot_signal_semi.connect(t.shoot)
+	
+	
 	
 	if not HUD_aim.is_empty():
 		aim_point_original_scale = HUD_aim[0].scale
@@ -264,6 +300,10 @@ func _ready() -> void:
 	map_icon.modulate = color
 	
 	var atch = Save_File_Manager.INSTANCE.current_attachment
+	
+	if atch:
+		atch = atch.duplicate()
+	
 	if atch:
 		tank_rigid.add_child(atch)
 		tank_rigid.attachment = atch
@@ -296,15 +336,25 @@ func color_HUD() -> void:
 		for s in HUD_Shoot_Ready_3D:
 			s.material_override.set_shader_parameter("tint", color)
 
-func shoot_ready(charge: float) -> void:
+func shoot_ready(charge: float, index: int) -> void:
 	#print("SOOOT ",charge)
-	for s in HUD_Shoot_Ready:
-		s.value = charge
+	#for s in HUD_Shoot_Ready:
+	#	s.value = charge
+	#if tank_rigid.vehicle_turrets[index].turret_priority != Vehicle_turret.Turret_Priority.Main:
+	#	return
 	
-	for s in HUD_Shoot_Ready_3D:
+	if not HUD_Shoot_Ready.is_empty():
+		HUD_Shoot_Ready[index].value = charge
+	
+	#for s in HUD_Shoot_Ready_3D:
 		#print(charge)
-		s.material_override.set_shader_parameter("progress", charge/100.0)
+	#	s.material_override.set_shader_parameter("progress", charge/100.0)
 		#s.value = charge
+	
+	
+	if not HUD_Shoot_Ready_3D.is_empty():
+		HUD_Shoot_Ready_3D[index].material_override.set_shader_parameter("progress", charge/100.0)
+	
 	if charge > 99 and not ready_to_shoot:
 		ready_to_shoot = true
 		var crew_speak: int = randi_range(0,4)
@@ -437,12 +487,12 @@ func _process(delta: float) -> void:
 		return
 	
 	if is_destroyed:
-		if Input.is_action_just_pressed("Shoot"):
+		if Input.is_action_just_pressed("Main_Shoot"):
 			get_tree().reload_current_scene()
 		return
 	
 	if mission_finished:
-		if Input.is_action_just_pressed("Shoot"):
+		if Input.is_action_just_pressed("Main_Shoot"):
 			#get_tree().change_scene_to_file("res://Scenes/main_menu.tscn")
 			get_tree().change_scene_to_file("res://Scenes/after_mission.tscn")
 		return
@@ -456,11 +506,21 @@ func _process(delta: float) -> void:
 	#print(get_viewport().get_mouse_position())
 	
 	
-	if tank_rigid.vehicle_turrets[0].fire_mode == 0 and Input.is_action_just_pressed("Shoot"):
-		tank_rigid.shoot()
+	if Input.is_action_just_pressed("Main_Shoot"):
+		main_shoot_signal_semi.emit()
 	
-	if tank_rigid.vehicle_turrets[0].fire_mode == 1 and Input.is_action_pressed("Shoot"):
-		tank_rigid.shoot()
+	if Input.is_action_pressed("Main_Shoot"):
+		main_shoot_signal_auto.emit()
+	
+	
+	if Input.is_action_just_pressed("Secondary_Shoot"):
+		secondary_shoot_signal_semi.emit()
+	
+	if Input.is_action_pressed("Secondary_Shoot"):
+		secondary_shoot_signal_auto.emit()
+	
+	
+	
 	
 	if Input.is_action_just_pressed("Attachment"):
 		tank_rigid.use_attachment()

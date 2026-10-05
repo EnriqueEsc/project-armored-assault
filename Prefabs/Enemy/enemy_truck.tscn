@@ -300,6 +300,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.9802322e-08, 0.044968367, -
 script = ExtResource("2_44tl4")
 turret_barrel = [NodePath("Gun")]
 side_angle_limit = 360.0
+turret_priority = 1
 
 [node name="turret_V3" parent="Turret" unique_id=1331242705 instance=ExtResource("3_ihprn")]
 transform = Transform3D(1.6391772e-07, 0, 1.25, 0, 1.25, 0, -1.25, 0, 1.6391772e-07, 0, -0.29506743, 0)
@@ -310,6 +311,7 @@ transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0
 script = ExtResource("4_e8l43")
 projectile_type = 2
 fire_mode = 1
+muzzle_pos = Vector3(0, 0, 0.3)
 fire_rate_prim = 0.2
 cooling_factor = 5.0
 

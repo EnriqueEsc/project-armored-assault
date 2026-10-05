@@ -62,11 +62,15 @@ func _physics_process(delta: float) -> void:
 			if collider.has_method("calculate_impact_chunk"):
 				var impact_damage = (armor_points/20.0) * impact
 				collider.calculate_impact_chunk(impact_damage, self, global_position)
-		
+				if Effects_Manager.INSTANCE:
+					Effects_Manager.INSTANCE.sparks_from_pool(global_position)
 			
 			elif collider.has_method("take_damage"):
-				var impact_damage = (armor_points/20.0) * impact
+				var impact_damage = (5.0) * impact
 				collider.take_damage(impact_damage, self, global_position)
+				
+				if Effects_Manager.INSTANCE:
+					Effects_Manager.INSTANCE.sparks_from_pool(global_position)
 			
 		#print(last_building_impact)
 		
@@ -78,3 +82,5 @@ func _physics_process(delta: float) -> void:
 			shakes.emit(0.2,0.2)
 			collider.calculate_impact_chunk(5 ,self, global_position)
 			last_building_impact = 0
+			if Effects_Manager.INSTANCE:
+				Effects_Manager.INSTANCE.failed_sparks_from_pool(global_position)

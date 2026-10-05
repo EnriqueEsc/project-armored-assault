@@ -26,6 +26,11 @@ var detonated: bool = false
 
 var effects_manager: Effects_Manager = null
 
+@export var muzzle_flash_scale: float = 1.0
+
+var fake_light: Mesh_Instance_3D_Effect = null
+var fake_light_original_size: Vector2 = Vector2.ZERO
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
@@ -36,6 +41,16 @@ func _ready() -> void:
 	deactivate()
 	
 	await get_tree().physics_frame
+	
+	for c in get_children():
+		if c is MeshInstance3D:
+			set_emission_in_material(c)
+	
+	if is_instance_valid($CollisionShape3D):
+		for c in $CollisionShape3D.get_children():
+			if c is MeshInstance3D:
+				set_emission_in_material(c)
+		
 	
 	effects_manager = Effects_Manager.INSTANCE
 	
@@ -118,11 +133,13 @@ func _on_body_entered(body):
 	
 	if body is Vehicle_Rigid:
 		body.shakes.emit(0.1,0.2)
+		
 	
 	if body.has_method("take_damage"):
 		direction = Vector3.ZERO
 		#origin.projectile_to_pool(self)
 		body.take_damage(damage, origin, global_position)
+		effects_manager.sparks_from_pool(global_position)
 		#origin.get_score(damage)
 		if not is_explosive:
 			deactivate()
@@ -130,6 +147,7 @@ func _on_body_entered(body):
 			detonate()
 	elif body.has_method("detonate"):
 		direction = Vector3.ZERO
+		effects_manager.sparks_from_pool(global_position)
 		body.detonate()
 		if not is_explosive:
 			deactivate()
@@ -137,6 +155,7 @@ func _on_body_entered(body):
 			detonate()
 	else:
 		direction = Vector3.ZERO
+		effects_manager.failed_sparks_from_pool(global_position)
 		if not is_explosive:
 			deactivate()
 		else:
@@ -154,7 +173,7 @@ func detonate() -> void:
 	
 	
 	if effects_manager:
-		effects_manager.explosion_from_pool(global_position)
+		effects_manager.explosion_from_pool(global_position,blast_rad)
 	
 	explodes.emit(global_position,blast_rad,blast_damage)
 	
@@ -211,6 +230,7 @@ func detonate() -> void:
 				
 				
 				if res and res.collider == current_collider:
+					Effects_Manager.INSTANCE.sparks_from_pool(res.position)
 					hitted_enemies.append(current_collider)
 					#print(current_collider)
 					if current_collider.has_method("take_damage"):
@@ -218,6 +238,8 @@ func detonate() -> void:
 						#current_collider.take_damage(blast_damage, origin, global_position)
 				
 	for t in hitted_enemies:
+		#Effects_Manager.INSTANCE.sparks_from_pool(t.global_position)
+		
 		if (t is Vehicle_Rigid and t != origin) or t is Emplacement:
 			hits_enemy.emit()
 			
@@ -242,3 +264,14 @@ func detonate() -> void:
 			t.call_deferred("detonate")
 			continue
 	deactivate()
+
+
+func set_emission_in_material(mesh: MeshInstance3D, enable_emission: bool = Settings_Manager.INSTANCE.enable_emmisions) -> void:
+		if mesh.material_override and mesh.material_override is StandardMaterial3D:
+			mesh.material_override.emission_enabled = enable_emission
+		if mesh.mesh is QuadMesh:
+			if not enable_emission:
+				mesh.queue_free()
+			elif mesh is Mesh_Instance_3D_Effect:
+				fake_light = mesh as Mesh_Instance_3D_Effect
+				fake_light_original_size = mesh.mesh.size

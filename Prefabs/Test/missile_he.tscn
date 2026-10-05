@@ -3,12 +3,25 @@
 [ext_resource type="Script" uid="uid://dumgslihv4uuc" path="res://Scripts/Vehicles/missile.gd" id="1_8iqrr"]
 [ext_resource type="PackedScene" uid="uid://dk2ejhum7dj0e" path="res://Models/Test/Projectile.fbx" id="2_pkkxs"]
 [ext_resource type="PackedScene" uid="uid://koxj0b8ls2xa" path="res://Models/Test/Gun.fbx" id="3_opgor"]
+[ext_resource type="Shader" uid="uid://r0dpspjp6381" path="res://Shaders/fake_light.gdshader" id="4_opgor"]
+[ext_resource type="Script" uid="uid://pk4lo6kji8hu" path="res://Scripts/Game/Effects/meshinstance3d_as_effect.gd" id="5_j0cyi"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_sn0t7"]
 size = Vector3(0.2, 0.2, 0.5)
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_u3pth"]
+render_priority = 0
+shader = ExtResource("4_opgor")
+shader_parameter/light_color = Color(1, 0.45, 0.08, 1)
+shader_parameter/intensity = 1.0
+shader_parameter/softness = 2.5
+
+[sub_resource type="QuadMesh" id="QuadMesh_silq6"]
+size = Vector2(0.4, 0.8)
+
 [node name="Projectile" type="Area3D" unique_id=1973506426]
 script = ExtResource("1_8iqrr")
+muzzle_flash_scale = 0.6
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1897963084]
 shape = SubResource("BoxShape3D_sn0t7")
@@ -20,3 +33,9 @@ transform = Transform3D(4, 0, 0, 0, -4, -3.496911e-07, 0, 3.496911e-07, -4, 0, 0
 [node name="Gun" parent="CollisionShape3D" unique_id=51241174 instance=ExtResource("3_opgor")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.23016813, 0, 0)
 visible = false
+
+[node name="Fake_Light" type="MeshInstance3D" parent="CollisionShape3D" unique_id=684139848]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0.52456653)
+material_override = SubResource("ShaderMaterial_u3pth")
+mesh = SubResource("QuadMesh_silq6")
+script = ExtResource("5_j0cyi")

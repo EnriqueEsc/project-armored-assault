@@ -50,7 +50,7 @@ func _process(delta: float) -> void:
 		break_typing()
 		get_parent_control().visible = false
 	
-	if Input.is_action_just_pressed("Shoot"):
+	if Input.is_action_just_pressed("Main_Shoot"):
 		click_count += 1
 		if click_count > min_clicks_to_skip:
 			stop_typing()

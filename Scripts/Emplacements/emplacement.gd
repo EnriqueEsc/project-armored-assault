@@ -83,7 +83,13 @@ func deactivate() -> void:
 	gets_disabled.emit()
 	
 	visible = false
-	Effects_Manager.INSTANCE.explosion_from_pool(global_position)
+	var scale: float = 1.0
+	
+	for c in get_children():
+		if c is CollisionShape3D and c.shape is BoxShape3D:
+			scale += c.shape.size.length() * 5
+	
+	Effects_Manager.INSTANCE.explosion_from_pool(global_position, scale)
 	process_mode = Node.PROCESS_MODE_DISABLED
 	var collision = $CollisionShape3D
 	collision.set_deferred("disabled",true)

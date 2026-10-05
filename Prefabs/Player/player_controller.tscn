@@ -578,7 +578,8 @@ text = "[font_size=38]Controls[/font_size]
 [W] - Tank moves forward
 [S] - Tank moves bakward
 [A]/[D] - Tank steers
-[Left Click] - Shoot
+[Left Click] - Shoot main weapon
+[Right Click] - Shoot secondary weapon
 [Tab] - Show map
 [Q] - Activate / Disable Lock On
 [Mouse] - It shows the point that turret will rotate to aim to

@@ -153,6 +153,7 @@ transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0
 script = ExtResource("4_fy2v0")
 projectile_type = 2
 fire_mode = 1
+muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.2
 
 [node name="Gun" type="MeshInstance3D" parent="Turret/Gun" unique_id=1528815107]

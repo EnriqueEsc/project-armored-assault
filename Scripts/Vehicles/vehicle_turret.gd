@@ -30,6 +30,11 @@ signal shoot_recharge(charge: float)
 var fire_mode: Turret_Weapon.Fire_Mode = Turret_Weapon.Fire_Mode.Semi
 var projectile_type: Turret_Weapon.Projectile_Type = Turret_Weapon.Projectile_Type.AP
 
+enum Fire_Types {Simultaneous, OneByOne, NbyN}
+@export var fire_type: Fire_Types = Fire_Types.Simultaneous
+var current_weapon_index: int = 0
+@export var shoot_by_n_turrets: int = 1
+
 var original_side_angle: float = 0.0
 
 signal aim_point(point: Vector3)
@@ -43,6 +48,9 @@ signal target(node: Node3D)
 var static_model: bool = false
 
 signal shakes_on_shoot(intensity: float, duration: float)
+
+enum Turret_Priority {Main,Secondary}
+@export var turret_priority: Turret_Priority = Turret_Priority.Main
 
 func spawn() -> void:
 	
@@ -67,7 +75,7 @@ func calculate_sight_pos() -> void:
 	for w in turret_barrel:
 		if not is_instance_valid(w):
 			continue
-		mean_weapon_pos += w.position
+		mean_weapon_pos += w.position + w.muzzle_pos
 	
 	mean_weapon_pos /= float(turret_barrel.size())
 	
@@ -238,10 +246,51 @@ func calculate_mean_rotation() -> Vector3:
 
 
 func shoot() -> void:
-	for w in turret_barrel:
-		if not is_instance_valid(w):
-			continue
-		w.shoot()
+	match fire_type:
+		Fire_Types.Simultaneous:
+			for w in turret_barrel:
+				if not is_instance_valid(w):
+					continue
+				if turret_priority == Turret_Priority.Secondary:
+					w.shoot(0.2)
+					continue
+				w.shoot()
+		Fire_Types.OneByOne:
+			if current_weapon_index >= turret_barrel.size():
+				current_weapon_index = 0
+			if not is_instance_valid(turret_barrel[current_weapon_index]):
+				return
+			if not all_weapons_can_shoot():
+				return
+			if turret_priority == Turret_Priority.Secondary:
+				turret_barrel[current_weapon_index].shoot(0.2)
+				current_weapon_index += 1
+				return
+			turret_barrel[current_weapon_index].shoot()
+			current_weapon_index += 1
+		Fire_Types.NbyN:
+			if not all_weapons_can_shoot():
+				return
+			for i in shoot_by_n_turrets:
+				if current_weapon_index >= turret_barrel.size():
+					current_weapon_index = 0
+				if not is_instance_valid(turret_barrel[current_weapon_index]):
+					continue
+				if turret_priority == Turret_Priority.Secondary:
+					turret_barrel[current_weapon_index].shoot(0.2)
+					current_weapon_index += 1
+					continue
+				turret_barrel[current_weapon_index].shoot()
+				current_weapon_index += 1
+
+
+func all_weapons_can_shoot() -> bool:
+	var res: bool = true
+	
+	for t in turret_barrel:
+		res = res and t.can_shoot()
+	
+	return res
 
 func set_fire_mode(mode: Turret_Weapon.Fire_Mode) -> void:
 	if turret_barrel.is_empty():

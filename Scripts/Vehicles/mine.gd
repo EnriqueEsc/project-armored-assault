@@ -11,9 +11,12 @@ var detonated: bool = false
 
 @onready var trigger: Area3D = $Area3D
 
+var effects_manager: Effects_Manager = null
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	trigger.body_entered.connect(_on_area_entered)
+	effects_manager = Effects_Manager.INSTANCE
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
@@ -65,6 +68,9 @@ func detonate() -> void:
 		return
 	
 	detonated = true
+	
+	if effects_manager:
+		effects_manager.explosion_from_pool(global_position,blast_rad)
 	
 	var explosion = SphereShape3D.new()
 	explosion.radius = blast_rad
