@@ -308,6 +308,8 @@ func fire_from_pool(position: Vector3) -> Fire_Effect:
 		fire.process_mode = Node.PROCESS_MODE_ALWAYS
 		fire.global_position = position
 		fire.counter = 0.0
+		if fire.fake_light_effect:
+			fire.fake_light_effect.scale = Vector3.ONE
 		fire.show()
 		fire.restart()
 		#fake_light_from_pool(position, Vector2.ONE * 2.0)

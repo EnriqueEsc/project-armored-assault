@@ -583,7 +583,8 @@ text = "[font_size=38]Controls[/font_size]
 [Tab] - Show map
 [Q] - Activate / Disable Lock On
 [Mouse] - It shows the point that turret will rotate to aim to
-[Shift] - Dash
-[R] - Use Attachment"
+[Shift/Space] - Dash
+[R] - Use Attachment
+[C] - Special action (If aviable)"
 scroll_active = false
 horizontal_alignment = 1

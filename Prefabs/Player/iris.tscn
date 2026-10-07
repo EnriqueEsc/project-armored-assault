@@ -337,7 +337,7 @@ visible = false
 [node name="Gun" type="Node3D" parent="Turret" unique_id=51241174]
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, -0.344, 0, 0)
 script = ExtResource("8_id1vq")
-projectile_type = 2
+projectile_type = 4
 fire_mode = 1
 muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.2
@@ -351,7 +351,7 @@ mesh = SubResource("ArrayMesh_bdpwl")
 [node name="Gun2" type="Node3D" parent="Turret" unique_id=1115701518]
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0.3428709, 0, -1.4987362e-08)
 script = ExtResource("8_id1vq")
-projectile_type = 2
+projectile_type = 4
 fire_mode = 1
 muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.2
@@ -365,7 +365,7 @@ mesh = SubResource("ArrayMesh_bdpwl")
 [node name="Gun3" type="Node3D" parent="Turret" unique_id=1262219485]
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, -0.344, 0.17882353, 0)
 script = ExtResource("8_id1vq")
-projectile_type = 2
+projectile_type = 4
 fire_mode = 1
 muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.2
@@ -379,7 +379,7 @@ mesh = SubResource("ArrayMesh_bdpwl")
 [node name="Gun4" type="Node3D" parent="Turret" unique_id=1712975162]
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0.3428709, 0.17882353, -1.4987362e-08)
 script = ExtResource("8_id1vq")
-projectile_type = 2
+projectile_type = 4
 fire_mode = 1
 muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.2

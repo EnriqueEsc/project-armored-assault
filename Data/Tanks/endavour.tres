@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_kr22o")
+filename = "endavour"
 tank_Name = "MK_01 vindicator"
 acceleration = 1.0
 friction = 1.2

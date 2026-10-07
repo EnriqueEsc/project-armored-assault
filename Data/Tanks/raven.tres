@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="Tank_Data" format=3 uid="uid://wgu3poigmoo2"]
+
+[ext_resource type="Script" uid="uid://o0qesee4s8dx" path="res://Data/Tanks/Tank_Data.gd" id="1_i1rwx"]
+
+[resource]
+script = ExtResource("1_i1rwx")
+filename = "raven"
+tank_Name = "RX02 Raven"
+traction = 2.0
+max_armor_points = 400
+boost_cooldown = 1.0
+metadata/_custom_type_script = "uid://o0qesee4s8dx"

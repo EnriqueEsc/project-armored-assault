@@ -18,7 +18,7 @@ signal recoil (dir: Vector3)
 var ignore = []
 
 
-enum Projectile_Type {HE, AP, MachineGun, Nuke, Flamethrower}
+enum Projectile_Type {HE, AP, MachineGun, Nuke, Flak, Flamethrower}
 enum Fire_Mode {Semi, Auto}
 
 
@@ -106,6 +106,9 @@ func _ready() -> void:
 			case_prefab = load("res://Prefabs/Test/machine_gun_case.tscn")
 		Projectile_Type.Nuke:
 			projectile_prefab = load("res://Prefabs/Test/nuke.tscn")
+		Projectile_Type.Flak:
+			projectile_prefab = load("res://Prefabs/Test/flak_bullet.tscn")
+			case_prefab = load("res://Prefabs/Test/machine_gun_case.tscn")
 		Projectile_Type.Flamethrower:
 			projectile_prefab = load("res://Prefabs/Test/flamethrower.tscn")
 		

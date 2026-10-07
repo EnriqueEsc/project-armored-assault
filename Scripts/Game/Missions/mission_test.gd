@@ -144,20 +144,20 @@ func _check_success_conditions() -> void:
 		_mission_succeeded()
 
 func _additional_rewards_to_player() -> void:
-	var reward: String = Save_File_Manager.INSTANCE.get_random_tank_reward()
+	var reward: Tank_Data = Save_File_Manager.INSTANCE.get_random_tank_reward()
 	var add_text: String = ""
 	
-	if reward == "":
+	if reward == null:
 		add_text = "1000 points"
 	if Save_File_Manager.INSTANCE.check_has_tank(reward):
 		add_text = " (Already owned) -> Converted to 1000 points"
-	if reward != "":
+	if reward != null:
 		Save_File_Manager.INSTANCE.unlock_tank(reward)
 	
 	mission_results = {
 		"tank_kills": current_tank_kills,
 		"score" : player.tank_rigid.score,
-		"tanks_unlocked" : reward + add_text
+		"tanks_unlocked" : reward.tank_Name + add_text
 	}
 
 func _create_results_dictionary() -> void:

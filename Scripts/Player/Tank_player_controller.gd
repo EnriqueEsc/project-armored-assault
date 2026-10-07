@@ -71,7 +71,7 @@ var ready_to_shoot: bool = true
 
 var transition_to_game: bool = false
 
-enum Move_Types {Axial,Directional,To_Pointer}
+enum Move_Types {Axial,Directional,To_Pointer,Skating}
 var move_type: Move_Types = Move_Types.Axial
 
 var controller_move: bool = false
@@ -95,23 +95,30 @@ signal main_shoot_signal_semi
 signal secondary_shoot_signal_auto
 signal secondary_shoot_signal_semi
 
+var pointer_pos: Vector3 = Vector3.ZERO
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	var tank_load
 	var tank_data
 	if Settings_Manager.INSTANCE.current_tank_used_in_game:
 		tank_data = Settings_Manager.INSTANCE.current_tank_used_in_game
-		if tank_data.tank_Name == "mk_-2inferno":
-			tank_load = load("res://Prefabs/Player/inferno.tscn")
-		elif tank_data.tank_Name == "iris":
-			tank_load = load("res://Prefabs/Player/iris.tscn")
-		elif tank_data.tank_Name != "MK_01 vindicator":
-			tank_load = load("res://Prefabs/Player/tank.tscn")
-		else:
-			tank_load = load("res://Prefabs/Player/endavour.tscn")
+		
+	elif ResourceLoader.exists("res://Data/Tanks/tank.tres"):
+		tank_data = load("res://Data/Tanks/tank.tres") as Tank_Data
+	elif ResourceLoader.exists("res://Data/Tanks/tank.remap"):
+		tank_data = load("res://Data/Tanks/tank.remap") as Tank_Data
+		
+	if ResourceLoader.exists("res://Prefabs/Player/"+tank_data.filename+".tscn"):
+		tank_load = load("res://Prefabs/Player/"+tank_data.filename+".tscn")
+		
 	else:
-		tank_load = load("res://Prefabs/Player/endavour.tscn")
-		tank_data = load("res://Data/Tanks/mk-0_test.tres") as Tank_Data
+		tank_load = load("res://Prefabs/Player/tank.tscn")
+		
+		
+		
+			#tank_data = load("res://Data/Tanks/tank.tres") as Tank_Data
 	
 	tank_rigid = tank_load.instantiate() as Tank_Rigid
 	
@@ -311,7 +318,8 @@ func _ready() -> void:
 		if tank_rigid.attachment:
 			tank_rigid.attachment.master_vehicle = tank_rigid
 			tank_rigid.attachment.shakes.connect(tank_rigid.shakes.emit)
-
+		
+	tank_rigid.update_stencil_color(Color.GREEN)
 
 func color_HUD() -> void:
 		#HUD_aim.modulate = color
@@ -383,7 +391,6 @@ func _physics_process(delta: float) -> void:
 	
 	#print(tank_camera.get_mouse_3d_pos())
 	
-	var pointer_pos: Vector3 = Vector3.ZERO
 	
 	
 	
@@ -523,7 +530,10 @@ func _process(delta: float) -> void:
 	
 	
 	if Input.is_action_just_pressed("Attachment"):
-		tank_rigid.use_attachment()
+		var mouse_pos = tank_camera.get_mouse_3d_pos()
+		if lock_on:
+			mouse_pos = pointer_pos
+		tank_rigid.use_attachment(mouse_pos)
 	
 	
 	match move_type:
@@ -533,6 +543,8 @@ func _process(delta: float) -> void:
 			controller_movement(input_dir,delta)
 		Move_Types.To_Pointer:
 			movement_towards_point(input_dir,delta)
+		Move_Types.Skating:
+			movement_skating(input_dir, delta)
 	
 	
 	#tank_rigid.rotate_turret_to_point(get_viewport().get_mouse_position())
@@ -552,6 +564,10 @@ func _process(delta: float) -> void:
 	
 	if Input.is_action_just_pressed("Boost"):
 		tank_rigid.quick_boost()
+	
+	if Input.is_action_just_pressed("Special_Action"):
+		if tank_rigid.special_action():
+			change_move_type()
 	
 	if Input.is_action_just_pressed("LockOn"):
 		lock_on = !lock_on
@@ -579,6 +595,16 @@ func _process(delta: float) -> void:
 		if last_time_hit_shown >= hit_marker_time:
 			HUD_Hitmarker.visible = false
 
+func change_move_type() -> void:
+	if Settings_Manager.INSTANCE.move_type == Move_Types.To_Pointer:
+		return
+	
+	if move_type != Move_Types.Skating:
+		move_type = Move_Types.Skating
+		return
+	
+	move_type = Settings_Manager.INSTANCE.move_type
+	
 
 func controller_movement(target_pos: Vector2, delta: float) -> void:
 	var next_pos: Vector3 = tank_rigid.global_position + Vector3(target_pos.x,0.0,target_pos.y)
@@ -613,6 +639,8 @@ func movement_towards_point(target_pos: Vector2, delta: float) -> void:
 		return
 	
 	var mouse_pos = tank_camera.get_mouse_3d_pos()
+	if lock_on:
+		mouse_pos = pointer_pos
 	mouse_pos.y = tank_rigid.global_position.y
 	var aux = tank_rigid.global_position.direction_to(mouse_pos)
 	aux.y = 0.0
@@ -637,6 +665,38 @@ func movement_towards_point(target_pos: Vector2, delta: float) -> void:
 	
 	#print(input_x,",",input_y,""," ",rad_to_deg(y_angle))
 	tank_rigid.move(Vector2(input_x, -input_y), delta)
+
+
+func movement_skating(target_pos: Vector2, delta: float) -> void:
+	
+	#if target_pos == Vector2.ZERO:
+	#	tank_rigid.move(Vector2.ZERO, delta)
+	#	return
+	
+	var mouse_pos = tank_camera.get_mouse_3d_pos()
+	if lock_on:
+		mouse_pos = pointer_pos
+	
+	mouse_pos.y = tank_rigid.global_position.y
+	
+	
+	var dir_to_path = tank_rigid.global_position.direction_to(mouse_pos)
+	dir_to_path.y = 0.0
+	dir_to_path = dir_to_path.normalized()
+	
+	var forward = tank_rigid.global_transform.basis.z.normalized()
+	var angle = forward.signed_angle_to(dir_to_path, tank_rigid.global_basis.y)
+	
+	var input_x: float = -clamp(angle, -1.0, 1.0)
+	
+	input_x = clamp(input_x, -1.0, 1.0)
+	
+	var input_y: float = 1.0 if abs(angle) < 1.8 else 0.0
+	
+	input_y *= -target_pos.y
+	
+	#print(target_pos," | ",input_x,",",input_y)
+	tank_rigid.move(Vector2(input_x, -input_y), delta, target_pos.x)
 
 
 

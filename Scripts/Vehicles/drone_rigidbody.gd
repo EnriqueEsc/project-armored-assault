@@ -51,14 +51,20 @@ func _physics_process(delta: float) -> void:
 	
 	#print(global_position.y)
 	
+	if not is_equal_approx(global_position.y , distance_to_ground):
+		#global_position.y = lerpf(global_position.y,distance_to_ground,delta * 3.0)
+		
+		#print(delta)
+		global_position.y = lerpf(global_position.y, distance_to_ground, delta * 3.0)
+		
+		velocity.y = minf(velocity.y, 0.0)
+		velocity.y = 0.0
+		
+		#print(" ",global_position.y," ",distance_to_ground," ",lerpf(global_position.y,distance_to_ground,delta * 3.0))
+		#print(global_position.y)
+	
 	
 	move_and_slide()
-	
-	if not is_equal_approx(global_position.y , distance_to_ground):
-		
-		global_position.y = lerpf(global_position.y,distance_to_ground,0.5 * delta)
-		velocity.y = minf(velocity.y, 0.0)
-		#print(global_position.y)
 	
 	#print("AAAAAAAAAAAAAAAAAA ",is_kamikaze,is_armed,not detonated)
 	
@@ -104,7 +110,7 @@ func _physics_process(delta: float) -> void:
 			last_building_impact = 0
 
 
-func move(move: Vector2, delta: float) -> void:
+func move(move: Vector2, delta: float, lateral_move: float = 0.0) -> void:
 	#rotate_y(-move.x * turn_speed * delta)
 	if staggered:
 		return
@@ -131,7 +137,8 @@ func move(move: Vector2, delta: float) -> void:
 
 
 func set_distance_to_ground(dis: float, delta: float) -> void:
-	distance_to_ground += dis * delta
+	pass
+	#distance_to_ground += dis * delta
 	#print(distance_to_ground)
 
 func check_distance_from_ground() -> float:

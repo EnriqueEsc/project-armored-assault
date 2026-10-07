@@ -9,6 +9,7 @@ var intensity: float = 3.0
 func _ready() -> void:
 	counter = lifetime
 	fake_light_effect.set_instance_shader_parameter("light_color",Color.YELLOW)
+	fake_light_effect.mesh.size = Vector2.ONE
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -23,3 +24,10 @@ func light_scale(delta: float) -> void:
 		return
 	var scale = sin((counter/lifetime)*PI) * randf_range(0.7,1.3)
 	fake_light_effect.scale = Vector3.ONE * scale * intensity
+	fake_light_effect.scale.z = 1.0
+	
+	
+	
+	
+	
+	#print(fake_light_effect.scale," ",fake_light_effect.visible," ")

@@ -132,7 +132,11 @@ func switch_active(window: Control) -> void:
 	window.visible = not window.visible
 
 func create_move_options() -> void:
+	var skating: String = Tank_player_controller.Move_Types.keys()[Tank_player_controller.Move_Types.Skating]
+	
 	for m in Tank_player_controller.Move_Types:
+		if m == skating:
+			continue
 		move_type_option.add_item(m)
 		
 func create_destruction_effects_options() -> void:
@@ -258,18 +262,15 @@ func create_tank_selection_buttons() -> void:
 		tank_button.button_down.connect(select_tank.bind(t))
 		
 		var tank_p = null
+		#print(t.filename)
 		
-		match t.tank_Name:
-			"MK_-0 Test":
-				tank_p = load("res://Prefabs/Player/tank.tscn")
-			"MK_01 vindicator":
-				tank_p = load("res://Prefabs/Player/endavour.tscn")
-			"MK_0 Tonnel":
-				tank_p = load("res://Prefabs/Player/tank.tscn")
-			"mk_-2inferno":
-				tank_p = load("res://Prefabs/Player/inferno.tscn")
-			"iris":
-				tank_p = load("res://Prefabs/Player/iris.tscn")
+		if ResourceLoader.exists("res://Prefabs/Player/"+t.filename+".tscn"):
+			print("COÑO ",t.filename)
+			tank_p = load("res://Prefabs/Player/"+t.filename+".tscn")
+		
+		if not tank_p:
+			print("COÑO ",t.filename)
+			tank_p = load("res://Prefabs/Player/tank.tscn")
 		
 		if tank_p:
 			var tank_clone = tank_p.instantiate() as Tank_Rigid

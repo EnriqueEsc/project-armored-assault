@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_ce4cm")
+filename = "tonnel"
 max_speed = 1.5
 acceleration = 1.0
 friction = 1.2

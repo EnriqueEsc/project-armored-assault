@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_o3804")
+filename = "iris"
 tank_Name = "iris"
 traction = 2.0
 max_armor_points = 400

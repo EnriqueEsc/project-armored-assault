@@ -16,7 +16,7 @@ var damage_effect: Fire_Effect = null
 @export var acceleration: float = 5.0
 @export var turn_speed: float = 1.0
 
-@export var boost_speed: float = 3.0
+@export var boost_speed: float = 5.0
 @export var boost_cooldown: float = 5.0
 var boost_last_use: float = 5.0
 
@@ -149,8 +149,9 @@ func update_stencil(stencil_mode: BaseMaterial3D.StencilMode) -> void:
 	if not model.is_empty():
 		material.stencil_mode = stencil_mode
 		for m in model:
-			#print("sssss ",m," ",material.stencil_mode)
-			m.material_override = material
+			if is_instance_valid(m):
+				#print("sssss ",m," ",material.stencil_mode)
+				m.material_override = material
 
 func update_stencil_color(color: Color) -> void:
 	if not material:
@@ -160,8 +161,9 @@ func update_stencil_color(color: Color) -> void:
 	if not model.is_empty():
 		material.stencil_color = color
 		for m in model:
-			#print("sssss ",m," ",material.stencil_mode)
-			m.material_override = material
+			if is_instance_valid(m):
+				#print("sssss ",m," ",material.stencil_mode)
+				m.material_override = material
 
 
 func initialize_effects() -> void:
@@ -175,7 +177,8 @@ func initialize_effects() -> void:
 		damage_effect.hide()
 		damage_effect.process_mode = Node.PROCESS_MODE_DISABLED
 		if damage_effect.fake_light_effect:
-			damage_effect.fake_light_effect.mesh.size = Vector2.ZERO
+			#damage_effect.fake_light_effect.mesh.size = Vector2.ZERO
+			damage_effect.fake_light_effect.scale = Vector3.ZERO
 	
 	var move_trail_prefab = load("res://Prefabs/Effects/ground_trail.tscn")
 	if move_trail_prefab:
@@ -209,7 +212,7 @@ func boost(force: float) -> void:
 	#push = Vector3(push.x, 0 ,push.z)
 	velocity += push * force
 	Effects_Manager.INSTANCE.fake_light_from_pool(attachment.global_position,Vector2.ONE * velocity.length() * 0.3,Color.BLUE_VIOLET)
-
+	Effects_Manager.INSTANCE.shoot_from_pool(attachment.global_position, attachment.global_rotation - Vector3(0,deg_to_rad(180),0), velocity.length() * 0.02)
 
 
 func quick_boost() -> void:
@@ -224,7 +227,7 @@ func quick_boost() -> void:
 	velocity += push * max_speed * boost_speed
 	boost_last_use = 0.0
 	Effects_Manager.INSTANCE.fake_light_from_pool(global_position, Vector2.ONE * velocity.length() * 0.2,Color.ORANGE)
-
+	Effects_Manager.INSTANCE.shoot_from_pool(global_position, global_rotation - Vector3(0,deg_to_rad(180),0), velocity.length() * 0.02)
 
 func allign_with_floor(delta: float) -> void:
 	var normal: Vector3 = Vector3.UP
@@ -352,7 +355,7 @@ func show_move_effects(vel: float) -> void:
 	
 	
 
-func move(move: Vector2, delta: float) -> void:
+func move(move: Vector2, delta: float, lateral_move: float = 0.0) -> void:
 	#rotate_y(-move.x * turn_speed * delta)
 	if staggered:
 		return
@@ -465,9 +468,9 @@ func deactivate() -> void:
 	gets_disabled.emit()
 	
 
-func use_attachment() -> void:
+func use_attachment(objective: Vector3 = get_aim_point_3d(0,100)) -> void:
 	if attachment:
-		attachment.objective = get_aim_point_3d(0,100)
+		attachment.objective = objective
 		attachment._use_attachment()
 
 func get_score(score: int) -> void:
@@ -527,3 +530,7 @@ func create_map_icon() -> Sprite3D:
 	map_icon.render_priority = 98
 	map_icon.layers = 1 << 19
 	return map_icon
+
+func special_action() -> bool:
+	pass
+	return false

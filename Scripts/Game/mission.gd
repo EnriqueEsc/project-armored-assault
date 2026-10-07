@@ -124,6 +124,12 @@ func _link_player() -> void:
 	if mission_data and mission_info_text:
 		_show_mission_info()
 		mission_info_text.finished_typing.connect(set_process.bind(true))
+		return
+	
+	
+	player.set_process(true)
+	player.transition_to_game = false
+	black_screen.visible = false
 	
 
 func _show_mission_info() -> void:

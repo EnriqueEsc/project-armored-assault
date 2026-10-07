@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_p4jfd")
+filename = "inferno"
 tank_Name = "mk_-2inferno"
 traction = 2.0
 max_armor_points = 600

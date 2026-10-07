@@ -7,7 +7,7 @@ var CURRENT_PATH: String = "user://test.json"
 const DEFAULT_SAVE_DATA: Dictionary = {
 	"tank_kills_record": 0,
 	"total_score" : 0,
-	"tanks_unlocked" : ["MK_-0 Test"]
+	"tanks_unlocked" : ["tank"]
 }
 
 var current_save_data: Dictionary = DEFAULT_SAVE_DATA.duplicate(true)
@@ -85,27 +85,28 @@ func score_record(score: int) -> void:
 	current_save_data["total_score"] += score
 	save_game()
 
-func check_has_tank(tank: String) -> bool:
-	return current_save_data["tanks_unlocked"].has(tank)
+func check_has_tank(tank: Tank_Data) -> bool:
+	return current_save_data["tanks_unlocked"].has(tank.filename)
 
-func get_random_tank_reward() -> String:
-	var res: String = ""
+func get_random_tank_reward() -> Tank_Data:
+	var res: Tank_Data
 	if not tanks_locked.is_empty():
-		res = tanks_locked[randi_range(0,tanks_locked.size()-1)].tank_Name
+		res = tanks_locked[randi_range(0,tanks_locked.size()-1)]
 		return res
 	if not all_tanks.is_empty():
-		res = all_tanks[randi_range(0,all_tanks.size()-1)].tank_Name
+		res = all_tanks[randi_range(0,all_tanks.size()-1)]
 		return res
 	return res
 
-func unlock_tank(tank: String) -> void:
-	if current_save_data["tanks_unlocked"].has(tank):
+func unlock_tank(tank: Tank_Data) -> void:
+	if current_save_data["tanks_unlocked"].has(tank.filename):
 		print("+1000 lince")
 		score_record(1000)
 		return
 	
 	print(current_save_data["tanks_unlocked"])
-	current_save_data["tanks_unlocked"].append(tank)
+	current_save_data["tanks_unlocked"].append(tank.filename)
+	print("FFFF ",tank.filename)
 	print(current_save_data["tanks_unlocked"])
 	save_game()
 	load_tanks_data()
@@ -127,9 +128,14 @@ func load_tanks_data() -> void:
 					var path = "res://Data/Tanks".path_join(clean_name)
 					var tank = ResourceLoader.load(path) as Tank_Data
 					if tank:
+						#tank.filename = clean_name.split(".")[0]
 						all_tanks.append(tank)
 			file_name = dir.get_next()
 		dir.list_dir_end()
+		
+		for t in all_tanks:
+			print("ZZZZ ",t.filename)
+		
 		load_unlocked_tanks()
 
 
@@ -149,7 +155,7 @@ func load_tank_data(str: String) -> Tank_Data:
 					var path = "res://Data/Tanks".path_join(clean_name)
 					#print(str," ",clean_name)
 					var tank = ResourceLoader.load(path) as Tank_Data
-					if tank and tank.tank_Name == str:
+					if tank and tank.filename == str:
 						return tank
 			file_name = dir.get_next()
 		dir.list_dir_end()
@@ -192,7 +198,7 @@ func load_unlocked_tanks() -> void:
 	tanks_unlocked.clear()
 	var names: Array = current_save_data["tanks_unlocked"]
 	for t in all_tanks:
-		if names.has(t.tank_Name):
+		if names.has(t.filename):
 			tanks_unlocked.append(t)
 		else:
 			tanks_locked.append(t)
