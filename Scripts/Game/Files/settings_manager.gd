@@ -24,12 +24,17 @@ var mouse_visible: bool = false
 
 var enable_emmisions: bool = true
 
+#var enable_mouse_assist: bool = true
+
 enum Destruction_Effects_Mode {Disabled, On_Block_Only, On_Building_Only, Always}
 var destruction_effects_mode: Destruction_Effects_Mode = Destruction_Effects_Mode.Always
 
 var move_type: Tank_player_controller.Move_Types = Tank_player_controller.Move_Types.Axial
 var controller_aim: bool = false
 var use_vibration: bool = false
+
+enum Aim_Assist_Type {None, ToCenter, Box}
+var aim_assist_type: Aim_Assist_Type = Aim_Assist_Type.None
 
 var current_save: String = "user://test.json"
 
@@ -67,6 +72,8 @@ func save_settings() -> void:
 	settings_file.set_value("Controls","controller_aim",controller_aim)
 	settings_file.set_value("Controls","move_type",move_type)
 	settings_file.set_value("Video","enable_emmisions",enable_emmisions)
+	#settings_file.set_value("Game","enable_mouse_assist",enable_mouse_assist)
+	settings_file.set_value("Game","aim_assist_type",aim_assist_type)
 	settings_file.set_value("Game","destruction_effects_mode",destruction_effects_mode)
 	settings_file.set_value("Controls","use_vibration",use_vibration)
 	settings_file.save(SETTINGS_PATH)
@@ -88,6 +95,11 @@ func load_settings() -> void:
 		max_effects = settings_file.get_value("Game","max_effects",max_effects)
 		
 		destruction_effects_mode = settings_file.get_value("Game","destruction_effects_mode",destruction_effects_mode)
+		
+		
+		#enable_mouse_assist = settings_file.get_value("Game","enable_mouse_assist",enable_mouse_assist)
+		
+		aim_assist_type = settings_file.get_value("Game","aim_assist_type",aim_assist_type)
 		
 		enable_emmisions = settings_file.get_value("Video","enable_emmisions",enable_emmisions)
 		

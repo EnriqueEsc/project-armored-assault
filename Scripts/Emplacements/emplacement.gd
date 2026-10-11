@@ -13,10 +13,21 @@ signal ap_percent (ap: float)
 
 var damage_effect: GPUParticles3D = null
 
+var ingame_data: NodeInGameData = null
+var current_team: Basic_AI.Team = Basic_AI.Team.ENEMY
+@export var emplacement_name: String = "Emplacement"
+
 func _ready() -> void:
 	if is_enemy:
 		self.add_to_group("Enemy")
 	initialize_effects()
+	
+	ingame_data = NodeInGameData.new(self)
+	call_deferred("add_child",ingame_data)
+	if ingame_data:
+		#gets_enabled.connect(ingame_data.activate)
+		gets_disabled.connect(ingame_data.deactivate)
+		#ingame_data.activate()
 
 func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> void:
 	
@@ -107,3 +118,7 @@ func deactivate() -> void:
 
 func get_score(score: int) -> void:
 	self.score += score
+
+
+func get_ap_percent() -> float:
+	return (float(armor_points)/float(max_armor_points) * 100.0)

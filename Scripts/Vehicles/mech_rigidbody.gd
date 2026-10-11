@@ -14,7 +14,7 @@ var step_phase: float = 0.0
 enum Move_Type {Walking, Skating}
 var move_type: Move_Type = Move_Type.Walking
 
-func move(move_input: Vector2, delta: float, lateral_move: float = 0.0) -> void:
+func move(move_input: Vector2, delta: float, lateral_move: float = 0.0, plane_move: Vector3 = Vector3.ZERO) -> void:
 	if staggered:
 		return
 	
@@ -29,8 +29,8 @@ func move(move_input: Vector2, delta: float, lateral_move: float = 0.0) -> void:
 			
 			turning_velocity = lerpf(turning_velocity, -move_input.x * turn_speed * 1.5, turning_acceleration * delta)
 			
-			direction = ( (transform.basis.z * move_input.y) + (transform.basis.x * lateral_move) )* 2.0
-			#direction = ( (Vector3.FORWARD * -move_input.y) + (Vector3.RIGHT * lateral_move) )* 2.0
+			#direction = ( (transform.basis.z * move_input.y) + (transform.basis.x * lateral_move) )* 2.0
+			direction = ( (Vector3.FORWARD * -move_input.y) + (Vector3.RIGHT * lateral_move) )* 2.0
 			
 			if direction.length() != 0:
 				Effects_Manager.INSTANCE.fake_light_from_pool(global_position)

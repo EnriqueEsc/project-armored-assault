@@ -83,8 +83,13 @@ func _physics_process(delta: float) -> void:
 		var normal = collision.get_normal()
 		var impact = pre_impact_vel.dot(-normal)
 		
+		#if impact < 2.0 and turning_velocity != 0:
+		#print(impact, " ",turning_velocity * 50.0)
+		impact += abs(turning_velocity * 50.0)
+		#print(impact)
 		
 		if impact > 2.0:
+			#print("CHI")
 			
 			if collider is RigidBody3D:
 				var push = -normal * impact
@@ -110,7 +115,7 @@ func _physics_process(delta: float) -> void:
 			last_building_impact = 0
 
 
-func move(move: Vector2, delta: float, lateral_move: float = 0.0) -> void:
+func move(move: Vector2, delta: float, lateral_move: float = 0.0, plane_move: Vector3 = Vector3.ZERO) -> void:
 	#rotate_y(-move.x * turn_speed * delta)
 	if staggered:
 		return

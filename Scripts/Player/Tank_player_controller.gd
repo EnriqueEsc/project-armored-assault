@@ -6,7 +6,6 @@ signal aim_to(point: Vector3)
 @onready var tank_rigid: Tank_Rigid = null
 @onready var tank_camera: Tank_camera = $Camera3D
 
-@onready var HUD_mouse: Sprite2D = $HUD/HUD_Player/Icon
 @onready var HUD_Lock_on: Sprite2D = $HUD/HUD_Player/Icon/Lock_on
 var HUD_aim: Array[Sprite2D] = []
 var HUD_aim_3D: Array[Sprite3D] = []
@@ -30,13 +29,14 @@ var HUD_height_line: Array[Line2D] = []
 
 @onready var HUD_Map: Map_Visualization = $HUD/HUD_Player/Map
 
+@onready var HUD_Aim_box: HUD_Aim_Box = null
+
 @onready var pause_menu: Pause_menu = $Pause_menu
 
 @export var color: Color = Color.GREEN
 
 @export var max_armor_points: int = 120
 
-@onready var HUD_Hitmarker: RichTextLabel = $HUD/HUD_Player/Icon/HUD_Hitmarker
 
 @onready var HUD_dialog: HUD_Dialog = $HUD/HUD_Player/HUD_Dialog
 
@@ -53,7 +53,6 @@ var aim_guideline: bool = false
 var aim_3d: bool = false
 var third_person: bool = false
 
-var last_time_hit_shown: float = 0
 @export var hit_marker_time: float = 2.0
 
 var targeted_enemies: Array[Vehicle_Rigid] = []
@@ -97,6 +96,7 @@ signal secondary_shoot_signal_semi
 
 var pointer_pos: Vector3 = Vector3.ZERO
 
+var aim_assist_type: Settings_Manager.Aim_Assist_Type = Settings_Manager.Aim_Assist_Type.None
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -145,8 +145,6 @@ func _ready() -> void:
 	HUD_Boss_info.show_boss_info()
 	
 	
-	HUD_Hitmarker.visible = false
-	last_time_hit_shown = hit_marker_time
 	HUD_Lock_on.visible = lock_on
 	
 	#tank_rigid.shoot_recharge.connect(shoot_ready)
@@ -189,12 +187,30 @@ func _ready() -> void:
 	
 	mouse_visible = Settings_Manager.INSTANCE.mouse_visible
 	
+	aim_assist_type = Settings_Manager.INSTANCE.aim_assist_type
+	
+	HUD_Aim_box = HUD_Aim_Box.new()
+	$HUD/HUD_Player.call_deferred("add_child", HUD_Aim_box)
+	$HUD/HUD_Player.call_deferred("move_child",HUD_Aim_box,0)
+	HUD_Aim_box.draw_aim_box_basic(aim_assist_type,100.0,color)
+	HUD_Aim_box.hit_marker_time = hit_marker_time
+	if Tank_camera.INSTANCE:
+		Tank_camera.INSTANCE.hud_aim_box = HUD_Aim_box
+	
 	if not mouse_visible:
 		Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
 	
 	for t in tank_rigid.vehicle_turrets:
 		
 		aim_to.connect(t.rotate_turret_to_point_3d)
+		
+		
+		for i in 15:
+			await get_tree().process_frame
+		var index = HUD_Aim_box.create_indicator(t.turret_priority)
+		t.shoot_recharge.connect(HUD_Aim_box.set_indicator_fill.bind(t.turret_priority,index))
+		
+		
 		
 		if t.turret_priority == Vehicle_turret.Turret_Priority.Secondary:
 			continue
@@ -260,6 +276,7 @@ func _ready() -> void:
 			t.target.connect(target_enemy_2d.bind(new_aim))
 		
 		t.shoot_recharge.connect(shoot_ready.bind(HUD_aim_3D.size()-1))
+		
 	
 	for t in tank_rigid.vehicle_turrets:
 		if not t.turret_barrel.is_empty():
@@ -323,14 +340,18 @@ func _ready() -> void:
 
 func color_HUD() -> void:
 		#HUD_aim.modulate = color
-		HUD_mouse.modulate = color
+		#HUD_mouse.modulate = color
 		HUD_Score.modulate = color
 		HUD_AP.modulate = color
 		HUD_Velocimeter.modulate = color
 		HUD_Objectives.modulate = color
 		HUD_AP_Bar.modulate = color
-		HUD_Hitmarker.modulate = color
+		#HUD_Hitmarker.modulate = color
 		HUD_Boss_info.color_boss_info(color)
+		
+		if HUD_Aim_box:
+			HUD_Aim_box.change_color(color)
+		
 		
 		for l in HUD_height_line:
 			l.modulate = color
@@ -397,7 +418,9 @@ func _physics_process(delta: float) -> void:
 	if lock_on:
 		#print(enemy_locked)
 		pointer_pos = enemy_locked.global_position
-		HUD_mouse.position = tank_camera.unproject_position(pointer_pos)
+		#HUD_mouse.position = tank_camera.unproject_position(pointer_pos)
+		if HUD_Aim_box:
+			HUD_Aim_box.position = tank_camera.unproject_position(pointer_pos)
 	else:
 		if controller_aim:
 		#pointer_pos = tank_camera.get_mouse_3d_pos()
@@ -405,7 +428,9 @@ func _physics_process(delta: float) -> void:
 			aim_dir_input = Input.get_vector("Aim_Left","Aim_Right","Aim_Up","Aim_Down").normalized() * 3 if Input.get_vector("Aim_Left","Aim_Right","Aim_Up","Aim_Down").length_squared() > 0.2 else aim_dir_input
 			aim_dir_3d = tank_rigid.global_position + Vector3(aim_dir_input.x,0.0,aim_dir_input.y)
 			pointer_pos = aim_dir_3d
-			HUD_mouse.position = tank_camera.unproject_position(pointer_pos)
+			#HUD_mouse.position = tank_camera.unproject_position(pointer_pos)
+			if HUD_Aim_box:
+				HUD_Aim_box.position = tank_camera.unproject_position(pointer_pos)
 		else:
 			var stick_input = Input.get_vector("Aim_Left", "Aim_Right", "Aim_Up", "Aim_Down")
 			if stick_input.length_squared() > 0.04:
@@ -413,7 +438,9 @@ func _physics_process(delta: float) -> void:
 				Input.warp_mouse(get_viewport().get_mouse_position() + stick_input)
 			
 			pointer_pos = tank_camera.get_mouse_3d_pos()
-			HUD_mouse.position = get_viewport().get_mouse_position()
+			#HUD_mouse.position = get_viewport().get_mouse_position()
+			if HUD_Aim_box:
+				HUD_Aim_box.position = get_viewport().get_mouse_position()
 	#HUD_aim.scale = aim_new_scale
 	
 	#print(tank_rigid.get_aim_point_3d())
@@ -556,7 +583,8 @@ func _process(delta: float) -> void:
 		if controller_aim:
 			aim_to.emit(aim_dir_3d)
 		else:
-			aim_to.emit(tank_camera.get_mouse_3d_pos())
+			#print(abs(tank_rigid.turning_velocity * 10.0)/tank_rigid.max_turn_velocity)
+			aim_to.emit(tank_camera.get_mouse_3d_pos(),(abs(tank_rigid.turning_velocity * 10.0)/tank_rigid.max_turn_velocity))
 		#print("AIM ",aim_dir," ",aim_dir.length_squared())
 	
 	if Input.is_action_just_pressed("Map"):
@@ -589,11 +617,6 @@ func _process(delta: float) -> void:
 			enemy_locked = null
 		HUD_Lock_on.visible = lock_on
 	
-	
-	if last_time_hit_shown <= hit_marker_time:
-		last_time_hit_shown += delta
-		if last_time_hit_shown >= hit_marker_time:
-			HUD_Hitmarker.visible = false
 
 func change_move_type() -> void:
 	if Settings_Manager.INSTANCE.move_type == Move_Types.To_Pointer:
@@ -639,8 +662,10 @@ func movement_towards_point(target_pos: Vector2, delta: float) -> void:
 		return
 	
 	var mouse_pos = tank_camera.get_mouse_3d_pos()
-	if lock_on:
+	
+	if lock_on or controller_aim:
 		mouse_pos = pointer_pos
+		
 	mouse_pos.y = tank_rigid.global_position.y
 	var aux = tank_rigid.global_position.direction_to(mouse_pos)
 	aux.y = 0.0
@@ -674,7 +699,7 @@ func movement_skating(target_pos: Vector2, delta: float) -> void:
 	#	return
 	
 	var mouse_pos = tank_camera.get_mouse_3d_pos()
-	if lock_on:
+	if lock_on or controller_aim:
 		mouse_pos = pointer_pos
 	
 	mouse_pos.y = tank_rigid.global_position.y
@@ -791,7 +816,7 @@ func show_HUD(state: bool) -> void:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	
 	#HUD_aim.visible = state
-	HUD_mouse.visible = state
+	#HUD_mouse.visible = state
 	HUD_Score.visible = state
 	HUD_AP.visible = state
 	HUD_Velocimeter.visible = state
@@ -800,6 +825,9 @@ func show_HUD(state: bool) -> void:
 	HUD_Boss_info.show_boss_info()
 	#HUD_height_line.visible = state
 	HUD_Map.visible = false
+	
+	if HUD_Aim_box:
+		HUD_Aim_box.show_visible(state)
 	
 	HUD_dialog.visible = (state and HUD_dialog.is_active) or mission_finished
 	
@@ -839,8 +867,8 @@ func finish_mission(result: bool) -> void:
 	
 
 func hits_enemy() -> void:
-	last_time_hit_shown = 0.0
-	HUD_Hitmarker.visible = true
+	if HUD_Aim_box:
+		HUD_Aim_box.hits_enemy()
 	dialog_hit_enemy()
 
 func dialog_hit_enemy() -> void:

@@ -45,6 +45,8 @@ extends Menu
 @onready var destruction_effects_text: RichTextLabel = $Settings_Menu/Buttons/Destruction_effect_text
 @onready var destruction_effects_option: OptionButton = $Settings_Menu/Buttons/Destruction_effect_option
 
+@onready var aim_assist_text: RichTextLabel = $Settings_Menu/Buttons/Aim_Assist_text
+@onready var aim_assist_option: OptionButton = $Settings_Menu/Buttons/Aim_Assist_option
 
 @onready var enable_emmisions_button: CheckButton = $Settings_Menu/Buttons/Enable_Emmision
 
@@ -60,6 +62,7 @@ extends Menu
 
 var selected_mission: Mission_Data = null
 var selected_tank: Tank_Data = null
+var selected_attachment: Attachment = null
 
 var tanks_preview_models: Array[Node3D] = []
 
@@ -113,6 +116,7 @@ func _set_buttons() -> void:
 	
 	create_move_options()
 	create_destruction_effects_options()
+	create_aim_assist_options()
 	
 	create_tank_selection_buttons()
 	create_mission_selection_buttons()
@@ -123,6 +127,7 @@ func load_scene() -> void:
 	if selected_mission != null:
 		Settings_Manager.INSTANCE.current_tank_used_in_game = selected_tank
 		Save_File_Manager.INSTANCE.current_mission = selected_mission
+		Save_File_Manager.INSTANCE.current_attachment = selected_attachment
 		get_tree().change_scene_to_file("res://Scenes/Missions/"+selected_mission.mission_file_path_name+".tscn")
 
 func select_mission(mission: Mission_Data) -> void:
@@ -143,6 +148,10 @@ func create_destruction_effects_options() -> void:
 	for m in Settings_Manager.INSTANCE.Destruction_Effects_Mode:
 		destruction_effects_option.add_item(m)
 
+func create_aim_assist_options() -> void:
+	for a in Settings_Manager.INSTANCE.Aim_Assist_Type:
+		aim_assist_option.add_item(a)
+
 
 func update_settings_window() -> void:
 	fullscreen_button.button_pressed = Settings_Manager.INSTANCE.fullscreen
@@ -154,6 +163,9 @@ func update_settings_window() -> void:
 	see_trough.button_pressed = Settings_Manager.INSTANCE.see_trough_buildings
 	max_effects_bar.value = Settings_Manager.INSTANCE.max_effects
 	update_max_effects_text(max_effects_bar.value)
+	
+	#enable_mouse_assist_button.button_pressed = Settings_Manager.INSTANCE.enable_mouse_assist
+	aim_assist_option.selected = Settings_Manager.INSTANCE.aim_assist_type
 	
 	enable_emmisions_button.button_pressed = Settings_Manager.INSTANCE.enable_emmisions
 	
@@ -209,11 +221,11 @@ func select_attachment(i: int) -> void:
 	if i > attachments.size():
 		return
 	if i == 0:
-		Save_File_Manager.INSTANCE.current_attachment = null
+		selected_attachment = null
 		print(null)
 		return
 	i -= 1
-	Save_File_Manager.INSTANCE.current_attachment = attachments[i]
+	selected_attachment = attachments[i]
 	print(attachments[i])
 
 func create_mission_selection_buttons() -> void:
@@ -341,6 +353,10 @@ func save_settings() -> void:
 	Settings_Manager.INSTANCE.max_effects = max_effects_bar.value
 	
 	Settings_Manager.INSTANCE.destruction_effects_mode = destruction_effects_option.selected
+	
+	#Settings_Manager.INSTANCE.enable_mouse_assist = enable_mouse_assist_button.button_pressed
+	
+	Settings_Manager.INSTANCE.aim_assist_type = aim_assist_option.selected
 	
 	Settings_Manager.INSTANCE.enable_emmisions = enable_emmisions_button.button_pressed
 	

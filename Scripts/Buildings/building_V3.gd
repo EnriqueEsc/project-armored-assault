@@ -354,6 +354,8 @@ func crush_below() -> void:
 				collider.shakes.emit(1.0,1.0)
 
 func shake_player() -> void:
+	if not player_ref:
+		return
 	#print("OLA",damage_zone.global_position.distance_to(player_ref.global_position))
 	var distance = damage_zone.global_position.distance_to(player_ref.global_position)
 	if distance < max_shake_distance:
@@ -416,7 +418,15 @@ func activate() -> void:
 
 func destroy_chunk(chunk: Building_Chunk) -> void:
 	
+	var aux_levels = levels.duplicate()
+	
 	levels.erase(chunk)
+	
+	
+	if chunk != aux_levels[aux_levels.size()-1]:
+		destroy_basement()
+		return
+	
 	if levels.is_empty():
 		for l in levels:
 			l.deactivate_collisions()

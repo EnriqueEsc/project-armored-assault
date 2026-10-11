@@ -400,6 +400,10 @@ func activate() -> void:
 func destroy_chunk(chunk: Building_Chunk) -> void:
 	
 	levels.erase(chunk)
+	
+	destroy_basement()
+	return
+	
 	if levels.is_empty():
 		for l in levels:
 			l.deactivate_collisions()

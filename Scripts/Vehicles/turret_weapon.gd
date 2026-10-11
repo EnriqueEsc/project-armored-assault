@@ -135,7 +135,7 @@ func _ready() -> void:
 
 
 func show_heat_effects(vel: float) -> void:
-	if overheat and not heat_effect:
+	if effects_manager and (overheat and not heat_effect):
 		heat_effect = effects_manager.heat_from_pool(to_global(muzzle_pos))
 		if heat_effect:
 			if heat_effect.finished.is_connected(disconnect_heat_effect):
@@ -251,7 +251,7 @@ func shoot(shake_mult: float = 1.0) -> void:
 	#rotation.y = lerp_angle(rotation.y,rotation.y+randf_range(deg_to_rad(-10),deg_to_rad(10)),1)
 	
 	last_shoot_prim = time_controller.running_time
-	if projectile_type != Projectile_Type.Flamethrower:
+	if effects_manager and projectile_type != Projectile_Type.Flamethrower:
 		effects_manager.shoot_from_pool(to_global(muzzle_pos), global_rotation, projectile.muzzle_flash_scale)
 	
 	recoil.emit(forward,recoil_force)
@@ -317,5 +317,5 @@ func calculate_charge(delta: float) -> void:
 			percent = clampf(percent,0,1)
 			percent *= 100
 		Fire_Mode.Auto:
-			percent = current_heat
+			percent = (current_heat / max_heat) * 100
 	shoot_recharge.emit(percent)

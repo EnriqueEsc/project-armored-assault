@@ -22,10 +22,11 @@ var boost_last_use: float = 5.0
 
 @export var turning_velocity: float = 0
 @export var turning_acceleration: float = 0.2
+var max_turn_velocity: float = 0.0
 
 @export var is_player: bool = false
 
-var current_speed = max_speed
+@export var current_speed = max_speed
 var score: int = 0
 @export var friction: float = 1
 
@@ -81,6 +82,8 @@ var is_destroyed: bool = false
 var map_icon: Sprite3D = null
 var icon_pref = preload("res://Sprites/Test/1771646306126.png")
 
+var ingame_data:NodeInGameData = null
+
 
 
 # Called when the node enters the scene tree for the first time.
@@ -91,6 +94,13 @@ func _ready() -> void:
 		set_process(false)
 		set_physics_process(false)
 		return
+	
+	ingame_data = NodeInGameData.new(self)
+	call_deferred("add_child",ingame_data)
+	if ingame_data:
+		gets_enabled.connect(ingame_data.activate)
+		gets_disabled.connect(ingame_data.deactivate)
+		#ingame_data.activate()
 	
 	
 	#if tank_Data:
@@ -123,6 +133,7 @@ func _ready() -> void:
 	
 	ap_percent.emit(float(armor_points)/float(max_armor_points) * 100.0)
 	
+	max_turn_velocity = 1.2 * turn_speed
 	
 	await get_tree().physics_frame
 	if material:
@@ -226,8 +237,9 @@ func quick_boost() -> void:
 	#push = Vector3(push.x, 0 ,push.z)
 	velocity += push * max_speed * boost_speed
 	boost_last_use = 0.0
-	Effects_Manager.INSTANCE.fake_light_from_pool(global_position, Vector2.ONE * velocity.length() * 0.2,Color.ORANGE)
-	Effects_Manager.INSTANCE.shoot_from_pool(global_position, global_rotation - Vector3(0,deg_to_rad(180),0), velocity.length() * 0.02)
+	if Effects_Manager.INSTANCE:
+		Effects_Manager.INSTANCE.fake_light_from_pool(global_position, Vector2.ONE * velocity.length() * 0.2,Color.ORANGE)
+		Effects_Manager.INSTANCE.shoot_from_pool(global_position, global_rotation - Vector3(0,deg_to_rad(180),0), velocity.length() * 0.02)
 
 func allign_with_floor(delta: float) -> void:
 	var normal: Vector3 = Vector3.UP
@@ -355,7 +367,7 @@ func show_move_effects(vel: float) -> void:
 	
 	
 
-func move(move: Vector2, delta: float, lateral_move: float = 0.0) -> void:
+func move(move: Vector2, delta: float, lateral_move: float = 0.0, plane_move: Vector3 = Vector3.ZERO) -> void:
 	#rotate_y(-move.x * turn_speed * delta)
 	if staggered:
 		return
@@ -416,6 +428,9 @@ func take_heal(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> voi
 	#embraces_damage.emit(damage)
 	#got_hit.emit(source, impact_point)
 
+func get_ap_percent() -> float:
+	return (float(armor_points)/float(max_armor_points) * 100.0)
+
 func show_visual_damage(ap: float) -> void:
 	if not damage_effect:
 		return
@@ -463,7 +478,8 @@ func deactivate() -> void:
 		if c is CollisionShape3D and c.shape is BoxShape3D:
 			scale += c.shape.size.length() * 5
 	
-	Effects_Manager.INSTANCE.explosion_from_pool(global_position, scale)
+	if Effects_Manager.INSTANCE:
+		Effects_Manager.INSTANCE.explosion_from_pool(global_position, scale)
 	
 	gets_disabled.emit()
 	

@@ -26,7 +26,8 @@ func _attachment_function() -> void:
 			case_active.push_back(case)
 			case.objective = objective
 			case.shoot(Vector3(global_position.x, global_position.y,global_position.z),Vector2(90,-30))
-			Effects_Manager.INSTANCE.shoot_from_pool(global_position,global_rotation, case.muzzle_flash_scale,0.0)
+			if Effects_Manager.INSTANCE:
+				Effects_Manager.INSTANCE.shoot_from_pool(global_position,global_rotation, case.muzzle_flash_scale,0.0)
 			#case.recoil(global_position, -global_basis.z)
 		
 		shakes.emit(0.1,0.2)

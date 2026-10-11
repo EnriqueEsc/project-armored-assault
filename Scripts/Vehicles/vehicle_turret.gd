@@ -52,6 +52,9 @@ signal shakes_on_shoot(intensity: float, duration: float)
 enum Turret_Priority {Main,Secondary}
 @export var turret_priority: Turret_Priority = Turret_Priority.Main
 
+var max_compensation: float = 0.0
+var current_correction: float = 0.0
+
 func spawn() -> void:
 	
 	if static_model:
@@ -108,6 +111,7 @@ func _ready() -> void:
 	
 	calculate_sight_pos()
 	
+	max_compensation = 1.0 - turret_turning_speed
 	
 	#muzzle_pos = global_position + muzzle_pos
 	pass
@@ -149,7 +153,7 @@ func rotate_turret_to_point(point: Vector2) -> void:
 	
 	rotation.y = lerp_angle(rotation.y,-(final_rotation + get_parent_node_3d().rotation.y), turret_turning_speed)
 
-func rotate_turret_to_point_3d(point: Vector3) -> void:
+func rotate_turret_to_point_3d(point: Vector3, compensation: float = 0.0) -> void:
 	if global_position.is_equal_approx(point):
 		return
 	
@@ -158,7 +162,16 @@ func rotate_turret_to_point_3d(point: Vector3) -> void:
 	var target_local_basis = get_parent_node_3d().global_transform.basis.inverse() * target_global_transform.basis
 	var target_rot_euler = target_local_basis.get_euler()
 	
-	var target_y = lerp_angle(rotation.y, target_rot_euler.y - (PI), turret_turning_speed)
+	
+	current_correction = lerpf(current_correction,(compensation * max_compensation), turret_turning_speed)
+	
+	#if compensation > 0.0:
+	#	print(current_correction)
+	
+	var correction = turret_turning_speed + current_correction
+	correction = clampf(correction,0.0,1.0)
+	var target_y = lerp_angle(rotation.y, target_rot_euler.y - (PI), correction)
+	#target_y = target_rot_euler.y - (PI)
 	if side_angle_limit < 360:
 		
 		var dif = clampf(angle_difference(original_side_angle, target_y), deg_to_rad(-side_angle_limit), deg_to_rad(side_angle_limit))

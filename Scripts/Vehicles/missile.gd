@@ -14,7 +14,8 @@ func _additional_deactivate_process() -> void:
 
 func _additional_shoot_process() -> void:
 	
-	impact_preview = Effects_Manager.INSTANCE.marker_from_pool(objective)
+	if Effects_Manager.INSTANCE:
+		impact_preview = Effects_Manager.INSTANCE.marker_from_pool(objective)
 	if not impact_preview:
 		return
 	if impact_preview.finished.is_connected(disconnect_heat_effect):

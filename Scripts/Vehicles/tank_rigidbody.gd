@@ -24,7 +24,9 @@ func _physics_process(delta: float) -> void:
 	
 	velocimeter.emit(velocity.length())
 	
+	#max_turn_velocity = turning_velocity
 	turning_velocity = lerpf(turning_velocity,0,friction * 5 * delta)
+	
 	rotate_y(turning_velocity)
 	
 	var pre_impact_vel: Vector3 = velocity

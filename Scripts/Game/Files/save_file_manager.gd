@@ -197,6 +197,38 @@ func load_missions_data() -> void:
 func load_unlocked_tanks() -> void:
 	tanks_unlocked.clear()
 	var names: Array = current_save_data["tanks_unlocked"]
+	var changed: bool = false
+	var aux: Array[String] = []
+	
+	for t in all_tanks:
+		aux.append(t.filename)
+		for n in current_save_data["tanks_unlocked"]:
+			if n == (t.tank_Name):
+				current_save_data["tanks_unlocked"][current_save_data["tanks_unlocked"].find(n)] = t.filename
+				changed = true
+	
+	for i in 5:
+		for n in current_save_data["tanks_unlocked"]:
+			#print("REVISANDO ",n)
+			if not aux.has(n):
+				#print("BORRANDO ",n)
+				current_save_data["tanks_unlocked"].erase(n)
+				changed = true
+	
+	#for n in current_save_data["tanks_unlocked"]:
+	#	print(n)
+	
+	if current_save_data["tanks_unlocked"].is_empty():
+		current_save_data["tanks_unlocked"].append("tank")
+		changed = true
+	
+	if changed:
+		save_game()
+		names = current_save_data["tanks_unlocked"]
+	
+	#for n in names:
+	#	print("PRESENTANDO ",n)
+	
 	for t in all_tanks:
 		if names.has(t.filename):
 			tanks_unlocked.append(t)

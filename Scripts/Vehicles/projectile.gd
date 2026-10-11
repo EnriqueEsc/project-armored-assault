@@ -139,7 +139,8 @@ func _on_body_entered(body):
 		direction = Vector3.ZERO
 		#origin.projectile_to_pool(self)
 		body.take_damage(damage, origin, global_position)
-		effects_manager.sparks_from_pool(global_position)
+		if effects_manager:
+			effects_manager.sparks_from_pool(global_position)
 		#origin.get_score(damage)
 		if not is_explosive:
 			deactivate()
@@ -147,7 +148,8 @@ func _on_body_entered(body):
 			detonate()
 	elif body.has_method("detonate"):
 		direction = Vector3.ZERO
-		effects_manager.sparks_from_pool(global_position)
+		if effects_manager:
+			effects_manager.sparks_from_pool(global_position)
 		body.detonate()
 		if not is_explosive:
 			deactivate()
@@ -155,7 +157,8 @@ func _on_body_entered(body):
 			detonate()
 	else:
 		direction = Vector3.ZERO
-		effects_manager.failed_sparks_from_pool(global_position)
+		if effects_manager:
+			effects_manager.failed_sparks_from_pool(global_position)
 		if not is_explosive:
 			deactivate()
 		else:

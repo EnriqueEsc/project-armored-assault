@@ -10,7 +10,18 @@ var current_tank_kills: int = 0
 var min_desmadre: int = 0
 var current_desmadre: int = 0
 
+
+
+var drone: Plane_AI = null
+
+var drone_pref = preload("res://Prefabs/Enemy/enemy_plane.tscn")
+
+var strike_hazard_counter: float = 0.0
+
 func _set_objectives() -> void:
+	
+	#create_strike_hazard()
+	
 	var enemies = get_tree().get_nodes_in_group("Enemy")
 	var emplacements: Array[Emplacement] = []
 	var tanks: Array[Tank_Rigid] = []
@@ -162,3 +173,29 @@ func _additional_rewards_to_player() -> void:
 
 func _create_results_dictionary() -> void:
 	Save_File_Manager.INSTANCE.LAST_MISSION_RESULTS = mission_results
+
+	'''
+func _physics_process(delta: float) -> void:
+	strike_hazard_counter += delta
+	if strike_hazard_counter >= 5.0:
+		strike_hazard_counter = 0.0
+		summon_strike_hazard()
+	'''
+
+func summon_strike_hazard() -> void:
+	drone.plan_attack_route(Vector3(randf_range(-30.0,30.0),0.0,randf_range(-30.0,30.0)))
+
+func create_strike_hazard() -> void:
+	drone_pref = drone_pref.instantiate()
+	for c in drone_pref.get_children():
+		if c is Plane_AI:
+			drone = c
+			drone.current_team = drone.Team.ENEMY
+			get_tree().current_scene.call_deferred("add_child",drone_pref)
+			drone_pref.set_process(false)
+			drone.set_process(false)
+	if not drone:
+		drone = Plane_AI.new()
+		drone.current_team = drone.Team.ENEMY
+		get_tree().current_scene.call_deferred("add_child",drone_pref)
+		drone_pref.call_deferred("add_child",drone)
