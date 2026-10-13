@@ -1,4 +1,5 @@
 extends Node3D
+class_name TurretAI
 
 signal gets_disabled
 
@@ -59,6 +60,7 @@ func _ready() -> void:
 	await get_tree().physics_frame
 	
 	
+	
 	match current_team:
 		Team.ENEMY:
 			player_ref = get_tree().get_first_node_in_group("Player")
@@ -78,6 +80,12 @@ func _ready() -> void:
 	
 	if deg_to_rad(turret.side_angle_limit) < max_shoot_angle:
 		max_shoot_angle = deg_to_rad(turret.side_angle_limit)
+	
+	
+	var mission: Mission = Mission.INSTANCE
+	#print(mission)
+	if mission:
+		mission.add_entity(self)
 
 
 func got_hit(source: Node3D, impact_point: Vector3) -> void:
@@ -142,7 +150,13 @@ func execute_current_state(delta: float, can_see_player: bool) -> void:
 				turret.rotate_turret_to_point_3d(player_ref.global_position)
 				
 		AI_State.ENGAGED:
-			turret.rotate_turret_to_point_3d(player_ref.global_position)
+			var data: NodeInGameData = null
+			var pos: Vector3 = player_ref.global_position
+			if "ingame_data" in player_ref:
+				data = player_ref.ingame_data
+			
+			turret.rotate_turret_to_point_3d(pos,data)
+			#turret.rotate_turret_to_point_3d(player_ref.global_position)
 			attempt_shoot(player_ref.global_position)
 			
 		AI_State.SCANNING:
@@ -180,10 +194,20 @@ func is_on_sight_range() -> bool:
 
 func activate() -> void:
 	process_mode = Node.PROCESS_MODE_INHERIT
+	
+	
+	var mission: Mission = Mission.INSTANCE
+	if mission:
+		mission.add_entity(self)
 
 func deactivate() -> void:
 	gets_disabled.emit()
 	process_mode = Node.PROCESS_MODE_DISABLED
+	
+	
+	var mission: Mission = Mission.INSTANCE
+	if mission:
+		mission.remove_entity(self)
 
 
 func _process(delta: float) -> void:

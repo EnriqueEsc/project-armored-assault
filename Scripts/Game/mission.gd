@@ -31,8 +31,27 @@ var mission_results: Dictionary = {}
 
 var mission_data: Mission_Data = null
 
+
+var active_entities: Array = []
+var entities_are_active: bool = false
+
+static var INSTANCE: Mission = null
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	
+	singleton()
+	
+
+
+func singleton() -> void:
+	if(Mission.INSTANCE != null):
+		queue_free()
+		return
+	Mission.INSTANCE = self
+	
+	
+	
 	set_process(false)
 	
 	add_child(effects_manager)
@@ -41,6 +60,9 @@ func _ready() -> void:
 	
 	
 	_spawn_player()
+	
+	activate_active_entities(false)
+	#_get_active_entities()
 	
 	_link_player()
 	
@@ -81,6 +103,7 @@ func _process(delta: float) -> void:
 			black_screen.visible = false
 			player.set_process(true)
 			player.transition_to_game = false
+			activate_active_entities(true)
 		player_dialog.start_mission()
 		set_process(false)
 
@@ -116,6 +139,7 @@ func _link_player() -> void:
 	fading_factor = black_screen.color.a / fade_time
 	
 	player.set_process(false)
+	activate_active_entities(false)
 	player.transition_to_game = true
 	
 	mission_data = Save_File_Manager.INSTANCE.current_mission
@@ -128,6 +152,7 @@ func _link_player() -> void:
 	
 	
 	player.set_process(true)
+	activate_active_entities(true)
 	player.transition_to_game = false
 	black_screen.visible = false
 	
@@ -165,3 +190,51 @@ func _additional_rewards_to_player() -> void:
 
 func _create_results_dictionary() -> void:
 	Save_File_Manager.INSTANCE.LAST_MISSION_RESULTS = mission_results
+
+
+'''
+func _get_active_entities() -> void:
+	active_entities = []
+	#create_strike_hazard()
+	#print("SEXOOO cosocoso")
+	
+	var entities = get_tree().get_nodes_in_group("Enemy")
+	entities.append_array(get_tree().get_nodes_in_group("Player"))
+	var emplacements: Array[Emplacement] = []
+	var tanks: Array[Tank_Rigid] = []
+	var counter: int = 1
+	for e in entities:
+		if is_instance_of(e, Emplacement):
+			for c in e.get_children():
+				if is_instance_of(c,TurretAI):
+					active_entities.append(c)
+		if is_instance_of(e, Vehicle_Rigid):
+			for c in e.get_children():
+				if is_instance_of(c,Basic_AI):
+					active_entities.append(c)
+	activate_active_entities(false)
+'''
+
+func add_entity(entity: Node) -> void:
+	#print("SIUUUUUUUUUU ",entities_are_active)
+	if (not entity is TurretAI) and (not entity is Basic_AI):
+		return
+	if active_entities.has(entity):
+		return
+	active_entities.append(entity)
+	entity.set_process(entities_are_active)
+
+func remove_entity(entity: Node) -> void:
+	if (not entity is TurretAI) and (not entity is Basic_AI):
+		return
+	if not active_entities.has(entity):
+		return
+	active_entities.erase(entity)
+	
+
+func activate_active_entities(active: bool) -> void:
+	#print("SEXOOOOO ",active_entities)
+	entities_are_active = active
+	for i in active_entities:
+		if is_instance_valid(i):
+			i.set_process(entities_are_active)

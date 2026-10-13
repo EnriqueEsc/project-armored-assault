@@ -583,8 +583,21 @@ func _process(delta: float) -> void:
 		if controller_aim:
 			aim_to.emit(aim_dir_3d)
 		else:
+			var corr: float = 0.0
+			
+			match move_type:
+				Move_Types.Axial:
+					corr = (abs(tank_rigid.turning_velocity * 10.0)/tank_rigid.max_turn_velocity)
+				_:
+					corr = (tank_rigid.velocity.length()/(tank_rigid.current_speed + 1.5)) * 0.3
+			
+			#print(tank_rigid.velocity.length()," | ",tank_rigid.current_speed)
 			#print(abs(tank_rigid.turning_velocity * 10.0)/tank_rigid.max_turn_velocity)
-			aim_to.emit(tank_camera.get_mouse_3d_pos(),(abs(tank_rigid.turning_velocity * 10.0)/tank_rigid.max_turn_velocity))
+			var data = null
+			if enemy_locked:
+				data = enemy_locked.ingame_data
+			aim_to.emit(tank_camera.get_mouse_3d_pos(),data,corr)
+			#aim_to.emit(tank_camera.get_mouse_3d_pos(),corr)
 		#print("AIM ",aim_dir," ",aim_dir.length_squared())
 	
 	if Input.is_action_just_pressed("Map"):

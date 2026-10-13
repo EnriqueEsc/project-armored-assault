@@ -9,6 +9,9 @@ var rotation_2d: float = 0.0
 enum TypeOfNode {Vehicle,Emplacement}
 var type_of_node: TypeOfNode = TypeOfNode.Vehicle
 
+var node_test: Sprite2D = null
+var pre_position: Vector3 = Vector3.ZERO
+
 func _init(parent_node: Node3D) -> void:
 	self.parent_node = parent_node
 	if self.parent_node is Vehicle_Rigid:
@@ -19,21 +22,37 @@ func _init(parent_node: Node3D) -> void:
 		type_of_node = TypeOfNode.Emplacement
 	
 
+func create_node_test() -> void:
+	var texture = load("res://Sprites/Test/ShootingPoint.png")
+	node_test = Sprite2D.new()
+	node_test.texture = texture
+	node_test.scale = Vector2.ONE * 0.5
+	get_tree().current_scene.call_deferred("add_child",node_test)
+
+func move_node_test() -> void:
+	if not node_test:
+		return
+	
+	node_test.position = Tank_camera.INSTANCE.unproject_position(pre_position)
 
 func _ready() -> void:
 	
 	for i in 15:
 		await get_tree().process_frame
 	activate()
+	#create_node_test()
 
 func calculate_unprojected_position(delta: float) -> void:
 	if not Tank_camera.INSTANCE:
 		return
 	unprojected_position_2d = Tank_camera.INSTANCE.unproject_position(parent_node.global_position)
 	#print(unprojected_position_2d)
+	
 
 func _process(delta: float) -> void:
 	calculate_unprojected_position(delta)
+	#calculate_pre_position()
+	#move_node_test()
 
 func activate() -> void:
 	if not Tank_camera.INSTANCE:
@@ -59,3 +78,15 @@ func get_node_name() -> String:
 	if parent_node is Emplacement:
 		return parent_node.emplacement_name
 	return ""
+
+func calculate_pre_position() -> void:
+	var res: Vector3 = parent_node.global_position
+	if type_of_node == TypeOfNode.Vehicle:
+		res += parent_node.velocity
+	pre_position = res
+	
+func get_pre_position(factor: float) -> Vector3:
+	var res: Vector3 = parent_node.global_position
+	if type_of_node == TypeOfNode.Vehicle:
+		res += (parent_node.velocity * factor)
+	return res

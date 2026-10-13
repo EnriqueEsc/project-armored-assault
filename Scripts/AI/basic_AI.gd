@@ -70,6 +70,7 @@ func _init_rigid() -> void:
 func _ready() -> void:
 	set_physics_process(false)
 	
+	
 	_init_rigid()
 	
 	tank_rigid.current_speed /= 2
@@ -173,6 +174,12 @@ func _ready() -> void:
 	tank_rigid.update_stencil_color(message_color)
 	
 	set_physics_process(true)
+	
+	
+	
+	var mission: Mission = Mission.INSTANCE
+	if mission:
+		mission.add_entity(self)
 	
 	for i in 10:
 		await get_tree().physics_frame
@@ -490,7 +497,10 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 
 func handle_turret_and_shooting(aim_pos: Vector3, can_shoot: bool, can_see_player: bool) -> void:
 	#tank_rigid.rotate_turret_to_point_3d(aim_pos)
-	aim_to.emit(aim_pos)
+	var data: NodeInGameData = null
+	if player_ref and "ingame_data" in player_ref:
+		data = player_ref.ingame_data
+	aim_to.emit(aim_pos, data)
 	if not can_shoot:
 		return
 	
@@ -626,12 +636,25 @@ func activate() -> void:
 	process_mode = Node.PROCESS_MODE_INHERIT
 	set_deferred("monitoring", true)
 	set_deferred("monitorable", true)
+	
+	
+	
+	
+	var mission: Mission = Mission.INSTANCE
+	if mission:
+		mission.add_entity(self)
 
 
 func deactivate() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
+	
+	
+	
+	var mission: Mission = Mission.INSTANCE
+	if mission:
+		mission.remove_entity(self)
 
 
 func _process(delta: float) -> void:

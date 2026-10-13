@@ -137,7 +137,14 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 
 func handle_turret_and_shooting(aim_pos: Vector3, can_shoot: bool, can_see_player: bool) -> void:
 	#tank_rigid.rotate_turret_to_point_3d(aim_pos)
-	aim_to.emit(aim_pos)
+	#aim_to.emit(aim_pos)
+	
+	var data: NodeInGameData = null
+	if player_ref and "ingame_data" in player_ref:
+		data = player_ref.ingame_data
+	aim_to.emit(aim_pos, data)
+	if not can_shoot:
+		return
 	
 	if not can_shoot:
 		return

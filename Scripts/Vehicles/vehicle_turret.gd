@@ -55,6 +55,8 @@ enum Turret_Priority {Main,Secondary}
 var max_compensation: float = 0.0
 var current_correction: float = 0.0
 
+var mean_bullet_speed: float = 1.0
+
 func spawn() -> void:
 	
 	if static_model:
@@ -64,6 +66,28 @@ func spawn() -> void:
 		w.static_model = static_model
 		w.spawn()
 	
+
+func calculate_mean_bullet_speed() -> void:
+	
+	if static_model:
+		return
+	
+	for i in 60:
+		await get_tree().process_frame
+	
+	if turret_barrel.is_empty():
+		mean_bullet_speed = 1.0
+		return
+	mean_bullet_speed = 0.0
+	var counter: int = 0
+	for t in turret_barrel:
+		if is_instance_valid(t) and t.projectile:
+			mean_bullet_speed += t.projectile.base_speed
+			counter += 1
+	
+	#mean_bullet_speed /= (turret_barrel.size())
+	
+	mean_bullet_speed /= (counter)
 
 func calculate_sight_pos() -> void:
 	sight_pos = Node3D.new()
@@ -83,7 +107,16 @@ func calculate_sight_pos() -> void:
 	mean_weapon_pos /= float(turret_barrel.size())
 	
 	sight_pos.call_deferred("set_position",mean_weapon_pos)
+
+
+func calculate_travel_time_to_point(point: Vector3) -> float:
+	var res: float = 1.0
 	
+	res = global_position.distance_to(point)
+	
+	res /= mean_bullet_speed
+	return res
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -110,6 +143,8 @@ func _ready() -> void:
 	set_fire_mode(fire_mode)
 	
 	calculate_sight_pos()
+	
+	calculate_mean_bullet_speed()
 	
 	max_compensation = 1.0 - turret_turning_speed
 	
@@ -153,7 +188,9 @@ func rotate_turret_to_point(point: Vector2) -> void:
 	
 	rotation.y = lerp_angle(rotation.y,-(final_rotation + get_parent_node_3d().rotation.y), turret_turning_speed)
 
-func rotate_turret_to_point_3d(point: Vector3, compensation: float = 0.0) -> void:
+func rotate_turret_to_point_3d(point: Vector3,node_info: NodeInGameData = null, compensation: float = 0.0) -> void:
+	if node_info:
+		point = node_info.get_pre_position(calculate_travel_time_to_point(node_info.parent_node.global_position))
 	if global_position.is_equal_approx(point):
 		return
 	
