@@ -10,6 +10,10 @@ var explosion_pool: Array[GPUParticles3D] = []
 var explosion_active: Array[GPUParticles3D] = []
 
 
+var explo_wave_prefab = load("res://Prefabs/Effects/explo_wave.tscn")
+var explo_wave_pool: Array[GPUParticles3D] = []
+var explo_wave_active: Array[GPUParticles3D] = []
+
 var collapse_prefab = load("res://Prefabs/Effects/collapse.tscn")
 var collapse_pool: Array[GPUParticles3D] = []
 var collapse_active: Array[GPUParticles3D] = []
@@ -87,6 +91,13 @@ func create_effects() -> void:
 		explosion.finished.connect(explosion_to_pool.bind(explosion))
 		deactivate_effect(explosion)
 		explosion_pool.append(explosion)
+		
+		var explo_wave = explo_wave_prefab.instantiate() as GPUParticles3D
+		get_tree().current_scene.call_deferred("add_child",explo_wave)
+		explo_wave.finished.connect(explo_wave_to_pool.bind(explo_wave))
+		deactivate_effect(explo_wave)
+		explo_wave_pool.append(explo_wave)
+		set_emission_in_gpu_particles(explo_wave)
 		
 		var collapse = collapse_prefab.instantiate() as GPUParticles3D
 		get_tree().current_scene.call_deferred("add_child",collapse)
@@ -179,7 +190,7 @@ func create_effects() -> void:
 
 
 
-func explosion_from_pool(position: Vector3, radius: float) -> void:
+func explosion_from_pool(position: Vector3, radius: float, wave_scale: int = -1) -> void:
 	var explosion: GPUParticles3D = null
 	if explosion_pool.size() <= 0:
 		explosion = explosion_active.pop_front()
@@ -192,12 +203,54 @@ func explosion_from_pool(position: Vector3, radius: float) -> void:
 		explosion.show()
 		explosion.restart()
 		
+		
+		explo_wave_from_pool(position, radius, wave_scale)
 		fake_light_from_pool(position, Vector2.ONE * radius)
 
 func explosion_to_pool(explosion: GPUParticles3D) -> void:
 	explosion_active.erase(explosion)
 	explosion_pool.push_back(explosion)
 	deactivate_effect(explosion)
+
+
+func explo_wave_from_pool(position: Vector3, radius: float, wave_scale: int = -1, color: Color = Color.YELLOW) -> void:
+	var explo_wave: GPUParticles3D = null
+	if explo_wave_pool.size() <= 0:
+		explo_wave = explo_wave_active.pop_front()
+	else:
+		explo_wave = explo_wave_pool.pop_front()
+	if explo_wave:
+		explo_wave_active.push_back(explo_wave)
+		
+		if wave_scale < 0:
+			wave_scale = radius
+		
+		#print("WAVE SCALE ",wave_scale)
+		
+		var p = explo_wave.draw_pass_1
+		if p:
+			p.radius = wave_scale
+			p.height = wave_scale * 2
+			
+			var mat = p.material as StandardMaterial3D
+			if mat:
+				mat.emission = color
+				mat.albedo_color = color
+				mat.albedo_color.a = 0.06
+		
+		
+		explo_wave.process_mode = Node.PROCESS_MODE_ALWAYS
+		explo_wave.global_position = position
+		explo_wave.show()
+		explo_wave.restart()
+		
+		#fake_light_from_pool(position, Vector2.ONE * radius)
+
+func explo_wave_to_pool(explo_wave: GPUParticles3D) -> void:
+	explo_wave_active.erase(explo_wave)
+	explo_wave_pool.push_back(explo_wave)
+	deactivate_effect(explo_wave)
+
 
 
 

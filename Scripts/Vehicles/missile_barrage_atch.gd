@@ -6,6 +6,8 @@ var case: Missile
 var case_pool: Array[Missile] = []
 var case_active: Array[Missile] = []
 
+@export var error_factor: float = 2.0
+
 func _ready() -> void:
 	await get_tree().physics_frame
 	create_projectiles()
@@ -24,7 +26,7 @@ func _attachment_function() -> void:
 			case = case_pool.pop_front()
 		if case:
 			case_active.push_back(case)
-			case.objective = objective
+			case.objective = Vector3(objective.x + randf_range(-error_factor,error_factor),objective.y,objective.z + randf_range(-error_factor,error_factor))
 			case.shoot(Vector3(global_position.x, global_position.y,global_position.z),Vector2(90,-30))
 			if Effects_Manager.INSTANCE:
 				Effects_Manager.INSTANCE.shoot_from_pool(global_position,global_rotation, case.muzzle_flash_scale,0.0)

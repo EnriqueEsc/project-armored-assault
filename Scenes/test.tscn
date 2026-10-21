@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://coflapngtlfyb" path="res://Scripts/Emplacements/emplacement.gd" id="8_n0wup"]
 [ext_resource type="PackedScene" uid="uid://6vggcgtbiq4i" path="res://Prefabs/Test/Buildings/small_building.tscn" id="11_0qy5o"]
 [ext_resource type="PackedScene" uid="uid://pg5f3rmaed7x" path="res://Prefabs/Effects/sparks.tscn" id="13_wjyqs"]
+[ext_resource type="PackedScene" uid="uid://cl00qs88gpmj7" path="res://Prefabs/Effects/explo_wave.tscn" id="14_kxtw2"]
 [ext_resource type="Script" uid="uid://cblxmspvt3yxm" path="res://Scripts/Buildings/gridmap_to_building.gd" id="16_7nf3m"]
 [ext_resource type="PackedScene" uid="uid://cyt63xjcvvdgs" path="res://Prefabs/Player/endavour.tscn" id="16_wojap"]
 [ext_resource type="Script" uid="uid://b02j404uo38ap" path="res://Scripts/Vehicles/drone_rigidbody.gd" id="17_copon"]
@@ -2364,11 +2365,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0660223, 0)
 [node name="Spark" parent="." unique_id=130900469 instance=ExtResource("13_wjyqs")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0660223, 0)
 
+[node name="Explo_Wave" parent="." unique_id=252376188 instance=ExtResource("14_kxtw2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2987498, 1.907215, 1.1947248)
+
 [node name="Fire" parent="." unique_id=1829018680 instance=ExtResource("20_wojap")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0660223, 0)
+visible = false
 
 [node name="Fire2" type="GPUParticles3D" parent="." unique_id=794065780]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8815272, 1.0660223, 0)
+visible = false
 emitting = false
 amount = 10
 lifetime = 1.5

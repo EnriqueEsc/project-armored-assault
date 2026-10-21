@@ -16,7 +16,6 @@ height = 0.5
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_1185n"]
 render_priority = 0
 shader = ExtResource("4_gxfw7")
-shader_parameter/light_color = Color(1, 0.45, 0.08, 1)
 shader_parameter/intensity = 1.0
 shader_parameter/softness = 2.5
 
@@ -28,6 +27,7 @@ script = ExtResource("1_mlnxn")
 damage = 3
 blast_damage = 0.0
 recoil_force = 0.01
+status_effect = 1
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1897963084]
 shape = SubResource("BoxShape3D_sn0t7")

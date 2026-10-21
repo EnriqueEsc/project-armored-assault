@@ -50,19 +50,21 @@ func _physics_process(delta: float) -> void:
 	var pre_impact_vel: Vector3 = velocity
 	
 	#print(global_position.y)
-	
-	if not is_equal_approx(global_position.y , distance_to_ground):
-		#global_position.y = lerpf(global_position.y,distance_to_ground,delta * 3.0)
-		
-		#print(delta)
-		global_position.y = lerpf(global_position.y, distance_to_ground, delta * 3.0)
-		
-		velocity.y = minf(velocity.y, 0.0)
-		velocity.y = 0.0
-		
-		#print(" ",global_position.y," ",distance_to_ground," ",lerpf(global_position.y,distance_to_ground,delta * 3.0))
-		#print(global_position.y)
-	
+	if not staggered:
+		if not is_equal_approx(global_position.y , distance_to_ground):
+			#global_position.y = lerpf(global_position.y,distance_to_ground,delta * 3.0)
+			
+			#print(delta)
+			global_position.y = lerpf(global_position.y, distance_to_ground, delta * 3.0)
+			
+			velocity.y = minf(velocity.y, 0.0)
+			velocity.y = 0.0
+			
+			#print(" ",global_position.y," ",distance_to_ground," ",lerpf(global_position.y,distance_to_ground,delta * 3.0))
+			#print(global_position.y)
+	else:
+		if not is_on_floor():
+			velocity += get_gravity() * delta
 	
 	move_and_slide()
 	
@@ -282,3 +284,21 @@ func kamikaze_move(delta: float) -> void:
 	
 	
 	global_position += global_basis.z * current_speed * 4 * delta
+
+
+
+func allign_with_floor(delta: float) -> void:
+	if staggered:
+		return
+	
+	var normal: Vector3 = Vector3.UP
+	
+	if is_on_floor():
+		normal = get_floor_normal()
+	var current_transform = global_transform
+	var current_right = current_transform.basis.x
+	var forward = current_right.cross(normal).normalized()
+	var right = normal.cross(forward).normalized()
+	var target_basis = Basis(right,normal,forward)
+	var new_basis = current_transform.basis.slerp(target_basis, allign_speed * delta)
+	global_transform.basis = new_basis.orthonormalized()

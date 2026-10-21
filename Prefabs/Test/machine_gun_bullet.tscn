@@ -52,7 +52,6 @@ shadow_mesh = SubResource("ArrayMesh_yvf51")
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_riqys"]
 render_priority = 0
 shader = ExtResource("4_yvf51")
-shader_parameter/light_color = Color(1, 0.45, 0.08, 1)
 shader_parameter/intensity = 1.0
 shader_parameter/softness = 2.5
 

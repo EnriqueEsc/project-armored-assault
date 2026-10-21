@@ -120,7 +120,7 @@ debug_color = Color(0.9995242, 0, 0.12464743, 0.41960785)
 [node name="Turret" type="Node3D" parent="." unique_id=1777633236 node_paths=PackedStringArray("turret_barrel")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.335, 0)
 script = ExtResource("3_g2m3y")
-turret_barrel = [NodePath("Gun"), NodePath("")]
+turret_barrel = [NodePath("Gun"), null]
 side_angle_limit = 5.0
 
 [node name="turret_V3" parent="Turret" unique_id=1331242705 instance=ExtResource("4_ingu5")]
@@ -130,8 +130,10 @@ visible = false
 [node name="Gun" type="Node3D" parent="Turret" unique_id=51241174]
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0, 0)
 script = ExtResource("5_rg08m")
-projectile_type = 0
+projectile_type = 6
+fire_mode = 1
 muzzle_pos = Vector3(0, 0, 0.8)
+fire_rate_prim = 0.5
 
 [node name="Gun" type="MeshInstance3D" parent="Turret/Gun" unique_id=1346115680]
 material_override = SubResource("StandardMaterial3D_vwfjx")
@@ -152,10 +154,10 @@ visible = false
 [node name="Gun2" type="Node3D" parent="Turret2" unique_id=885136441]
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0.13611156, 0)
 script = ExtResource("5_rg08m")
-projectile_type = 2
+projectile_type = 7
 fire_mode = 1
 muzzle_pos = Vector3(0, 0, 0.8)
-fire_rate_prim = 0.3
+fire_rate_prim = 0.1
 
 [node name="Gun" type="MeshInstance3D" parent="Turret2/Gun2" unique_id=799299687]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.8, 0, 0, 0)
@@ -165,10 +167,10 @@ mesh = SubResource("ArrayMesh_bdpwl")
 [node name="Gun3" type="Node3D" parent="Turret2" unique_id=1034716367]
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0.07444364, 0)
 script = ExtResource("5_rg08m")
-projectile_type = 2
+projectile_type = 7
 fire_mode = 1
 muzzle_pos = Vector3(0, 0, 0.8)
-fire_rate_prim = 0.3
+fire_rate_prim = 0.1
 
 [node name="Gun" type="MeshInstance3D" parent="Turret2/Gun3" unique_id=1621242431]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.8, 0, 0, 0)

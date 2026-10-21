@@ -64,6 +64,7 @@ speed = 15.0
 damage = 2
 blast_rad = 1.0
 blast_damage = 4.0
+range = 50.0
 muzzle_flash_scale = 0.4
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1897963084]

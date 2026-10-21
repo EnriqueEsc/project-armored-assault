@@ -53,7 +53,7 @@ func _on_body_entered(body):
 	if body.has_method("take_damage"):
 		direction = Vector3.ZERO
 		#origin.projectile_to_pool(self)
-		body.take_damage(damage, origin, global_position)
+		body.take_damage(damage, origin, global_position, status_effect)
 		#origin.get_score(damage)
 	elif body.has_method("detonate"):
 		direction = Vector3.ZERO

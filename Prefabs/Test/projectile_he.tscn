@@ -52,7 +52,6 @@ shadow_mesh = SubResource("ArrayMesh_2mg2s")
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_ev2y4"]
 render_priority = 0
 shader = ExtResource("4_u7uku")
-shader_parameter/light_color = Color(1, 0.45, 0.08, 1)
 shader_parameter/intensity = 1.0
 shader_parameter/softness = 2.5
 

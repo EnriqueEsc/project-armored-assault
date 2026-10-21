@@ -12,14 +12,18 @@ var type_of_node: TypeOfNode = TypeOfNode.Vehicle
 var node_test: Sprite2D = null
 var pre_position: Vector3 = Vector3.ZERO
 
+var collision_lenght: float = 0.0
+
 func _init(parent_node: Node3D) -> void:
 	self.parent_node = parent_node
 	if self.parent_node is Vehicle_Rigid:
 		self.parent_node = self.parent_node as Vehicle_Rigid
 		type_of_node = TypeOfNode.Vehicle
+		self.collision_lenght = self.parent_node.collision_lenght
 	if parent_node is Emplacement:
 		self.parent_node = self.parent_node as Emplacement
 		type_of_node = TypeOfNode.Emplacement
+		self.collision_lenght = self.parent_node.collision_lenght
 	
 
 func create_node_test() -> void:
@@ -89,4 +93,5 @@ func get_pre_position(factor: float) -> Vector3:
 	var res: Vector3 = parent_node.global_position
 	if type_of_node == TypeOfNode.Vehicle:
 		res += (parent_node.velocity * factor)
+	pre_position = res
 	return res

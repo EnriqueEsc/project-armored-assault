@@ -84,7 +84,15 @@ var icon_pref = preload("res://Sprites/Test/1771646306126.png")
 
 var ingame_data:NodeInGameData = null
 
+enum StatusEffects {None, Burning, PEM}
+var current_status_effect: StatusEffects = StatusEffects.None
+var status_effect_buildup: float = 0.0
+var status_effect_res: float = 100.0
+var status_effect_ticks: float = 0.0
+var status_effect_max_tick: int = 5
+@export var status_effect_recovery: float = 5.0
 
+var collision_lenght: float = 0.0
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -150,6 +158,8 @@ func _ready() -> void:
 			collision_shape = c.shape
 			return
 	boost_last_use = boost_cooldown
+	
+	calculate_collision_lenght()
 	
 
 func update_stencil(stencil_mode: BaseMaterial3D.StencilMode) -> void:
@@ -391,7 +401,7 @@ func get_aim_point_3d_normal(turret_index: int) -> Vector3:
 	return vehicle_turrets[turret_index].aim_point_normal
 
 
-func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> void:
+func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3, status_effect: StatusEffects = StatusEffects.None) -> void:
 	if armor_points < 1:
 		return
 	armor_points -= damage
@@ -401,6 +411,9 @@ func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> v
 	
 	ap_percent.emit(float(armor_points)/float(max_armor_points) * 100.0)
 	hp_changed.emit(armor_points)
+	
+	if status_effect != StatusEffects.None:
+		status_buildup(damage * 10,status_effect)
 	
 	if armor_points <= 0:
 		if source:
@@ -467,21 +480,31 @@ func deactivate() -> void:
 	
 	for t in vehicle_turrets:
 		for w in t.turret_barrel:
-			if w.heat_effect:
+			if is_instance_valid(w) and w.heat_effect:
 				w.heat_effect.one_shot = true
 	
 	_switch_collision(false)
 	
-	var scale: float = 1.0
+	if collision_lenght <= 0.0:
+		calculate_collision_lenght()
+	
+	var scale: float = collision_lenght * 5
+	var wave_scale: float = collision_lenght
+	
+	if Effects_Manager.INSTANCE:
+		Effects_Manager.INSTANCE.explosion_from_pool(global_position, scale, wave_scale)
+	
+	gets_disabled.emit()
+	
+
+func calculate_collision_lenght() -> void:
+	collision_lenght = 0.0
 	
 	for c in get_children():
 		if c is CollisionShape3D and c.shape is BoxShape3D:
-			scale += c.shape.size.length() * 5
-	
-	if Effects_Manager.INSTANCE:
-		Effects_Manager.INSTANCE.explosion_from_pool(global_position, scale)
-	
-	gets_disabled.emit()
+			collision_lenght += c.shape.size.length()
+			if ingame_data and ingame_data.collision_lenght != collision_lenght:
+				ingame_data.collision_lenght = collision_lenght
 	
 
 func use_attachment(objective: Vector3 = get_aim_point_3d(0,100)) -> void:
@@ -509,10 +532,28 @@ func _process(delta: float) -> void:
 		update_stencil(2)
 		last_tick = 0
 	
+	if status_effect_buildup > 0.0:
+		status_effect_buildup -= status_effect_recovery * delta
+		if status_effect_buildup < 0.0:
+			status_effect_buildup = 0.0
+		#print("BUILDUP ",status_effect_buildup)
+	
+	if current_status_effect != StatusEffects.None and status_effect_ticks < 1:
+		status_effect_ticks += delta
+		
+		if status_effect_max_tick < 1:
+			current_status_effect = StatusEffects.None
+		
+		if status_effect_ticks > 1:
+			status_effect_ticks = 0.0
+			status_effect_max_tick -= 1
+			exec_status_effect()
+	
 	if stagger_timer < stagger_max_time:
 		stagger_timer += delta
 		if stagger_timer >= stagger_max_time:
 			staggered = false
+			status_effect_max_tick = 0.0
 	
 	if boost_last_use < boost_cooldown:
 		boost_last_use += delta
@@ -550,3 +591,35 @@ func create_map_icon() -> Sprite3D:
 func special_action() -> bool:
 	pass
 	return false
+
+func status_buildup(value: float, status: StatusEffects) -> void:
+	status_effect_buildup += value
+	status_effect_buildup = clampf(status_effect_buildup,0.0,status_effect_res)
+	#print("BUILDUP ",status," ",status_effect_buildup)
+	if status_effect_buildup >= status_effect_res:
+		current_status_effect = status
+		status_effect_max_tick = 5
+		status_effect_buildup = 0.0
+		exec_status_effect()
+
+func exec_status_effect() -> void:
+	if current_status_effect == StatusEffects.None:
+		return
+	
+	match current_status_effect:
+		StatusEffects.Burning:
+			take_damage(max_armor_points * 0.10,self,global_position)
+			if Effects_Manager.INSTANCE:
+				Effects_Manager.INSTANCE.fire_from_pool(global_position)
+			#print("ME QUEMO")
+		StatusEffects.PEM:
+			if Effects_Manager.INSTANCE:
+				if collision_lenght <= 0.0:
+					calculate_collision_lenght()
+				Effects_Manager.INSTANCE.explo_wave_from_pool(global_position,collision_lenght * 1.2,collision_lenght * 1.2,Color.SKY_BLUE)
+			#print("AY ME PARO")
+			if not staggered:
+				stagger()
+				status_effect_max_tick = 999.0
+		_:
+			return

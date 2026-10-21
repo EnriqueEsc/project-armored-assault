@@ -18,7 +18,7 @@ signal recoil (dir: Vector3)
 var ignore = []
 
 
-enum Projectile_Type {HE, AP, MachineGun, Nuke, Flak, Flamethrower}
+enum Projectile_Type {HE, AP, MachineGun, Nuke, Flak, Flamethrower, Slug, Laser}
 enum Fire_Mode {Semi, Auto}
 
 
@@ -111,6 +111,13 @@ func _ready() -> void:
 			case_prefab = load("res://Prefabs/Test/machine_gun_case.tscn")
 		Projectile_Type.Flamethrower:
 			projectile_prefab = load("res://Prefabs/Test/flamethrower.tscn")
+		Projectile_Type.Slug:
+			projectile_prefab = load("res://Prefabs/Test/slug.tscn")
+		Projectile_Type.Laser:
+			projectile_prefab = load("res://Prefabs/Test/laser.tscn")
+			case_prefab = null
+		_:
+			projectile_prefab = load("res://Prefabs/Test/projectile.tscn")
 		
 	original_side_angle = rotation.y
 	#spawn()
@@ -210,6 +217,9 @@ func create_projectiles() -> void:
 		heat = projectile_pool[0].heat
 	
 	if projectile_type == Projectile_Type.Flamethrower:
+		return
+	
+	if case_prefab == null:
 		return
 	
 	for i in Settings_Manager.INSTANCE.max_effects:

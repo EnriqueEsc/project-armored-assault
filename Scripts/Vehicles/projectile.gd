@@ -13,6 +13,8 @@ var origin: Vehicle_Rigid
 @export var blast_damage: float = 10
 @export var recoil_force: float = 1
 @export var heat: float = 5.0
+@export var status_effect: Vehicle_Rigid.StatusEffects = Vehicle_Rigid.StatusEffects.None
+@export var range: float = 15.0
 var ignore = []
 
 signal activated(projectile: Projectile)
@@ -30,6 +32,8 @@ var effects_manager: Effects_Manager = null
 
 var fake_light: Mesh_Instance_3D_Effect = null
 var fake_light_original_size: Vector2 = Vector2.ZERO
+
+var origin_point: Vector3 = Vector3.ZERO
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -75,13 +79,19 @@ func _additional_shoot_process() -> void:
 func shoot(pos: Vector3, rot: Vector2) -> void:
 	activate()
 	
-	_additional_shoot_process()
 	
 	current_pos = pos
 	position = current_pos
+	
+	
+	origin_point = global_position
+	
+	
 	rotation.y = rot.y
 	rotation.x = rot.x
 	direction = Vector3(1,0,0)
+	
+	_additional_shoot_process()
 
 
 func activate() -> void:
@@ -112,6 +122,10 @@ func move(delta: float) -> void:
 	if direction == Vector3.ZERO:
 		return
 	
+	if origin_point.distance_to(global_position) > range:
+		deactivate()
+		return
+	
 	var current_pos_2d: Vector2 = (Vector2(0,1).rotated(-rotation.y))
 	global_position += global_basis.z * speed * delta
 
@@ -138,7 +152,7 @@ func _on_body_entered(body):
 	if body.has_method("take_damage"):
 		direction = Vector3.ZERO
 		#origin.projectile_to_pool(self)
-		body.take_damage(damage, origin, global_position)
+		body.take_damage(damage, origin, global_position, status_effect)
 		if effects_manager:
 			effects_manager.sparks_from_pool(global_position)
 		#origin.get_score(damage)
@@ -255,7 +269,7 @@ func detonate() -> void:
 			continue
 	
 		if t.has_method("take_damage"):
-			t.call_deferred("take_damage", blast_damage, origin, global_position)
+			t.call_deferred("take_damage", blast_damage, origin, global_position, status_effect)
 			
 		if t.has_method("recoil"):
 			#print(t)

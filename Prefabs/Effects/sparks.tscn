@@ -7,7 +7,7 @@ colors = PackedColorArray(1, 1, 0, 1, 0.15487584, 0.15487605, 0.15487596, 0.3176
 gradient = SubResource("Gradient_kuf18")
 
 [sub_resource type="Curve" id="Curve_kuf18"]
-_data = [Vector2(0, 0.50000006), 0.0, 0.0, 0, 0, Vector2(0.20430106, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+_data = [Vector2(0.05421686, 0), 0.0, 0.0, 0, 0, Vector2(0.5903615, 0.11607146), 0.0, 0.0, 0, 0, Vector2(0.945783, 0), 0.0, 0.0, 0, 0]
 point_count = 3
 
 [sub_resource type="CurveTexture" id="CurveTexture_q8sys"]

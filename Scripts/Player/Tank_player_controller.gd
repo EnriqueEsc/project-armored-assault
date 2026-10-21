@@ -560,6 +560,8 @@ func _process(delta: float) -> void:
 		var mouse_pos = tank_camera.get_mouse_3d_pos()
 		if lock_on:
 			mouse_pos = pointer_pos
+		if enemy_locked:
+			mouse_pos = enemy_locked.ingame_data.pre_position
 		tank_rigid.use_attachment(mouse_pos)
 	
 	
