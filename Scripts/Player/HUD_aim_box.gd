@@ -214,6 +214,7 @@ func set_primary_indicator_fill(value: float, index: int) -> void:
 	#print("aaaaaaaaaaaaaaaa ",value," | ",index," | ",primary_weapon_indicators.size())
 	if index >= primary_weapon_indicators.size():
 		return
+	
 	primary_weapon_indicators[index].value = value
 
 
@@ -232,6 +233,8 @@ func set_indicator_fill(value: float, priority: Vehicle_turret.Turret_Priority, 
 			indicators = primary_weapon_indicators
 			
 	if index >= indicators.size():
+		return
+	if indicators[index].value == value:
 		return
 	indicators[index].value = value
 

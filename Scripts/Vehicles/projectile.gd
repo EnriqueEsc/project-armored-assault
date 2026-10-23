@@ -35,6 +35,21 @@ var fake_light_original_size: Vector2 = Vector2.ZERO
 
 var origin_point: Vector3 = Vector3.ZERO
 
+
+
+
+@export_group("Slug Settigns")
+var slugs: Array[Projectile] = []
+var slug_pref: PackedScene = null
+var fixated_ignore: Array = []
+@export var uses_slug: bool = false
+@export_file("*.tscn") var slug_pref_path: String
+@export var slug_num: int = 0
+@export var recursivity: int = 0
+@export var horizontal_disp: Vector2 = Vector2.ZERO
+@export var vertical_disp: Vector2 = Vector2.ZERO
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
@@ -54,11 +69,53 @@ func _ready() -> void:
 		for c in $CollisionShape3D.get_children():
 			if c is MeshInstance3D:
 				set_emission_in_material(c)
-		
+	
+	
 	
 	effects_manager = Effects_Manager.INSTANCE
 	
+	
+	
 	_additional_setup()
+	
+	if not uses_slug:
+		return
+	
+	if not slug_pref_path:
+		slug_pref_path = scene_file_path
+	
+	if slug_pref_path:
+		slug_pref = load(slug_pref_path)
+	
+	if not slug_pref:
+		return
+	
+	if recursivity < 1:
+		return
+	
+	if slug_num < 1:
+		return
+	
+	slugs = []
+	for i in slug_num:
+		var pref = slug_pref.instantiate() as Projectile
+		if not is_instance_valid(pref):
+			continue
+		pref.damage = damage
+		pref.blast_rad = blast_rad
+		pref.base_speed = base_speed
+		pref.blast_damage = blast_damage
+		pref.blast_det_max_entities = blast_det_max_entities
+		pref.recursivity = recursivity - 1
+		pref.origin = origin
+		get_tree().current_scene.call_deferred("add_child",pref)
+		slugs.append(pref)
+		fixated_ignore.append(pref.get_rid())
+		ignore.append(pref)
+	
+	for s in slugs:
+		s.ignore = (fixated_ignore)
+		s.ignore.append_array(ignore)
 
 func _additional_setup() -> void:
 	pass
@@ -73,6 +130,9 @@ func set_origin(vehicle: Vehicle_Rigid) -> void:
 	hits_enemy.connect(origin.send_hit_signal)
 	is_player = origin.is_player
 	
+	fixated_ignore = [origin.get_rid()]
+	
+
 func _additional_shoot_process() -> void:
 	pass
 
@@ -92,6 +152,19 @@ func shoot(pos: Vector3, rot: Vector2) -> void:
 	direction = Vector3(1,0,0)
 	
 	_additional_shoot_process()
+	
+	if slugs.is_empty():
+		return
+	
+	for s in slugs:
+		#s.ignore = (fixated_ignore)
+		#s.ignore.append_array(ignore)
+		
+		s.shoot(global_position,Vector2(rotation.x + deg_to_rad(randf_range(vertical_disp.x,vertical_disp.y)),rotation.y + deg_to_rad(randf_range(horizontal_disp.x,horizontal_disp.y))))
+	
+	rotation.x += deg_to_rad(randf_range(vertical_disp.x,vertical_disp.y))
+	rotation.y += deg_to_rad(randf_range(horizontal_disp.x,horizontal_disp.y))
+	
 
 
 func activate() -> void:
@@ -153,6 +226,7 @@ func _on_body_entered(body):
 		direction = Vector3.ZERO
 		#origin.projectile_to_pool(self)
 		body.take_damage(damage, origin, global_position, status_effect)
+		
 		if effects_manager:
 			effects_manager.sparks_from_pool(global_position)
 		#origin.get_score(damage)

@@ -20,14 +20,17 @@ signal recoil (dir: Vector3)
 
 var ignore = []
 
-enum Fire_Mode {Semi, Auto}
 
 
 var origin: Vehicle_Rigid
 
 signal shoot_recharge(charge: float)
 
-var fire_mode: Turret_Weapon.Fire_Mode = Turret_Weapon.Fire_Mode.Semi
+@export var fire_mode: Turret_Weapon.Fire_Mode = Turret_Weapon.Fire_Mode.Semi
+@export var bullets_per_burst: int = 1
+@export var time_between_burst: float = 4.0
+var waiting_time: float = 4.0
+var remaining_burst_bullets: int = -1
 var projectile_type: Turret_Weapon.Projectile_Type = Turret_Weapon.Projectile_Type.AP
 
 enum Fire_Types {Simultaneous, OneByOne, NbyN}
@@ -56,6 +59,7 @@ var max_compensation: float = 0.0
 var current_correction: float = 0.0
 
 var mean_bullet_speed: float = 1.0
+var mean_fire_rate: float = 1.0
 
 func spawn() -> void:
 	
@@ -64,7 +68,9 @@ func spawn() -> void:
 	
 	for w in turret_barrel:
 		w.static_model = static_model
+		w.fire_mode = fire_mode
 		w.spawn()
+		
 	
 
 func calculate_mean_bullet_speed() -> void:
@@ -77,17 +83,22 @@ func calculate_mean_bullet_speed() -> void:
 	
 	if turret_barrel.is_empty():
 		mean_bullet_speed = 1.0
+		mean_fire_rate = 1.0
 		return
 	mean_bullet_speed = 0.0
+	mean_fire_rate = 0.0
 	var counter: int = 0
 	for t in turret_barrel:
 		if is_instance_valid(t) and t.projectile:
 			mean_bullet_speed += t.projectile.base_speed
+			mean_fire_rate += t.fire_rate_prim
 			counter += 1
 	
 	#mean_bullet_speed /= (turret_barrel.size())
 	
 	mean_bullet_speed /= (counter)
+	mean_fire_rate /= counter
+	mean_fire_rate +=  + 0.2
 
 func calculate_sight_pos() -> void:
 	sight_pos = Node3D.new()
@@ -115,6 +126,7 @@ func calculate_travel_time_to_point(point: Vector3) -> float:
 	res = global_position.distance_to(point)
 	
 	res /= mean_bullet_speed
+	
 	return res
 
 
@@ -148,6 +160,9 @@ func _ready() -> void:
 	
 	max_compensation = 1.0 - turret_turning_speed
 	
+	if bullets_per_burst < 0:
+		bullets_per_burst = 0
+	
 	#muzzle_pos = global_position + muzzle_pos
 	pass
 
@@ -166,7 +181,12 @@ func create_projectiles() -> void:
 				w.origin = origin
 				
 			if not w.shoot_recharge.is_connected(shoot_recharge.emit):
-				w.shoot_recharge.connect(shoot_recharge.emit)
+				set_process(false)
+				if fire_mode == Turret_Weapon.Fire_Mode.Burst:
+					set_process(true)
+					w.shoot_recharge.connect(calculate_burst_charge)
+				else:
+					w.shoot_recharge.connect(shoot_recharge.emit)
 			w.ignore.append_array(ignore)
 			w.shakes_on_shoot.connect(shakes_on_shoot.emit)
 			await w.create_projectiles()
@@ -296,6 +316,69 @@ func calculate_mean_rotation() -> Vector3:
 
 
 func shoot() -> void:
+	if fire_mode == Turret_Weapon.Fire_Mode.Burst:
+		if remaining_burst_bullets >= 0:
+			return
+			
+		remaining_burst_bullets = bullets_per_burst
+		
+		
+		while remaining_burst_bullets > 0:
+			#if not all_weapons_can_shoot():
+			#	break
+			match fire_type:
+				Fire_Types.Simultaneous:
+					remaining_burst_bullets -= 1
+					for w in turret_barrel:
+						if not is_instance_valid(w):
+							continue
+						if turret_priority == Turret_Priority.Secondary:
+							w.shoot(0.2)
+							#remaining_burst_bullets -= 1
+							continue
+						w.shoot(1.0)
+						#remaining_burst_bullets -= 1
+				Fire_Types.OneByOne:
+					if current_weapon_index >= turret_barrel.size():
+						current_weapon_index = 0
+					if not is_instance_valid(turret_barrel[current_weapon_index]):
+						
+						break
+						#return
+						#return
+					if turret_priority == Turret_Priority.Secondary:
+						turret_barrel[current_weapon_index].shoot(0.2)
+						current_weapon_index += 1
+						remaining_burst_bullets -= 1
+					else:
+						turret_barrel[current_weapon_index].shoot(1.0)
+						remaining_burst_bullets -= 1
+						current_weapon_index += 1
+				Fire_Types.NbyN:
+						#return
+					remaining_burst_bullets -= 1
+					for i in shoot_by_n_turrets:
+						if current_weapon_index >= turret_barrel.size():
+							current_weapon_index = 0
+						if not is_instance_valid(turret_barrel[current_weapon_index]):
+							continue
+						if turret_priority == Turret_Priority.Secondary:
+							turret_barrel[current_weapon_index].shoot(0.2)
+							current_weapon_index += 1
+							continue
+						#print("PENE ",remaining_burst_bullets," ",bullets_per_burst," ",float(remaining_burst_bullets) / float(bullets_per_burst))
+						turret_barrel[current_weapon_index].shoot(1.0)
+						current_weapon_index += 1
+			if remaining_burst_bullets > 0:
+				await get_tree().create_timer(mean_fire_rate).timeout
+			else:
+				waiting_time = 0.0
+				await get_tree().create_timer(time_between_burst).timeout
+				remaining_burst_bullets -= 1
+		return
+	
+	
+	
 	match fire_type:
 		Fire_Types.Simultaneous:
 			for w in turret_barrel:
@@ -332,6 +415,9 @@ func shoot() -> void:
 					continue
 				turret_barrel[current_weapon_index].shoot()
 				current_weapon_index += 1
+	
+	
+	
 
 
 func all_weapons_can_shoot() -> bool:
@@ -339,6 +425,7 @@ func all_weapons_can_shoot() -> bool:
 	
 	for t in turret_barrel:
 		res = res and t.can_shoot()
+	
 	
 	return res
 
@@ -348,13 +435,39 @@ func set_fire_mode(mode: Turret_Weapon.Fire_Mode) -> void:
 	for w in turret_barrel:
 		if not is_instance_valid(w):
 			continue
+		'''
 		if w.fire_mode == w.Fire_Mode.Auto:
 			fire_mode = w.fire_mode
+		'''
+		w.fire_mode = mode
 		if w.projectile_type == w.Projectile_Type.Flamethrower:
 			projectile_type = w.projectile_type
 	
 	return
+	'''
 	if fire_mode == Fire_Mode.Auto:
 		set_process(true)
 	else:
 		set_process(false)
+	'''
+
+func _process(delta: float) -> void:
+	if fire_mode != Turret_Weapon.Fire_Mode.Burst:
+		return
+	if waiting_time < time_between_burst:
+		waiting_time += delta
+		
+		shoot_recharge.emit((waiting_time/time_between_burst)*100.0)
+
+
+func calculate_burst_charge(value: float) -> void:
+	if waiting_time < time_between_burst:
+		return
+	if remaining_burst_bullets < 1:
+		shoot_recharge.emit(100.0)
+		return
+	shoot_recharge.emit(float(remaining_burst_bullets)/float(bullets_per_burst)*100.0)
+	return
+	for w in turret_barrel:
+		if not is_instance_valid(w):
+			continue

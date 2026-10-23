@@ -122,6 +122,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0.335, 0)
 script = ExtResource("3_g2m3y")
 turret_barrel = [NodePath("Gun"), null]
 side_angle_limit = 5.0
+fire_mode = 2
+bullets_per_burst = 3
+time_between_burst = 1.0
 
 [node name="turret_V3" parent="Turret" unique_id=1331242705 instance=ExtResource("4_ingu5")]
 transform = Transform3D(1.6391772e-07, 0, 1.25, 0, 1.25, 0, -1.25, 0, 1.6391772e-07, 0, -0.29506743, 0)
@@ -131,9 +134,8 @@ visible = false
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0, 0)
 script = ExtResource("5_rg08m")
 projectile_type = 6
-fire_mode = 1
 muzzle_pos = Vector3(0, 0, 0.8)
-fire_rate_prim = 0.5
+fire_rate_prim = 0.2
 
 [node name="Gun" type="MeshInstance3D" parent="Turret/Gun" unique_id=1346115680]
 material_override = SubResource("StandardMaterial3D_vwfjx")
@@ -144,6 +146,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0.335, 0)
 script = ExtResource("3_g2m3y")
 turret_barrel = [NodePath("Gun3"), NodePath("Gun2")]
 side_angle_limit = 5.0
+fire_mode = 1
 fire_type = 1
 turret_priority = 1
 
@@ -155,7 +158,6 @@ visible = false
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0.13611156, 0)
 script = ExtResource("5_rg08m")
 projectile_type = 7
-fire_mode = 1
 muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.1
 
@@ -168,7 +170,6 @@ mesh = SubResource("ArrayMesh_bdpwl")
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0.07444364, 0)
 script = ExtResource("5_rg08m")
 projectile_type = 7
-fire_mode = 1
 muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.1
 

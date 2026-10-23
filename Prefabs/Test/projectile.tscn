@@ -52,16 +52,21 @@ shadow_mesh = SubResource("ArrayMesh_cqia8")
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_i0o53"]
 render_priority = 0
 shader = ExtResource("4_320s3")
-shader_parameter/light_color = Color(1, 0.45, 0.08, 1)
 shader_parameter/intensity = 1.0
 shader_parameter/softness = 2.5
 
 [sub_resource type="QuadMesh" id="QuadMesh_sehpw"]
 
 [node name="Projectile" type="Area3D" unique_id=1973506426]
+process_mode = 4
+visible = false
+monitoring = false
+monitorable = false
 script = ExtResource("1_lofw3")
+base_speed = 10.0
 damage = 5
 is_explosive = false
+slug_pref_path = "res://Prefabs/Test/projectile.tscn"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1897963084]
 shape = SubResource("BoxShape3D_sn0t7")

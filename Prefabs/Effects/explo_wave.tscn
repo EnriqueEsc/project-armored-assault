@@ -42,7 +42,7 @@ height = 2.0
 [node name="Explo_Wave" type="GPUParticles3D" unique_id=252376188]
 emitting = false
 amount = 1
-lifetime = 0.09999999999999999
+lifetime = 0.1
 one_shot = true
 collision_base_size = 1.0
 process_material = SubResource("ParticleProcessMaterial_rhq6j")

@@ -1,6 +1,6 @@
 [gd_scene format=4 uid="uid://c8nugqscyfpie"]
 
-[ext_resource type="Script" uid="uid://bkr575pe6ba38" path="res://Scripts/Vehicles/slug.gd" id="1_ep1kw"]
+[ext_resource type="Script" uid="uid://d0krsqofvg78i" path="res://Scripts/Vehicles/projectile.gd" id="1_ep1kw"]
 [ext_resource type="PackedScene" uid="uid://dk2ejhum7dj0e" path="res://Models/Test/Projectile.fbx" id="2_l6h6x"]
 [ext_resource type="PackedScene" uid="uid://koxj0b8ls2xa" path="res://Models/Test/Gun.fbx" id="3_2e8hl"]
 [ext_resource type="Shader" uid="uid://r0dpspjp6381" path="res://Shaders/fake_light.gdshader" id="4_0xhpr"]
@@ -60,9 +60,12 @@ size = Vector2(0.4, 0.8)
 
 [node name="Projectile" type="Area3D" unique_id=1973506426]
 script = ExtResource("1_ep1kw")
+is_explosive = false
+uses_slug = true
+slug_num = 10
+recursivity = 1
 horizontal_disp = Vector2(-25, 25)
 vertical_disp = Vector2(-5, 5)
-is_explosive = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1897963084]
 shape = SubResource("BoxShape3D_ofuc2")

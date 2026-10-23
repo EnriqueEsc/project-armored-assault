@@ -13,10 +13,29 @@ var middle_point: Vector3 = Vector3.ZERO
 var original_proy_size: float = 0.0
 var original_fake_light_size: float = 0.0
 
+var aux_ignore: Array[RID] = []
+
 func _additional_setup() -> void:
 	original_proy_size = proy.scale.z
 	original_fake_light_size = fake_light.mesh.size.x
 	life_timer = lifetime
+	
+	
+	
+	if is_instance_valid(self):
+		aux_ignore.append(self.get_rid())
+	if is_instance_valid(origin):
+		aux_ignore.append(origin.get_rid())
+	#if is_instance_valid(fixated_ignore):
+	#	raycast.exclude.append(fixated_ignore)
+	for i in fixated_ignore:
+		if is_instance_valid(i):
+			var rid_i = i.get_rid() if i.has_method("get_rid") else i
+			aux_ignore.append(rid_i)
+	for i in ignore:
+		if is_instance_valid(i):
+			var rid_i = i.get_rid() if i.has_method("get_rid") else i
+			aux_ignore.append(rid_i)
 	
 	var mat = proy.material_override as StandardMaterial3D
 	if mat and fake_light:
@@ -25,6 +44,7 @@ func _additional_setup() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	#return
 	if visible:
 		life_timer += delta
 		if life_timer >= lifetime:
@@ -50,15 +70,31 @@ func shoot(pos: Vector3, rot: Vector2) -> void:
 	
 	#line.points = [Tank_camera.INSTANCE.unproject_position(origin_point), Tank_camera.INSTANCE.unproject_position(end_point)]
 	
+	
 	shoot_laser()
 	
 	_additional_shoot_process()
+	
+	if slugs.is_empty():
+		return
+		
+	for s in slugs:
+		#s.ignore = (fixated_ignore.duplicate())
+		#s.ignore.append_array(ignore)
+		
+		s.shoot(origin_point,Vector2(rotation.x + deg_to_rad(randf_range(vertical_disp.x,vertical_disp.y)),rotation.y + deg_to_rad(randf_range(horizontal_disp.x,horizontal_disp.y))))
+
 
 func shoot_laser() -> void:
 	var space = get_world_3d().direct_space_state
 	var raycast = PhysicsRayQueryParameters3D.create(origin_point, end_point)
 				
-	raycast.exclude = [self.get_rid(), origin.get_rid()]
+	raycast.exclude = []
+	
+	var aux: Array[RID] = aux_ignore
+	#aux.append_array(ignore)
+	#raycast.exclude = [self.get_rid(), origin.get_rid()]
+	raycast.exclude = aux
 				
 	#raycast.collide_with_areas = true
 	raycast.collide_with_areas = false
@@ -138,6 +174,12 @@ func _on_body_entered(body):
 		return
 	
 	if ignore.has(body):
+		return
+	
+	if fixated_ignore.has(body):
+		return
+	
+	if body is Laser:
 		return
 	
 	#print(body)

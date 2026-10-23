@@ -19,11 +19,11 @@ var ignore = []
 
 
 enum Projectile_Type {HE, AP, MachineGun, Nuke, Flak, Flamethrower, Slug, Laser}
-enum Fire_Mode {Semi, Auto}
+enum Fire_Mode {Semi, Auto, Burst}
 
 
 @export var projectile_type: Projectile_Type = Projectile_Type.AP
-@export var fire_mode: Fire_Mode = Fire_Mode.Semi
+var fire_mode: Fire_Mode = Fire_Mode.Semi
 var projectile_prefab = preload("res://Prefabs/Test/projectile.tscn")
 var case_prefab = preload("res://Prefabs/Test/case.tscn")
 var projectile: Projectile
@@ -72,7 +72,6 @@ signal shakes_on_shoot(intensity: float, duration: float)
 
 var effects_manager: Effects_Manager = null
 var heat_effect: GPUParticles3D = null
-
 
 func spawn() -> void:
 	
@@ -328,4 +327,5 @@ func calculate_charge(delta: float) -> void:
 			percent *= 100
 		Fire_Mode.Auto:
 			percent = (current_heat / max_heat) * 100
+		
 	shoot_recharge.emit(percent)

@@ -6,12 +6,12 @@ colors = PackedColorArray(1, 1, 0, 1, 0.15487584, 0.15487605, 0.15487596, 0.3176
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_q8sys"]
 gradient = SubResource("Gradient_kuf18")
 
-[sub_resource type="Curve" id="Curve_kuf18"]
-_data = [Vector2(0.05421686, 0), 0.0, 0.0, 0, 0, Vector2(0.5903615, 0.11607146), 0.0, 0.0, 0, 0, Vector2(0.945783, 0), 0.0, 0.0, 0, 0]
-point_count = 3
+[sub_resource type="Curve" id="Curve_8v607"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.3253012, 0.47321433), 0.0, 0.0, 0, 0, Vector2(0.68674695, 0.58928573), 0.0, 0.0, 0, 0, Vector2(1, 0), -1.4631411, 0.0, 0, 0]
+point_count = 4
 
-[sub_resource type="CurveTexture" id="CurveTexture_q8sys"]
-curve = SubResource("Curve_kuf18")
+[sub_resource type="CurveTexture" id="CurveTexture_l6h6x"]
+curve = SubResource("Curve_8v607")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_8v607"]
 emission_shape = 1
@@ -22,14 +22,14 @@ initial_velocity_min = 4.0
 initial_velocity_max = 8.0
 gravity = Vector3(0, -12, 0)
 scale_min = 0.0
-scale_curve = SubResource("CurveTexture_q8sys")
+scale_curve = SubResource("CurveTexture_l6h6x")
 color_ramp = SubResource("GradientTexture1D_q8sys")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_epjab"]
 albedo_color = Color(1, 1, 0, 1)
 emission_enabled = true
 emission = Color(1, 0.8117647, 0, 1)
-emission_energy_multiplier = 5.54
+emission_energy_multiplier = 16.0
 
 [sub_resource type="PrismMesh" id="PrismMesh_6j6ot"]
 material = SubResource("StandardMaterial3D_epjab")

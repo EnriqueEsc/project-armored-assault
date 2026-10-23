@@ -58,7 +58,7 @@ var third_person: bool = false
 var targeted_enemies: Array[Vehicle_Rigid] = []
 
 var lock_on: bool = false
-var enemy_locked: Vehicle_Rigid = null
+var enemy_locked: NodeInGameData = null
 
 var bellow_75: bool = true
 var bellow_50: bool = true
@@ -417,7 +417,8 @@ func _physics_process(delta: float) -> void:
 	
 	if lock_on:
 		#print(enemy_locked)
-		pointer_pos = enemy_locked.global_position
+		if is_instance_valid(enemy_locked):
+			pointer_pos = enemy_locked.parent_node.global_position
 		#HUD_mouse.position = tank_camera.unproject_position(pointer_pos)
 		if HUD_Aim_box:
 			HUD_Aim_box.position = tank_camera.unproject_position(pointer_pos)
@@ -535,6 +536,12 @@ func _process(delta: float) -> void:
 		get_tree().reload_current_scene()
 		return
 	
+	var node = tank_camera.last_enemy_inside_box
+	if is_instance_valid(node) and enemy_locked != node:
+		enemy_locked = node
+	elif not is_instance_valid(node) and enemy_locked != null:
+		enemy_locked = null
+	
 	var input_dir := Input.get_vector("Left","Right","Forward","Backward")
 	
 	#print(get_viewport().get_mouse_position())
@@ -561,7 +568,7 @@ func _process(delta: float) -> void:
 		if lock_on:
 			mouse_pos = pointer_pos
 		if enemy_locked:
-			mouse_pos = enemy_locked.ingame_data.pre_position
+			mouse_pos = enemy_locked.pre_position
 		tank_rigid.use_attachment(mouse_pos)
 	
 	
@@ -580,10 +587,24 @@ func _process(delta: float) -> void:
 	
 	#tank_rigid.rotate_turret_to_point_3d(tank_camera.get_mouse_3d_pos())
 	if lock_on:
-		aim_to.emit(enemy_locked.global_position)
+		var corr: float = 0.0
+			
+		match move_type:
+			Move_Types.Axial:
+				corr = (abs(tank_rigid.turning_velocity * 10.0)/tank_rigid.max_turn_velocity)
+			_:
+				corr = (tank_rigid.velocity.length()/(tank_rigid.current_speed + 1.5)) * 0.3
+			
+			#print(tank_rigid.velocity.length()," | ",tank_rigid.current_speed)
+			#print(abs(tank_rigid.turning_velocity * 10.0)/tank_rigid.max_turn_velocity)
+		var data = null
+		if enemy_locked:
+			aim_to.emit(enemy_locked.parent_node.global_position,enemy_locked,corr)
 	else:
 		if controller_aim:
-			aim_to.emit(aim_dir_3d)
+			var data = null
+			if enemy_locked:
+				aim_to.emit(aim_dir_3d,enemy_locked,100.0)
 		else:
 			var corr: float = 0.0
 			
@@ -597,8 +618,7 @@ func _process(delta: float) -> void:
 			#print(abs(tank_rigid.turning_velocity * 10.0)/tank_rigid.max_turn_velocity)
 			var data = null
 			if enemy_locked:
-				data = enemy_locked.ingame_data
-			aim_to.emit(tank_camera.get_mouse_3d_pos(),data,corr)
+				aim_to.emit(tank_camera.get_mouse_3d_pos(),enemy_locked,corr)
 			#aim_to.emit(tank_camera.get_mouse_3d_pos(),corr)
 		#print("AIM ",aim_dir," ",aim_dir.length_squared())
 	
@@ -620,12 +640,12 @@ func _process(delta: float) -> void:
 			return
 		var lock = tank_camera.get_closest_enemy_to_mouse(tank_camera.get_mouse_3d_pos())
 		if lock:
-			enemy_locked = lock
-			if enemy_locked.gets_disabled.is_connected(untarget_enemy.bind(enemy_locked)):
+			enemy_locked = lock.ingame_data
+			if enemy_locked.parent_node.gets_disabled.is_connected(untarget_enemy.bind(enemy_locked)):
 				lock_on = false
-				enemy_locked.gets_disabled.disconnect(untarget_enemy.bind(enemy_locked))
+				enemy_locked.parent_node.gets_disabled.disconnect(untarget_enemy.bind(enemy_locked))
 				#enemy_locked = null
-			enemy_locked.gets_disabled.connect(untarget_enemy.bind(enemy_locked))
+			enemy_locked.parent_node.gets_disabled.connect(untarget_enemy.bind(enemy_locked))
 			lock_on = true
 		else:
 			lock_on = false
@@ -954,28 +974,27 @@ func target_enemy_2d(e: Node3D, aim: Node2D) -> void:
 		return
 	e.update_stencil(1)
 
-func untarget_enemy(e: Node3D) -> void:
+func untarget_enemy(e: NodeInGameData) -> void:
 	if not e:
 		return
-	e = e as Vehicle_Rigid
 	if e == enemy_locked:
-		enemy_locked.gets_disabled.disconnect(untarget_enemy)
+		enemy_locked.parent_node.gets_disabled.disconnect(untarget_enemy)
 		
-		var lock = tank_camera.get_closest_enemy_to_mouse(enemy_locked.global_position)
+		var lock = tank_camera.get_closest_enemy_to_mouse(enemy_locked.parent_node.global_position)
 		if lock:
-			if enemy_locked == lock:
+			if enemy_locked == lock.ingame_data:
 				lock_on = false
 				enemy_locked = null
 				HUD_Lock_on.visible = lock_on
 				return
 				
-			enemy_locked = lock
-			if enemy_locked.gets_disabled.is_connected(untarget_enemy.bind(enemy_locked)):
+			enemy_locked = lock.ingame_data
+			if enemy_locked.parent_node.gets_disabled.is_connected(untarget_enemy.bind(enemy_locked)):
 				lock_on = false
 				enemy_locked = null
 				HUD_Lock_on.visible = lock_on
 				return
-			enemy_locked.gets_disabled.connect(untarget_enemy.bind(enemy_locked))
+			enemy_locked.parent_node.gets_disabled.connect(untarget_enemy.bind(enemy_locked))
 			lock_on = true
 			HUD_Lock_on.visible = lock_on
 		else:

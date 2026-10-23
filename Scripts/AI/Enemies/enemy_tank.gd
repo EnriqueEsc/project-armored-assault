@@ -142,7 +142,8 @@ func handle_turret_and_shooting(aim_pos: Vector3, can_shoot: bool, can_see_playe
 	var data: NodeInGameData = null
 	if player_ref and "ingame_data" in player_ref:
 		data = player_ref.ingame_data
-	aim_to.emit(aim_pos, data)
+	var correction: float = 0.0
+	aim_to.emit(aim_pos, data, correction)
 	if not can_shoot:
 		return
 	
