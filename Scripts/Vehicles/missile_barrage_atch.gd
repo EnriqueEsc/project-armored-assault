@@ -7,6 +7,7 @@ var case_pool: Array[Missile] = []
 var case_active: Array[Missile] = []
 
 @export var error_factor: float = 2.0
+@export var active_tracking: bool = false
 
 func _ready() -> void:
 	await get_tree().physics_frame
@@ -26,7 +27,7 @@ func _attachment_function() -> void:
 			case = case_pool.pop_front()
 		if case:
 			case_active.push_back(case)
-			case.objective = Vector3(objective.x + randf_range(-error_factor,error_factor),objective.y,objective.z + randf_range(-error_factor,error_factor))
+			case.set_objective(Vector3(objective.x + randf_range(-error_factor,error_factor),objective.y,objective.z + randf_range(-error_factor,error_factor)),objective_node)
 			case.shoot(Vector3(global_position.x, global_position.y,global_position.z),Vector2(90,-30))
 			if Effects_Manager.INSTANCE:
 				Effects_Manager.INSTANCE.shoot_from_pool(global_position,global_rotation, case.muzzle_flash_scale,0.0)
@@ -45,6 +46,7 @@ func create_projectiles() -> void:
 		case.set_origin(get_parent_node_3d() as Vehicle_Rigid)
 		case.deactivate()
 		case.deactivated.connect(case_to_pool)
+		case.active_tracking = active_tracking
 		get_tree().current_scene.call_deferred("add_child",case)
 		#get_tree().current_scene.add_child(case)
 		case_pool.append(case)

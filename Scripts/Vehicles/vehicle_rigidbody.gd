@@ -322,7 +322,7 @@ func _physics_process(delta: float) -> void:
 					Effects_Manager.INSTANCE.sparks_from_pool(global_position)
 		
 			
-			elif collider.has_method("take_damage"):
+			elif (not collider is Deformable_Terrain) and collider.has_method("take_damage"):
 				var impact_damage = (armor_points/20.0) * impact
 				collider.take_damage(impact_damage, self, global_position)
 				if Effects_Manager.INSTANCE:
@@ -507,9 +507,9 @@ func calculate_collision_lenght() -> void:
 				ingame_data.collision_lenght = collision_lenght
 	
 
-func use_attachment(objective: Vector3 = get_aim_point_3d(0,100)) -> void:
+func use_attachment(objective: Vector3 = get_aim_point_3d(0,100), node: Node3D = null) -> void:
 	if attachment:
-		attachment.objective = objective
+		attachment.set_objective(objective, node)
 		attachment._use_attachment()
 
 func get_score(score: int) -> void:

@@ -166,10 +166,16 @@ func check_is_inside_box(node: NodeInGameData, color: Color = Color.GREEN) -> No
 	return null
 
 func show_marker(node: NodeInGameData, color: Color = original_color) -> void:
+	
 	if node:
 		color = Color.RED
 	if color != modulate:
 		modulate = color
+	
+	
+	if not is_instance_valid(marker):
+		return
+	
 	if not node and marker:
 		marker.visible = false
 		enemy_health_bar.visible = false

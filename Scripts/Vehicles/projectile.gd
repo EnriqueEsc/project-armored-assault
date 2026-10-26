@@ -14,7 +14,7 @@ var origin: Vehicle_Rigid
 @export var recoil_force: float = 1
 @export var heat: float = 5.0
 @export var status_effect: Vehicle_Rigid.StatusEffects = Vehicle_Rigid.StatusEffects.None
-@export var range: float = 15.0
+@export var range: float = 25.0
 var ignore = []
 
 signal activated(projectile: Projectile)

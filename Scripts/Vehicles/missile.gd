@@ -3,16 +3,25 @@ class_name Missile
 
 var impact_preview: Sprite_Effect = null
 
+var objective_node: Node3D = null
 var objective: Vector3 = Vector3.ZERO
 var active_tracking: bool = false
 #var accuracy: float = 1.0
 
 signal impact()
 
+
+func set_objective(obj: Vector3, node: Node3D = null) -> void:
+	objective_node = node
+	objective = obj
+
 func _additional_deactivate_process() -> void:
 	impact.emit()
 
 func _additional_shoot_process() -> void:
+	
+	if active_tracking and is_instance_valid(objective_node):
+		return
 	
 	if Effects_Manager.INSTANCE:
 		impact_preview = Effects_Manager.INSTANCE.marker_from_pool(objective)
@@ -37,6 +46,10 @@ func disconnect_heat_effect() -> void:
 
 
 func move(delta: float) -> void:
+	if active_tracking and is_instance_valid(objective_node):
+		objective = objective_node.global_position
+	
+	#print("SEXO ",active_tracking," ",objective_node," ",objective)
 	
 	var target_direction = global_position.direction_to(objective)
 

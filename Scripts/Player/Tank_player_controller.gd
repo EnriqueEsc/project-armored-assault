@@ -565,11 +565,13 @@ func _process(delta: float) -> void:
 	
 	if Input.is_action_just_pressed("Attachment"):
 		var mouse_pos = tank_camera.get_mouse_3d_pos()
+		var obj_node: Node3D = null
 		if lock_on:
 			mouse_pos = pointer_pos
 		if enemy_locked:
 			mouse_pos = enemy_locked.pre_position
-		tank_rigid.use_attachment(mouse_pos)
+			obj_node = enemy_locked.parent_node
+		tank_rigid.use_attachment(mouse_pos,obj_node)
 	
 	
 	match move_type:
@@ -616,10 +618,16 @@ func _process(delta: float) -> void:
 			
 			#print(tank_rigid.velocity.length()," | ",tank_rigid.current_speed)
 			#print(abs(tank_rigid.turning_velocity * 10.0)/tank_rigid.max_turn_velocity)
-			var data = null
+			var data = enemy_locked if is_instance_valid(enemy_locked) else null 
+			
+			'''
 			if enemy_locked:
 				aim_to.emit(tank_camera.get_mouse_3d_pos(),enemy_locked,corr)
-			#aim_to.emit(tank_camera.get_mouse_3d_pos(),corr)
+			else:
+				aim_to.emit(tank_camera.get_mouse_3d_pos(),null,corr)
+			'''
+			#aim_to.emit(tank_camera.get_mouse_3d_pos(),enemy_locked,corr)
+			aim_to.emit(tank_camera.get_mouse_3d_pos(),data,corr)
 		#print("AIM ",aim_dir," ",aim_dir.length_squared())
 	
 	if Input.is_action_just_pressed("Map"):

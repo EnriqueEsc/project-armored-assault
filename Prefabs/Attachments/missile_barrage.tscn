@@ -5,6 +5,7 @@
 
 [node name="Attachment" type="Node3D" unique_id=2119041961]
 script = ExtResource("1_tde4x")
+active_tracking = true
 cooldown = 5.0
 attachment_name = "Missile_Barrage"
 

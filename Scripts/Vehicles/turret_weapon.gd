@@ -259,7 +259,7 @@ func shoot(shake_mult: float = 1.0) -> void:
 	
 	#rotation.y = lerp_angle(rotation.y,rotation.y+randf_range(deg_to_rad(-10),deg_to_rad(10)),1)
 	
-	last_shoot_prim = time_controller.running_time
+	last_shoot_prim = time_controller.running_time if is_instance_valid(time_controller) else 0.0
 	if effects_manager and projectile_type != Projectile_Type.Flamethrower:
 		effects_manager.shoot_from_pool(to_global(muzzle_pos), global_rotation, projectile.muzzle_flash_scale)
 	
@@ -314,6 +314,8 @@ func set_fire_mode(mode: Fire_Mode) -> void:
 func can_shoot() -> bool:
 	if overheat:
 		return false
+	if not is_instance_valid(time_controller):
+		return true
 	return last_shoot_prim + fire_rate_prim < time_controller.running_time
 
 

@@ -96,7 +96,7 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 			return
 					
 		if tank_rigid.attachment:
-			tank_rigid.attachment.objective = target_pos + Vector3(randi_range(-5,5),-2.0,randi_range(-5,5))
+			tank_rigid.attachment.set_objective(target_pos + Vector3(randi_range(-5,5),-2.0,randi_range(-5,5)),player_ref)
 			tank_rigid.attachment._use_attachment()
 		tank_rigid.distance_to_ground = 10.0
 	

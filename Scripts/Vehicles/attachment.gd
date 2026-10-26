@@ -1,6 +1,7 @@
 extends Node3D
 class_name Attachment
 
+var objective_node: Node3D = null
 var objective: Vector3 = Vector3.ZERO
 
 @export var cooldown: float = 0.0
@@ -13,6 +14,11 @@ signal shoot_recharge(charge: float)
 var master_vehicle: Vehicle_Rigid = null
 
 signal shakes(time: float, intensity: float)
+
+func set_objective(obj: Vector3, node: Node3D = null) -> void:
+	objective_node = node
+	objective = obj
+	
 
 func _ready() -> void:
 	pass # Replace with function body.

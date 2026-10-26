@@ -82,7 +82,7 @@ func _update_current_objectives() -> void:
 		
 		objectives_text = objectives_text.format({"ctk": current_tank_kills, "mtk": min_tank_kills, "cek": current_emplacement_kills, "mek": min_emplacement_kills, "cd": current_desmadre, "md": min_desmadre})
 	
-	else:
+	elif is_instance_valid(exfil_zone):
 		
 		if not exfil_zone.visible:
 			exfil_zone.visible = true
