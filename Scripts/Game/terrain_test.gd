@@ -4,6 +4,7 @@ class_name Deformable_Terrain
 
 var mesh_instance: MeshInstance3D = null
 var collision_shape: CollisionShape3D = null
+var navigation: NavRegion = null
 
 @export var terrain_texture: Texture2D
 
@@ -18,37 +19,133 @@ var min_max_height: PackedVector2Array = PackedVector2Array()
 
 var update_collision_next_tick: bool = false
 @export var recalculate_collision_tick: float = 1.0
-var recalculate_timer: float = 0.0
+var recalculate_collision_timer: float = 0.0
 
-var affected_buffer: Array[int] = []
+
+var update_visual_next_tick: bool = false
+@export var recalculate_visual_tick: float = 0.1
+var recalculate_visual_timer: float = 0.0
+
 
 enum DeformationMode{None,VisualOnly,All}
 @export var deformation_mode: DeformationMode = DeformationMode.All
 @export var max_deformation_in_runtime: float = 1.0
 
-func _process(delta: float) -> void:
+@export var deformation_treshold: float = 5
+
+
+func visual_process(delta: float) -> void:
+	
+	if not update_visual_next_tick:
+			return
+	recalculate_visual_timer += delta
+	if recalculate_visual_timer > recalculate_visual_tick:
+		recalculate_visual_timer = 0.0
+		if update_visual_next_tick:
+			update_visuals()
+			update_visual_next_tick = false
+
+func collision_process(delta: float) -> void:
+	
 	if not update_collision_next_tick:
 			return
-	recalculate_timer += delta
-	if recalculate_timer > recalculate_collision_tick:
-		recalculate_timer = 0.0
+	recalculate_collision_timer += delta
+	if recalculate_collision_timer > recalculate_collision_tick:
+		recalculate_collision_timer = 0.0
 		if update_collision_next_tick:
 			update_collisions()
 			update_collision_next_tick = false
 
+func _process(delta: float) -> void:
+	visual_process(delta)
+	collision_process(delta)
+
 func _ready() -> void:
 	generate()
-	recalculate_timer = recalculate_collision_tick
+	recalculate_visual_timer = recalculate_visual_tick
+	recalculate_collision_timer = recalculate_collision_tick
 
 func generate() -> void:
+	get_visuals_from_existing_mesh()
 	generate_visuals()
 	generate_collisions()
+	generate_navmesh()
 
-func generate_visuals() -> void:
+
+func generate_navmesh() -> void:
+	
+	navigation = NavRegion.new()
+	var nav_mesh: NavigationMesh = NavigationMesh.new()
+	
+	nav_mesh.agent_height = 2.0
+	nav_mesh.agent_radius = 0.5
+	nav_mesh.agent_max_climb = 0.3
+	nav_mesh.geometry_collision_mask = 2
+	
+	nav_mesh.geometry_parsed_geometry_type = NavigationMesh.PARSED_GEOMETRY_STATIC_COLLIDERS
+	
+	navigation.navigation_mesh = nav_mesh
+	
+	get_tree().current_scene.call_deferred("add_child",navigation)
+	call_deferred("reparent",navigation)
+	navigation.call_deferred("bake_navigation_mesh",true)
+	
+
+
+func get_visuals_from_existing_mesh() -> void:
+	for c in get_children():
+		if c is MeshInstance3D:
+			mesh_instance = c
+			#c.queue_free()
+	
+	if not mesh_instance:
+		return
+	
+	print("MESH INSTANCE FOUND")
+	
 	vertices.clear()
 	indexes.clear()
 	uvs.clear()
 	normals.clear()
+	min_max_height.clear()
+	
+	var mesh_array = mesh_instance.mesh as ArrayMesh
+	
+	if not mesh_array:
+		mesh_instance = null
+		return
+	
+	var aux = mesh_array.surface_get_arrays(0)
+	
+	vertices = aux[Mesh.ARRAY_VERTEX]
+	indexes = aux[Mesh.ARRAY_INDEX]
+	uvs = aux[Mesh.ARRAY_TEX_UV] 
+	normals = aux[Mesh.ARRAY_NORMAL]
+	
+	var mat: StandardMaterial3D = StandardMaterial3D.new()
+	if mat:
+		mat.albedo_texture = terrain_texture
+		#mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+		mesh_instance.material_override = mat
+	
+	for v in vertices:
+		min_max_height.append(Vector2(v.y-max_deformation_in_runtime,v.y+max_deformation_in_runtime))
+	
+
+	
+
+
+func generate_visuals() -> void:
+	
+	if mesh_instance:
+		return
+	
+	vertices.clear()
+	indexes.clear()
+	uvs.clear()
+	normals.clear()
+	min_max_height.clear()
 	
 	
 	for z in subdivisions.y + 1:
@@ -129,6 +226,7 @@ func generate_collisions() -> void:
 	var data = mesh_instance.mesh.create_trimesh_shape()
 	
 	collision_shape = CollisionShape3D.new()
+	collision_layer = 3
 	
 	collision_shape.shape = data
 	
@@ -136,29 +234,64 @@ func generate_collisions() -> void:
 
 
 func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3, status_effect: Vehicle_Rigid.StatusEffects = Vehicle_Rigid.StatusEffects.None) -> void:
+	if damage <= deformation_treshold:
+		return
+	
 	var closest_index: int = find_closest_vertex_to_point(impact_point)
 	deform_terrain_by_index(closest_index)
 
 
-func take_explosion(damage: int, source: Vehicle_Rigid, impact_point: Vector3, radius: float) -> void:
+func take_explosion(damage: int,source: Vehicle_Rigid,impact_point: Vector3,radius: float) -> void:
+	if damage <= deformation_treshold:
+		return
 	
+	var local_point = to_local(impact_point)
+	var radius_squared = radius * radius
 	
-	var radius_squared: float = radius * radius
+	for i in range(vertices.size()):
+		if vertices[i].distance_squared_to(local_point) <= radius_squared:
+			deform_terrain_by_index(i,damage)
 	
-	var affected_indexes: Array[int] = []
-	for v in vertices:
-		var dist_squared = v.distance_squared_to(impact_point)
-		if dist_squared <= radius_squared:
-			affected_indexes.append(vertices.find(v))
-			#b.take_damage(damage, source, impact_point)
+	return
 	
-	for a in affected_indexes:
-		deform_terrain_by_index(a)
-		#call_deferred("take_damage",damage, source, impact_point)
+	var vertex_spacing_x = (float(size.x) / subdivisions.x)
+	var vertex_spacing_z = (float(size.y) / subdivisions.y)
+	
+	var center_x = roundi((local_point.x + size.x * 0.5) / vertex_spacing_x)
+	var center_z = roundi((local_point.z + size.y * 0.5) / vertex_spacing_z)
+	
+	var range_x = ceili(radius / vertex_spacing_x)
+	var range_z = ceili(radius / vertex_spacing_z)
+	
+	var min_x = maxi(0, center_x - range_x)
+	var max_x = mini(subdivisions.x, center_x + range_x)
+	
+	var min_z = maxi(0, center_z - range_z)
+	var max_z = mini(subdivisions.y, center_z + range_z)
+	
+	var row_size = subdivisions.x + 1
+	
+	for z in range(min_z, max_z + 1):
+		for x in range(min_x, max_x + 1):
+			
+			var index = x + z * row_size
+			var vertex = vertices[index]
+			var dist_x = vertex.x - local_point.x
+			var dist_z = vertex.z - local_point.z
+			var distance_squared = (dist_x * dist_x) + (dist_z * dist_z)
+			
+			if distance_squared > radius_squared:
+				continue
+				
+			var distance = sqrt(distance_squared)
+			var fallout = 1.0 - (distance / radius)
+			
+			deform_terrain_by_index(index,damage)
+			#deform_terrain_by_index(index,damage * fallout)
 
 
 
-func deform_terrain_by_index(index: int, damage: int = 1) -> void:
+func deform_terrain_by_index(index: int, damage: float = 1) -> void:
 	if deformation_mode == DeformationMode.None:
 		return
 	if index < 0:
@@ -173,19 +306,21 @@ func deform_terrain_by_index(index: int, damage: int = 1) -> void:
 		return
 	
 	vertices[index].y = new_height
-	update()
+	update_visual_next_tick = true
+	#update()
 
 func find_closest_vertex_to_point(point: Vector3) -> int:
-	var res: int = -999
-	
+	var closest_index: int = -1
 	var min_dist: float = INF
-	var closest_vertex: Vector3 = Vector3.ZERO
+	var local_point: Vector3 = to_local(point)
+	#var closest_vertex: Vector3 = Vector3.ZERO
 	
-	for v in vertices:
-		if v.distance_to(point) < min_dist:
-			min_dist = v.distance_to(point)
-			closest_vertex = v
+	for v in vertices.size():
+		var dist: float = vertices[v].distance_squared_to(local_point)
+		if dist < min_dist:
+			min_dist = dist
+			closest_index = v
 	
-	res = vertices.find(closest_vertex)
+	#res = vertices.find(closest_vertex)
 	
-	return res
+	return closest_index

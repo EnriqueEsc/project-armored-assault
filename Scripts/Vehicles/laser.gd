@@ -2,7 +2,6 @@ extends Projectile
 class_name Laser
 
 @onready var collision: CollisionShape3D = $CollisionShape3D
-@onready var proy: MeshInstance3D = $CollisionShape3D/Proy
 @export var lifetime: float = 1.0
 var life_timer: float = 1.0
 
@@ -54,8 +53,14 @@ func _process(delta: float) -> void:
 func _additional_shoot_process() -> void:
 	stretch()
 
-func shoot(pos: Vector3, rot: Vector2) -> void:
+func shoot(pos: Vector3, rot: Vector2, pot: bool = false, mult: float = 2.0) -> void:
 	activate()
+	
+	if pot:
+		power_multiplier = mult
+		change_material_color(Color.BLUE)
+	else:
+		power_multiplier = 1.0
 	
 	life_timer = 0.0
 	
@@ -134,7 +139,7 @@ func shoot_laser() -> void:
 	if body.has_method("take_damage"):
 		direction = Vector3.ZERO
 		#origin.projectile_to_pool(self)
-		body.take_damage(damage, origin, global_position, status_effect)
+		body.take_damage(damage * power_multiplier, origin, global_position, status_effect)
 		if effects_manager:
 			effects_manager.sparks_from_pool(global_position)
 		#origin.get_score(damage)
@@ -194,7 +199,7 @@ func _on_body_entered(body):
 	if body.has_method("take_damage"):
 		direction = Vector3.ZERO
 		#origin.projectile_to_pool(self)
-		body.take_damage(damage, origin, end_point, status_effect)
+		body.take_damage(damage * power_multiplier, origin, end_point, status_effect)
 		if effects_manager:
 			effects_manager.sparks_from_pool(end_point)
 			effects_manager.sparks_from_pool(body.global_position)
@@ -232,7 +237,7 @@ func detonate() -> void:
 	if effects_manager:
 		effects_manager.explosion_from_pool(end_point,blast_rad)
 	
-	explodes.emit(end_point,blast_rad,blast_damage)
+	explodes.emit(end_point,blast_rad,blast_damage * power_multiplier)
 	
 	
 	var explosion = SphereShape3D.new()
@@ -303,13 +308,13 @@ func detonate() -> void:
 		
 		#print("olaaaa ",t," | ",hits_enemy.is_connected(origin.send_hit_signal))
 		if t.has_method("take_explosion"):
-			t.call_deferred("take_explosion", blast_damage, origin, end_point, blast_rad)
+			t.call_deferred("take_explosion", blast_damage * power_multiplier, origin, end_point, blast_rad)
 			
 			print(t)
 			continue
 	
 		if t.has_method("take_damage"):
-			t.call_deferred("take_damage", blast_damage, origin, end_point, status_effect)
+			t.call_deferred("take_damage", blast_damage * power_multiplier, origin, end_point, status_effect)
 			
 		if t.has_method("recoil"):
 			#print(t)

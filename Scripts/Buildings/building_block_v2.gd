@@ -26,22 +26,18 @@ func initialize() -> void:
 	effects_manager = Effects_Manager.INSTANCE
 	settings_manager = Settings_Manager.INSTANCE
 	destruction_point = global_position
+	if shape:
+		shape = shape.duplicate()
 	return
-	# 1. Verificamos que este nodo realmente tenga una forma tipo caja asignada
 	if shape is BoxShape3D:
-		# 2. Creamos el nodo visual (MeshInstance3D)
 		var r: MeshInstance3D = MeshInstance3D.new()
 		
-		# 3. Creamos el recurso visual de la caja (BoxMesh)
 		var box_mesh: BoxMesh = BoxMesh.new()
 		
-		# 4. Le copiamos el tamaño exacto del CollisionShape3D
 		box_mesh.size = shape.size
 		
-		# 5. Asignamos la malla al nodo visual
 		r.mesh = box_mesh
 		
-		# 6. Añadimos el nodo visual como hijo para que aparezca en el mundo
 		add_child(r)
 
 func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> void:
@@ -77,8 +73,17 @@ func destroy_now(point: Vector3 = global_position) -> void:
 		if settings_manager.destruction_effects_mode == settings_manager.Destruction_Effects_Mode.Always or settings_manager.destruction_effects_mode == settings_manager.Destruction_Effects_Mode.On_Block_Only:
 			effects_manager.debris_from_pool(destruction_point)
 	
+	if shape:
+		#PhysicsServer3D.shape_set_data(shape.get_rid(), null)
+		pass
 	queue_free()
-	
+
+func check_disabling(damage: int) -> void:
+	var res = armor_points - damage
+	if res < 1:
+		disabled = true
+	#print("CHECKING ",res," ",armor_points," ",damage," ",disabled)
+
 func deactivate() -> void:
 	
 	

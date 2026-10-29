@@ -39,9 +39,32 @@ var check_offset: Vector2 = Vector2.ZERO
 
 signal got_destroyed
 
+var destroy_blocks_tick: float = 0.1
+var destroy_timer: float = 1.0
+var destroy_blocks: bool = false
+var blocks_to_destroy: Array[Dictionary] = []
+
+func _process(delta: float) -> void:
+	if not destroy_blocks:
+		return
+		
+	destroy_timer += delta
+	if destroy_timer > destroy_blocks_tick:
+		destroy_timer = 0.0
+		
+		while not blocks_to_destroy.is_empty():
+			var aux = blocks_to_destroy.pop_front()
+			
+			if not is_instance_valid(aux["Block"]):
+				continue
+			
+			aux["Block"].take_damage(aux["Damage"], aux["Source"], aux["ImpactPoint"])
+			
+		destroy_blocks = false
+
 func _ready() -> void:
 	
-	max_armor_points = randi_range(1,5)
+	max_armor_points = randi_range(3,7)
 	
 	for b in get_children():
 		
@@ -152,6 +175,11 @@ func calculate_closest_block(damage:int, source: Vehicle_Rigid, impact_point: Ve
 			closest_block = b
 	
 	if closest_block:
+		closest_block.check_disabling(damage)
+		var to_buffer = {"Block": closest_block,"Damage":damage,"Source":source,"ImpactPoint":impact_point}
+		blocks_to_destroy.append(to_buffer)
+		destroy_blocks = true
+		return
 		closest_block.take_damage(damage,source,impact_point)
 	
 

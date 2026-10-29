@@ -9,6 +9,12 @@
 [sub_resource type="BoxShape3D" id="BoxShape3D_sn0t7"]
 size = Vector3(0.5, 0.5, 0.5)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oxg01"]
+albedo_color = Color(1, 0.69803923, 0, 1)
+emission_enabled = true
+emission = Color(1, 0.6117647, 0, 1)
+emission_energy_multiplier = 5.0
+
 [sub_resource type="SphereMesh" id="SphereMesh_bhunq"]
 radius = 0.25
 height = 0.5
@@ -41,7 +47,8 @@ visible = false
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.23016813, 0, 0)
 visible = false
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="CollisionShape3D" unique_id=1268505562]
+[node name="Proy" type="MeshInstance3D" parent="CollisionShape3D" unique_id=1268505562]
+material_override = SubResource("StandardMaterial3D_oxg01")
 mesh = SubResource("SphereMesh_bhunq")
 
 [node name="Fake_Light" type="MeshInstance3D" parent="CollisionShape3D" unique_id=1273235399]

@@ -17,6 +17,17 @@ var origin: Vehicle_Rigid
 @export var range: float = 25.0
 var ignore = []
 
+var original_speed: float = 10
+var original_damage: int = 10
+var orginal_is_explosive: bool = true
+var original_blast_rad: float = 2
+var original_blast_damage: float = 10
+var original_recoil_force: float = 1
+var original_heat: float = 5.0
+var original_status_effect: Vehicle_Rigid.StatusEffects = Vehicle_Rigid.StatusEffects.None
+var original_range: float = 25.0
+var original_color: Color = Color.YELLOW
+
 signal activated(projectile: Projectile)
 signal deactivated(projectile: Projectile)
 signal explodes(pos: Vector3, blast_rad: float, blast_damage: float)
@@ -49,6 +60,9 @@ var fixated_ignore: Array = []
 @export var horizontal_disp: Vector2 = Vector2.ZERO
 @export var vertical_disp: Vector2 = Vector2.ZERO
 
+@onready var proy: MeshInstance3D = $CollisionShape3D/Proy
+
+var power_multiplier: float = 1.0
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -77,6 +91,8 @@ func _ready() -> void:
 	
 	
 	_additional_setup()
+	
+	_set_originals()
 	
 	if not uses_slug:
 		return
@@ -117,6 +133,37 @@ func _ready() -> void:
 		s.ignore = (fixated_ignore)
 		s.ignore.append_array(ignore)
 
+func _set_originals() -> void:
+	original_speed = speed
+	original_damage = damage
+	orginal_is_explosive = is_explosive
+	original_blast_rad = blast_rad
+	original_blast_damage = blast_damage
+	original_recoil_force = recoil_force
+	original_heat = heat
+	original_status_effect = status_effect
+	original_range = range
+
+
+func modify_parameters(spd: float = 1.0, dmg: float = 1.0, rang: float = 1.0, sts: Vehicle_Rigid.StatusEffects = original_status_effect, exp: bool = orginal_is_explosive, blst_dmg: float = 1.0, blst_rd: float = 1.0, ht: float = 1.0, rec: float = 1.0) -> void:
+	speed = original_speed * spd
+	damage = original_damage * dmg
+	is_explosive = exp
+	blast_damage = original_blast_damage * blst_dmg
+	blast_rad = original_blast_rad * blst_rd
+	recoil_force = original_recoil_force * rec
+	heat = original_heat * ht
+	range = original_range * rang
+	status_effect = sts
+	
+	
+	if not is_instance_valid(proy):
+		return
+	var mat = proy.material_override as StandardMaterial3D
+	if not is_instance_valid(mat):
+		return
+	original_color = mat.albedo_color
+
 func _additional_setup() -> void:
 	pass
 
@@ -136,9 +183,15 @@ func set_origin(vehicle: Vehicle_Rigid) -> void:
 func _additional_shoot_process() -> void:
 	pass
 
-func shoot(pos: Vector3, rot: Vector2) -> void:
+func shoot(pos: Vector3, rot: Vector2, pot: bool = false, mult: float = 2.0) -> void:
 	activate()
 	
+	if pot:
+		power_multiplier = mult
+		change_material_color(Color.BLUE)
+	elif power_multiplier != 1.0:
+		power_multiplier = 1.0
+		change_material_color()
 	
 	current_pos = pos
 	position = current_pos
@@ -160,7 +213,7 @@ func shoot(pos: Vector3, rot: Vector2) -> void:
 		#s.ignore = (fixated_ignore)
 		#s.ignore.append_array(ignore)
 		
-		s.shoot(global_position,Vector2(rotation.x + deg_to_rad(randf_range(vertical_disp.x,vertical_disp.y)),rotation.y + deg_to_rad(randf_range(horizontal_disp.x,horizontal_disp.y))))
+		s.shoot(global_position,Vector2(rotation.x + deg_to_rad(randf_range(vertical_disp.x,vertical_disp.y)),rotation.y + deg_to_rad(randf_range(horizontal_disp.x,horizontal_disp.y))),pot,mult)
 	
 	rotation.x += deg_to_rad(randf_range(vertical_disp.x,vertical_disp.y))
 	rotation.y += deg_to_rad(randf_range(horizontal_disp.x,horizontal_disp.y))
@@ -225,7 +278,7 @@ func _on_body_entered(body):
 	if body.has_method("take_damage"):
 		direction = Vector3.ZERO
 		#origin.projectile_to_pool(self)
-		body.take_damage(damage, origin, global_position, status_effect)
+		body.take_damage(damage * power_multiplier, origin, global_position, status_effect)
 		
 		if effects_manager:
 			effects_manager.sparks_from_pool(global_position)
@@ -266,7 +319,7 @@ func detonate() -> void:
 	if effects_manager:
 		effects_manager.explosion_from_pool(global_position,blast_rad)
 	
-	explodes.emit(global_position,blast_rad,blast_damage)
+	explodes.emit(global_position,blast_rad,blast_damage * power_multiplier)
 	
 	
 	var explosion = SphereShape3D.new()
@@ -337,13 +390,13 @@ func detonate() -> void:
 		
 		#print("olaaaa ",t," | ",hits_enemy.is_connected(origin.send_hit_signal))
 		if t.has_method("take_explosion"):
-			t.call_deferred("take_explosion", blast_damage, origin, global_position, blast_rad)
+			t.call_deferred("take_explosion", blast_damage * power_multiplier, origin, global_position, blast_rad)
 			
-			print(t)
+			#print(t)
 			continue
 	
 		if t.has_method("take_damage"):
-			t.call_deferred("take_damage", blast_damage, origin, global_position, status_effect)
+			t.call_deferred("take_damage", blast_damage * power_multiplier, origin, global_position, status_effect)
 			
 		if t.has_method("recoil"):
 			#print(t)
@@ -366,3 +419,17 @@ func set_emission_in_material(mesh: MeshInstance3D, enable_emission: bool = Sett
 			elif mesh is Mesh_Instance_3D_Effect:
 				fake_light = mesh as Mesh_Instance_3D_Effect
 				fake_light_original_size = mesh.mesh.size
+
+func change_material_color(color: Color = original_color) -> void:
+	if not is_instance_valid(proy):
+		return
+	var mat = proy.material_override as StandardMaterial3D
+	if not is_instance_valid(mat):
+		return
+	mat.albedo_color = color
+	mat.emission = color
+	proy.material_override = mat
+	if not is_instance_valid(fake_light):
+		return
+	
+	fake_light.set_instance_shader_parameter("light_color",color)

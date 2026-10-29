@@ -4,8 +4,8 @@
 
 [resource]
 script = ExtResource("1_s45wc")
-mission_name = "Mission Test"
-mission_file_path_name = "mission_zero"
+mission_name = "Mission Test_DEST"
+mission_file_path_name = "mission_zero_dep"
 operation_date = "Today, Duh"
 briefing = "....
 ....

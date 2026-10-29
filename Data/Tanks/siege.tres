@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Tank_Data" format=3 uid="uid://lxclq6ha5tjc"]
+
+[ext_resource type="Script" uid="uid://o0qesee4s8dx" path="res://Data/Tanks/Tank_Data.gd" id="1_o037q"]
+
+[resource]
+script = ExtResource("1_o037q")
+filename = "siege"
+tank_Name = "siege"
+traction = 2.0
+max_armor_points = 800
+metadata/_custom_type_script = "uid://o0qesee4s8dx"

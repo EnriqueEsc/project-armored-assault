@@ -43,14 +43,17 @@ signal shoot_recharge(charge: float)
 @export var muzzle_pos: Vector3 = Vector3.ZERO
 var time_controller: Time_Controller
 @export var fire_rate_prim: float = 2
+var original_fire_rate_prim: float = 2.0
 var last_shoot_prim: float = -10
 
 var time_passed: float = 0
 
 
 @export var max_heat: float = 100.0
+var original_max_heat: float = 100.0
 var current_heat: float = 0.0
 @export var cooling_factor: float = 10.0
+var original_cooling_factor: float = 10.0
 var overheat: bool = false
 
 var original_side_angle: float = 0.0
@@ -78,6 +81,23 @@ func spawn() -> void:
 	if static_model:
 		return
 	
+	
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	
+	if static_model:
+		return
+	
+	
+	
+	
+	original_cooling_factor = cooling_factor
+	original_fire_rate_prim = fire_rate_prim
+	original_max_heat = max_heat
+	
+	
+	
 	projectile = projectile_prefab.instantiate() as Projectile
 	projectile.deactivate()
 	get_tree().root.call_deferred("add_child",projectile)
@@ -86,12 +106,6 @@ func spawn() -> void:
 	case.deactivate()
 	get_tree().root.call_deferred("add_child",case)
 	
-
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	
-	if static_model:
-		return
 	
 	case_prefab = load("res://Prefabs/Test/case.tscn")
 	
@@ -139,6 +153,27 @@ func _ready() -> void:
 	pass
 
 
+func modify_parameters(rate: float = 1.0, heat: float = 1.0, cooling: float = 1.0,spd: float = 1.0, dmg: float = 1.0, rang: float = 1.00)  -> void:
+	cooling_factor = original_cooling_factor * cooling
+	#print("FIRE RATE ",fire_rate_prim)
+	fire_rate_prim = original_fire_rate_prim / rate
+	#print("FIRE RATE ",fire_rate_prim," ",original_fire_rate_prim," ",rate)
+	
+	max_heat = original_max_heat * heat
+	
+	print("HEAT ",current_heat)
+	
+	for b in projectile_active:
+		b.modify_parameters(spd,dmg,rang)
+	for b in projectile_pool:
+		b.modify_parameters(spd,dmg,rang)
+	
+	match fire_mode:
+		Fire_Mode.Auto:
+			current_heat = max_heat * (percent/100.0)
+			print("HEAT ",current_heat," ",max_heat," ",percent)
+		_:
+			pass
 
 func show_heat_effects(vel: float) -> void:
 	if effects_manager and (overheat and not heat_effect):

@@ -7,14 +7,19 @@ var sight_pos: Node3D = null
 
 @export var barrel_upper_limit: float = 30
 @export var barrel_lower_limit: float = -10
+var original_barrel_upper_limit: float = 30
+var original_barrel_lower_limit: float = -10
+
 var current_rotation: float = 0
 var final_rotation: float = 0
 @export var turret_turning_speed: float = 0.025
+var original_turret_turning_speed: float = 0.025
 
 var turret_pos_2d: Vector2 = Vector2.ZERO
 
 
 @export var side_angle_limit: float = 30
+var original_side_angle_limit: float = 30
 
 signal recoil (dir: Vector3)
 
@@ -29,6 +34,7 @@ signal shoot_recharge(charge: float)
 @export var fire_mode: Turret_Weapon.Fire_Mode = Turret_Weapon.Fire_Mode.Semi
 @export var bullets_per_burst: int = 1
 @export var time_between_burst: float = 4.0
+var original_time_between_burst: float = 4.0
 var waiting_time: float = 4.0
 var remaining_burst_bullets: int = -1
 var projectile_type: Turret_Weapon.Projectile_Type = Turret_Weapon.Projectile_Type.AP
@@ -72,6 +78,17 @@ func spawn() -> void:
 		w.spawn()
 		
 	
+	original_barrel_lower_limit = barrel_lower_limit
+
+func modify_turret_limits(side: float = 1.0, turn: float = 1.0, lower: float = 1.0, upper: float = 1.0, burst: float = 1.0,rate: float = 1.0, heat: float = 1.0, cooling: float = 1.0, spd: float = 1.0, dmg: float = 1.0, rang: float = 1.00) -> void:
+	barrel_lower_limit = original_barrel_lower_limit * lower
+	barrel_upper_limit = original_barrel_upper_limit * upper
+	side_angle_limit = original_side_angle_limit * side
+	time_between_burst = original_time_between_burst * burst
+	turret_turning_speed = original_turret_turning_speed * turn
+	
+	for w in turret_barrel:
+		w.modify_parameters(rate,heat,cooling,spd,dmg,rang)
 
 func calculate_mean_bullet_speed() -> void:
 	
@@ -277,6 +294,8 @@ func get_aim_point_3d(distance: float) -> Vector3:
 		if not is_instance_valid(i):
 			continue
 		excluded.append(i)
+	if is_instance_valid(origin):
+		excluded.append(origin.get_rid())
 	
 	query.exclude = excluded
 	
