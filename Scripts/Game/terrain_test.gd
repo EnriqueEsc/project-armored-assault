@@ -33,6 +33,12 @@ enum DeformationMode{None,VisualOnly,All}
 
 @export var deformation_treshold: float = 5
 
+var image_buffer: Image = null
+var texture_buffer: ImageTexture = null
+var buffer_width: int = 1024
+var buffer_height: int = 0
+
+@export var use_shader: bool = true
 
 func visual_process(delta: float) -> void:
 	
@@ -139,6 +145,12 @@ func get_visuals_from_existing_mesh() -> void:
 func generate_visuals() -> void:
 	
 	if mesh_instance:
+		create_vertex_buffer()
+		var material = ShaderMaterial.new()
+		material.shader = load("res://Shaders/deformation_test.gdshader")
+		material.set_shader_parameter("buffer", texture_buffer)
+		material.set_shader_parameter("terrain_texture", terrain_texture)
+		mesh_instance.material_override = material
 		return
 	
 	vertices.clear()
@@ -190,10 +202,22 @@ func generate_visuals() -> void:
 	
 	mesh_instance = MeshInstance3D.new()
 	mesh_instance.mesh = new_mesh
+	var material
 	
-	var material = StandardMaterial3D.new()
-	material.albedo_texture = terrain_texture
-	
+	if use_shader:
+		material = ShaderMaterial.new()
+		var shader = load("res://Shaders/deformation_test.gdshader")
+		material.shader = shader
+		#material.albedo_texture = terrain_texture
+		
+		
+		create_vertex_buffer()
+		
+		material.set_shader_parameter("buffer",texture_buffer)
+		material.set_shader_parameter("terrain_texture", terrain_texture)
+	else:
+		material = StandardMaterial3D.new()
+		material.albedo_texture = terrain_texture
 	mesh_instance.material_override = material
 	
 	call_deferred("add_child", mesh_instance)
@@ -204,6 +228,16 @@ func update() -> void:
 	#update_collisions()
 
 func update_visuals() -> void:
+	if use_shader:
+		_update_texture_vram()
+		
+		if deformation_mode != DeformationMode.All:
+			return
+		
+		update_collision_next_tick = true
+		return
+	
+	
 	var mesh = mesh_instance.mesh as ArrayMesh
 	var aux = mesh.surface_get_arrays(0)
 	if aux[Mesh.ARRAY_VERTEX] != vertices:
@@ -218,11 +252,56 @@ func update_visuals() -> void:
 	update_collision_next_tick = true
 
 func update_collisions() -> void:
-	var shape = mesh_instance.mesh.create_trimesh_shape()
+	#var shape = mesh_instance.mesh.create_trimesh_shape()
+	var shape = ConcavePolygonShape3D.new()
+	var faces = PackedVector3Array()
+	
+	faces.resize(indexes.size())
+	
+	for i in range(indexes.size()):
+		faces[i] = vertices[indexes[i]]
+		
+	shape.set_faces(faces)
+	collision_shape.shape = shape
+	return
+	
+	
+	var arrays = []
+	arrays.resize(Mesh.ARRAY_MAX)
+	
+	arrays[Mesh.ARRAY_VERTEX] = vertices
+	arrays[Mesh.ARRAY_INDEX] = indexes
+	
+	var collision_mesh = ArrayMesh.new()
+	collision_mesh.add_surface_from_arrays(	Mesh.PRIMITIVE_TRIANGLES,arrays)
+	
+	#var shape = collision_mesh.create_trimesh_shape()
+	
 	if collision_shape.shape != shape:
 		collision_shape.shape = shape
 
 func generate_collisions() -> void:
+	
+	
+	var shape = ConcavePolygonShape3D.new()
+	var faces = PackedVector3Array()
+	
+	faces.resize(indexes.size())
+	
+	for i in range(indexes.size()):
+		faces[i] = vertices[indexes[i]]
+		
+	shape.set_faces(faces)
+	
+	collision_shape = CollisionShape3D.new()
+	collision_layer = 3
+	
+	collision_shape.shape = shape
+	
+	call_deferred("add_child", collision_shape)
+	
+	return
+	
 	var data = mesh_instance.mesh.create_trimesh_shape()
 	
 	collision_shape = CollisionShape3D.new()
@@ -290,7 +369,6 @@ func take_explosion(damage: int,source: Vehicle_Rigid,impact_point: Vector3,radi
 			#deform_terrain_by_index(index,damage * fallout)
 
 
-
 func deform_terrain_by_index(index: int, damage: float = 1) -> void:
 	if deformation_mode == DeformationMode.None:
 		return
@@ -302,11 +380,21 @@ func deform_terrain_by_index(index: int, damage: float = 1) -> void:
 	
 	#print("NEW ", new_height < vertices[index].y," ",vertices[index].y," ",new_height)
 	
+	new_height = clampf(new_height,min_max_height[index].x,min_max_height[index].y)
+	
 	if new_height < min_max_height[index].x or new_height > min_max_height[index].y:
 		return
 	
 	vertices[index].y = new_height
-	update_visual_next_tick = true
+	
+	if use_shader:
+		var x = index % buffer_width
+		var y = int(index / buffer_width)
+		var vertex = vertices[index]
+		image_buffer.set_pixel(x,y,Color(vertex.x, vertex.y, vertex.z, 1.0))
+	
+	if not update_visual_next_tick:
+		update_visual_next_tick = true
 	#update()
 
 func find_closest_vertex_to_point(point: Vector3) -> int:
@@ -324,3 +412,19 @@ func find_closest_vertex_to_point(point: Vector3) -> int:
 	#res = vertices.find(closest_vertex)
 	
 	return closest_index
+
+func _update_texture_vram():
+	texture_buffer.update(image_buffer)
+
+func create_vertex_buffer() -> void:
+	var vertex_count = vertices.size()
+
+	buffer_height = ceili(float(vertex_count) / buffer_width)
+
+	image_buffer = Image.create(buffer_width,buffer_height,false,Image.FORMAT_RGBF)
+	for i in range(vertex_count):
+		var x = i % buffer_width
+		var y = int(i / buffer_width)
+		var vertex = vertices[i]
+		image_buffer.set_pixel(x,y,Color(vertex.x, vertex.y, vertex.z, 1.0))
+	texture_buffer = ImageTexture.create_from_image(image_buffer)

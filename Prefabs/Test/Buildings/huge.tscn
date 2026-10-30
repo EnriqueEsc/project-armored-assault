@@ -25,6 +25,7 @@ size = Vector3(6, 16, 5)
 
 [node name="Big_Building" type="Node3D" unique_id=921184687]
 script = ExtResource("1_ns446")
+crush_update_frequency = null
 pref_mesh = SubResource("BoxMesh_qr0ht")
 material = SubResource("ShaderMaterial_pni4c")
 

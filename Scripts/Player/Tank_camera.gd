@@ -282,3 +282,10 @@ func add_unprojected(n: NodeInGameData) -> void:
 func remove_unprojected(n: NodeInGameData) -> void:
 	if enemies_unprojected.has(n):
 		enemies_unprojected.erase(n)
+
+func distance_squared_to_point(point: Vector3) -> float:
+	return global_position.distance_squared_to(point)
+	
+func is_outside_camera_range(point: Vector3) -> bool:
+	var dist = global_position.distance_squared_to(point)
+	return dist > 700.0

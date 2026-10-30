@@ -301,8 +301,10 @@ func _on_body_entered(body):
 		if effects_manager:
 			effects_manager.failed_sparks_from_pool(global_position)
 		if not is_explosive:
+			#deform_shader(body,global_position)
 			deactivate()
 		else:
+			#deform_shader(body,global_position)
 			detonate()
 
 

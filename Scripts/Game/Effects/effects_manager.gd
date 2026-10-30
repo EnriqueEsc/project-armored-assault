@@ -5,6 +5,8 @@ static var INSTANCE: Effects_Manager = null
 
 var max_particle_emmiters: int = 30
 
+var global_active: Array[GPUParticles3D] = []
+
 var explosion_prefab = load("res://Prefabs/Effects/explosion.tscn")
 var explosion_pool: Array[GPUParticles3D] = []
 var explosion_active: Array[GPUParticles3D] = []
@@ -89,12 +91,14 @@ func create_effects() -> void:
 		var explosion = explosion_prefab.instantiate() as GPUParticles3D
 		get_tree().current_scene.call_deferred("add_child",explosion)
 		explosion.finished.connect(explosion_to_pool.bind(explosion))
+		explosion.finished.connect(remove_from_global_active.bind(explosion))
 		deactivate_effect(explosion)
 		explosion_pool.append(explosion)
 		
 		var explo_wave = explo_wave_prefab.instantiate() as GPUParticles3D
 		get_tree().current_scene.call_deferred("add_child",explo_wave)
 		explo_wave.finished.connect(explo_wave_to_pool.bind(explo_wave))
+		explo_wave.finished.connect(remove_from_global_active.bind(explo_wave))
 		deactivate_effect(explo_wave)
 		explo_wave_pool.append(explo_wave)
 		set_emission_in_gpu_particles(explo_wave)
@@ -102,6 +106,7 @@ func create_effects() -> void:
 		var collapse = collapse_prefab.instantiate() as GPUParticles3D
 		get_tree().current_scene.call_deferred("add_child",collapse)
 		collapse.finished.connect(collapse_to_pool.bind(collapse))
+		collapse.finished.connect(remove_from_global_active.bind(collapse))
 		deactivate_effect(collapse)
 		collapse_pool.append(collapse)
 		
@@ -109,6 +114,7 @@ func create_effects() -> void:
 		var sparks = sparks_prefab.instantiate() as GPUParticles3D
 		get_tree().current_scene.call_deferred("add_child",sparks)
 		sparks.finished.connect(sparks_to_pool.bind(sparks))
+		sparks.finished.connect(remove_from_global_active.bind(sparks))
 		deactivate_effect(sparks)
 		sparks_pool.append(sparks)
 		set_emission_in_gpu_particles(sparks)
@@ -117,6 +123,7 @@ func create_effects() -> void:
 		var failed_sparks = failed_sparks_prefab.instantiate() as GPUParticles3D
 		get_tree().current_scene.call_deferred("add_child",failed_sparks)
 		failed_sparks.finished.connect(failed_sparks_to_pool.bind(failed_sparks))
+		failed_sparks.finished.connect(remove_from_global_active.bind(failed_sparks))
 		deactivate_effect(failed_sparks)
 		failed_sparks_pool.append(failed_sparks)
 		set_emission_in_gpu_particles(failed_sparks)
@@ -125,6 +132,7 @@ func create_effects() -> void:
 		var debris = debris_prefab.instantiate() as GPUParticles3D
 		get_tree().current_scene.call_deferred("add_child",debris)
 		debris.finished.connect(debris_to_pool.bind(debris))
+		debris.finished.connect(remove_from_global_active.bind(debris))
 		deactivate_effect(debris)
 		debris_pool.append(debris)
 		
@@ -191,6 +199,10 @@ func create_effects() -> void:
 
 
 func explosion_from_pool(position: Vector3, radius: float, wave_scale: int = -1) -> void:
+	var cam = Tank_camera.INSTANCE
+	if cam and cam.is_outside_camera_range(position):
+		return
+	
 	var explosion: GPUParticles3D = null
 	if explosion_pool.size() <= 0:
 		explosion = explosion_active.pop_front()
@@ -198,6 +210,9 @@ func explosion_from_pool(position: Vector3, radius: float, wave_scale: int = -1)
 		explosion = explosion_pool.pop_front()
 	if explosion:
 		explosion_active.push_back(explosion)
+		
+		to_global_active(explosion)
+		
 		explosion.process_mode = Node.PROCESS_MODE_ALWAYS
 		explosion.global_position = position
 		explosion.show()
@@ -214,6 +229,10 @@ func explosion_to_pool(explosion: GPUParticles3D) -> void:
 
 
 func explo_wave_from_pool(position: Vector3, radius: float, wave_scale: int = -1, color: Color = Color.YELLOW) -> void:
+	var cam = Tank_camera.INSTANCE
+	if cam and cam.is_outside_camera_range(position):
+		return
+	
 	var explo_wave: GPUParticles3D = null
 	if explo_wave_pool.size() <= 0:
 		explo_wave = explo_wave_active.pop_front()
@@ -221,6 +240,8 @@ func explo_wave_from_pool(position: Vector3, radius: float, wave_scale: int = -1
 		explo_wave = explo_wave_pool.pop_front()
 	if explo_wave:
 		explo_wave_active.push_back(explo_wave)
+		
+		to_global_active(explo_wave)
 		
 		if wave_scale < 0:
 			wave_scale = radius
@@ -256,6 +277,10 @@ func explo_wave_to_pool(explo_wave: GPUParticles3D) -> void:
 
 
 func sparks_from_pool(position: Vector3) -> void:
+	var cam = Tank_camera.INSTANCE
+	if cam and cam.is_outside_camera_range(position):
+		return
+	
 	var sparks: GPUParticles3D = null
 	if sparks_pool.size() <= 0:
 		sparks = sparks_active.pop_front()
@@ -263,6 +288,10 @@ func sparks_from_pool(position: Vector3) -> void:
 		sparks = sparks_pool.pop_front()
 	if sparks:
 		sparks_active.push_back(sparks)
+		
+		to_global_active(sparks)
+		
+		
 		sparks.process_mode = Node.PROCESS_MODE_ALWAYS
 		sparks.global_position = position
 		sparks.show()
@@ -281,6 +310,10 @@ func sparks_to_pool(sparks: GPUParticles3D) -> void:
 
 
 func failed_sparks_from_pool(position: Vector3) -> void:
+	var cam = Tank_camera.INSTANCE
+	if cam and cam.is_outside_camera_range(position):
+		return
+	
 	var failed_sparks: GPUParticles3D = null
 	if failed_sparks_pool.size() <= 0:
 		failed_sparks = failed_sparks_active.pop_front()
@@ -288,6 +321,10 @@ func failed_sparks_from_pool(position: Vector3) -> void:
 		failed_sparks = failed_sparks_pool.pop_front()
 	if failed_sparks:
 		failed_sparks_active.push_back(failed_sparks)
+		
+		to_global_active(failed_sparks)
+		
+		
 		failed_sparks.process_mode = Node.PROCESS_MODE_ALWAYS
 		failed_sparks.global_position = position
 		failed_sparks.show()
@@ -309,6 +346,10 @@ func failed_sparks_to_pool(failed_sparks: GPUParticles3D) -> void:
 
 
 func debris_from_pool(position: Vector3) -> void:
+	var cam = Tank_camera.INSTANCE
+	if cam and cam.is_outside_camera_range(position):
+		return
+	
 	var debris: GPUParticles3D = null
 	if debris_pool.size() <= 0:
 		debris = debris_active.pop_front()
@@ -316,6 +357,10 @@ func debris_from_pool(position: Vector3) -> void:
 		debris = debris_pool.pop_front()
 	if debris:
 		debris_active.push_back(debris)
+		
+		to_global_active(debris)
+		
+		
 		debris.process_mode = Node.PROCESS_MODE_ALWAYS
 		debris.global_position = position
 		debris.show()
@@ -328,6 +373,10 @@ func debris_to_pool(debris: GPUParticles3D) -> void:
 
 
 func collapse_from_pool(position: Vector3) -> void:
+	var cam = Tank_camera.INSTANCE
+	if cam and cam.is_outside_camera_range(position):
+		return
+	
 	
 	print(position)
 	var collapse: GPUParticles3D
@@ -337,6 +386,10 @@ func collapse_from_pool(position: Vector3) -> void:
 		collapse = collapse_pool.pop_front()
 	if collapse:
 		collapse_active.push_back(collapse)
+		
+		to_global_active(collapse)
+		
+		
 		collapse.process_mode = Node.PROCESS_MODE_ALWAYS
 		collapse.global_position = position
 		collapse.show()
@@ -349,6 +402,10 @@ func collapse_to_pool(collapse: GPUParticles3D) -> void:
 
 
 func fire_from_pool(position: Vector3) -> Fire_Effect:
+	var cam = Tank_camera.INSTANCE
+	if cam and cam.is_outside_camera_range(position):
+		return
+	
 	#print("EXP ",position)
 	#print("Efectos activos: ",fire_active.size())
 	var fire: Fire_Effect
@@ -429,6 +486,10 @@ func marker_to_pool(marker: Sprite_Effect) -> void:
 
 
 func fake_light_from_pool(position: Vector3, scale: Vector2 = Vector2.ONE, color: Color = Color.YELLOW, autoclear: bool = true) -> Mesh_Instance_3D_Effect:
+	var cam = Tank_camera.INSTANCE
+	if cam and cam.is_outside_camera_range(position):
+		return
+	
 	#print("EXP ",position)
 	#print("Efectos activos: ",fake_light_active.size())
 	var fake_light: Mesh_Instance_3D_Effect
@@ -462,6 +523,10 @@ func fake_light_to_pool(fake_light: Mesh_Instance_3D_Effect) -> void:
 
 
 func shoot_from_pool(position: Vector3, rotation: Vector3 = Vector3.ZERO, scale: float = 1.0, alligment:float = 90.0) -> Sprite_Effect:
+	var cam = Tank_camera.INSTANCE
+	if cam and cam.is_outside_camera_range(position):
+		return
+	
 	#print("EXP ",position)
 	#print("Efectos activos: ",shoot_active.size())
 	var shoot: Sprite_Effect
@@ -526,6 +591,21 @@ func deactivate_sprite(ef: Sprite_Effect) -> void:
 	
 func deactivate_mesh_instance_3d(ef: Mesh_Instance_3D_Effect) -> void:
 	ef.deactivate()
+
+func to_global_active(ef: GPUParticles3D) -> void:
+	var discard: GPUParticles3D = null
+	global_active.push_back(ef)
+	if global_active.size() > max_particle_emmiters:
+		discard = global_active.pop_front()
+	if discard:
+		discard.emitting = false
+		discard.finished.emit()
+	#print("GLOBAL POOL ",global_active.size()," ")
+
+func remove_from_global_active(ef: GPUParticles3D) -> void:
+	if not global_active.has(ef):
+		return
+	global_active.erase(ef)
 
 func _process(delta: float) -> void:
 	time_since_last_tick += delta

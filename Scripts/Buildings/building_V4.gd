@@ -63,7 +63,15 @@ var ghost_colission: Area3D = null
 var multimeshes: Dictionary = {}
 var meshes_type: Dictionary = {}
 
+
+
+var occlusion_node: DistanceOccluder = DistanceOccluder.new(self)
+
 func _ready() -> void:
+	
+	if occlusion_node:
+		get_tree().current_scene.call_deferred("add_child",occlusion_node)
+	
 	csg_active = Settings_Manager.INSTANCE.use_csg
 	see_trough = Settings_Manager.INSTANCE.see_trough_buildings
 	

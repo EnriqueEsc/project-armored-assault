@@ -220,6 +220,13 @@ func calculate_impact_chunk(damage: int, source: Vehicle_Rigid, impact_point: Ve
 		   abs(local_block_center.z) <= limit.z:
 			affected_blocks.append(b)
 			
+			b.check_disabling(damage)
+			var to_buffer = {"Block": b,"Damage":damage,"Source":source,"ImpactPoint":impact_point}
+			blocks_to_destroy.append(to_buffer)
+			destroy_blocks = true
+	
+	return
+	
 	for a in affected_blocks:
 		a.take_damage(damage, source, impact_point)
 
@@ -266,7 +273,14 @@ func take_explosion(damage: int, source: Vehicle_Rigid, impact_point: Vector3, r
 		var dist_squared = b.global_position.distance_squared_to(impact_point)
 		if dist_squared <= radius_squared:
 			affected_blocks.append(b)
+			
+			b.check_disabling(damage)
+			var to_buffer = {"Block": b,"Damage":damage,"Source":source,"ImpactPoint":impact_point}
+			blocks_to_destroy.append(to_buffer)
+			destroy_blocks = true
 			#b.take_damage(damage, source, impact_point)
+	
+	return
 	
 	for a in affected_blocks:
 		a.call_deferred("take_damage",damage, source, impact_point)

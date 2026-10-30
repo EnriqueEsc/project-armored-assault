@@ -136,7 +136,9 @@ Special_Action={
 
 [rendering]
 
+rendering_device/vulkan/max_descriptors_per_pool=128
 rendering_device/driver.windows="d3d12"
+occlusion_culling/use_occlusion_culling=true
 
 [shader_globals]
 
