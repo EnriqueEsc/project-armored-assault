@@ -1,4 +1,4 @@
-extends Area3D
+extends Node3D
 class_name Projectile
 
 var current_pos: Vector3 = Vector3.ZERO
@@ -60,9 +60,13 @@ var fixated_ignore: Array = []
 @export var horizontal_disp: Vector2 = Vector2.ZERO
 @export var vertical_disp: Vector2 = Vector2.ZERO
 
-@onready var proy: MeshInstance3D = $CollisionShape3D/Proy
+@onready var proy: MeshInstance3D = $Proy
 
 var power_multiplier: float = 1.0
+
+signal body_entered
+
+@export var caster: ShapeCast3D = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -88,7 +92,7 @@ func _ready() -> void:
 	
 	effects_manager = Effects_Manager.INSTANCE
 	
-	
+	set_shape_cast()
 	
 	_additional_setup()
 	
@@ -126,12 +130,22 @@ func _ready() -> void:
 		pref.origin = origin
 		get_tree().current_scene.call_deferred("add_child",pref)
 		slugs.append(pref)
-		fixated_ignore.append(pref.get_rid())
+		#fixated_ignore.append(pref.get_rid())
 		ignore.append(pref)
 	
 	for s in slugs:
 		s.ignore = (fixated_ignore)
 		s.ignore.append_array(ignore)
+
+func set_shape_cast() -> void:
+	var col = $CollisionShape3D
+	caster = ShapeCast3D.new()
+	var shape = col.shape.duplicate()
+	caster.shape = shape
+	caster.collide_with_areas = false
+	caster.collide_with_bodies = true
+	call_deferred("add_child",caster)
+	col.queue_free()
 
 func _set_originals() -> void:
 	original_speed = speed
@@ -253,6 +267,18 @@ func move(delta: float) -> void:
 		return
 	
 	var current_pos_2d: Vector2 = (Vector2(0,1).rotated(-rotation.y))
+	var dist = speed * delta
+	var mov = global_basis.z * dist
+	
+	caster.target_position = Vector3(0,0,dist)
+	caster.force_shapecast_update()
+	
+	if caster.is_colliding():
+		for i in range(caster.get_collision_count()):
+			var col = caster.get_collider(i)
+			if is_instance_valid(col):
+				body_entered.emit(col)
+	
 	global_position += global_basis.z * speed * delta
 
 func _on_body_entered(body):
@@ -334,7 +360,7 @@ func detonate() -> void:
 	query.collide_with_areas = false
 	query.collide_with_bodies = true
 	
-	query.exclude = [self.get_rid()] 
+	#query.exclude = [self.get_rid()] 
 	
 	var space = get_world_3d().direct_space_state
 	
@@ -361,7 +387,7 @@ func detonate() -> void:
 				var target_center = current_collider.global_position + Vector3(0.0, 0.5, 0.0)
 				var raycast = PhysicsRayQueryParameters3D.create(ray_origin, target_center)
 				
-				raycast.exclude = [self.get_rid()]
+				#raycast.exclude = [self.get_rid()]
 				
 				for h in hitted_enemies:
 					raycast.exclude.append(h)

@@ -6,9 +6,6 @@
 [ext_resource type="Shader" uid="uid://r0dpspjp6381" path="res://Shaders/fake_light.gdshader" id="4_q5qbb"]
 [ext_resource type="Script" uid="uid://pk4lo6kji8hu" path="res://Scripts/Game/Effects/meshinstance3d_as_effect.gd" id="5_ic3ug"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_ofuc2"]
-size = Vector3(0.07, 0.07, 1)
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tuvw7"]
 albedo_color = Color(1, 0.4745098, 0, 1)
 emission_enabled = true
@@ -58,32 +55,35 @@ shader_parameter/softness = 2.5
 [sub_resource type="QuadMesh" id="QuadMesh_ofuc2"]
 size = Vector2(0.4, 0.8)
 
-[node name="Laser" type="Area3D" unique_id=1973506426]
+[sub_resource type="BoxShape3D" id="BoxShape3D_ofuc2"]
+size = Vector3(0.07, 0.07, 1)
+
+[node name="Laser" type="Node3D" unique_id=977069586]
 script = ExtResource("1_ejr0c")
 lifetime = 0.1
-damage = 2
+damage = 5
 is_explosive = false
 range = 10.0
 muzzle_flash_scale = 0.4
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1897963084]
-shape = SubResource("BoxShape3D_ofuc2")
-debug_color = Color(0, 0.6485492, 0.20114565, 0.41960785)
-
-[node name="Projectile" parent="CollisionShape3D" unique_id=379440040 instance=ExtResource("2_oiwou")]
+[node name="Projectile" parent="." unique_id=379440040 instance=ExtResource("2_oiwou")]
 visible = false
 
-[node name="Gun" parent="CollisionShape3D" unique_id=51241174 instance=ExtResource("3_gei87")]
+[node name="Gun" parent="." unique_id=51241174 instance=ExtResource("3_gei87")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.23016813, 0, 0)
 visible = false
 
-[node name="Proy" type="MeshInstance3D" parent="CollisionShape3D" unique_id=473395126]
+[node name="Proy" type="MeshInstance3D" parent="." unique_id=473395126]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 5.5, 0, 0, 0.10294896)
 material_override = SubResource("StandardMaterial3D_tuvw7")
 mesh = SubResource("ArrayMesh_dsves")
 
-[node name="Fake_Light" type="MeshInstance3D" parent="CollisionShape3D" unique_id=1690803610]
+[node name="Fake_Light" type="MeshInstance3D" parent="." unique_id=1690803610]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0)
 material_override = SubResource("ShaderMaterial_riqys")
 mesh = SubResource("QuadMesh_ofuc2")
 script = ExtResource("5_ic3ug")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1897963084]
+shape = SubResource("BoxShape3D_ofuc2")
+debug_color = Color(0, 0.6485492, 0.20114565, 0.41960785)

@@ -18,7 +18,7 @@ signal recoil (dir: Vector3)
 var ignore = []
 
 
-enum Projectile_Type {HE, AP, MachineGun, Nuke, Flak, Flamethrower, Slug, Laser}
+enum Projectile_Type {HE, AP, MachineGun, Nuke, Flak, Flamethrower, Slug, Laser, Railgun, Grenade}
 enum Fire_Mode {Semi, Auto, Burst}
 
 
@@ -129,6 +129,11 @@ func _ready() -> void:
 		Projectile_Type.Laser:
 			projectile_prefab = load("res://Prefabs/Test/laser.tscn")
 			case_prefab = null
+		Projectile_Type.Railgun:
+			projectile_prefab = load("res://Prefabs/Test/railgun.tscn")
+			case_prefab = null
+		Projectile_Type.Grenade:
+			projectile_prefab = load("res://Prefabs/Test/grenade.tscn")
 		_:
 			projectile_prefab = load("res://Prefabs/Test/projectile.tscn")
 		
@@ -278,7 +283,9 @@ func shoot(shake_mult: float = 1.0) -> void:
 		projectile = projectile_pool.pop_front()
 	
 	projectile_active.push_back(projectile)
-	projectile.shoot(global_position, Vector2(global_rotation.x, global_rotation.y))
+	#projectile.shoot(global_position, Vector2(global_rotation.x, global_rotation.y))
+	projectile.shoot(to_global(muzzle_pos), Vector2(global_rotation.x, global_rotation.y))
+	
 	var forward = global_basis * Vector3.FORWARD * 10
 	
 	

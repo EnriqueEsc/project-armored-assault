@@ -22,7 +22,8 @@ func _additional_setup() -> void:
 	
 	
 	if is_instance_valid(self):
-		aux_ignore.append(self.get_rid())
+		pass
+		#aux_ignore.append(self.get_rid())
 	if is_instance_valid(origin):
 		aux_ignore.append(origin.get_rid())
 	#if is_instance_valid(fixated_ignore):
@@ -166,7 +167,8 @@ func stretch() -> void:
 	
 	global_position = middle_point
 	
-	collision.shape.size.z = dist
+	caster.shape.size.z = dist
+	#collision.shape.size.z = dist
 	proy.scale.z = original_proy_size * dist
 	fake_light.mesh.size.x = original_fake_light_size * dist
 
@@ -250,7 +252,7 @@ func detonate() -> void:
 	query.collide_with_areas = false
 	query.collide_with_bodies = true
 	
-	query.exclude = [self.get_rid()] 
+	#query.exclude = [self.get_rid()] 
 	
 	var space = get_world_3d().direct_space_state
 	
@@ -277,7 +279,7 @@ func detonate() -> void:
 				var target_center = current_collider.global_position + Vector3(0.0, 0.5, 0.0)
 				var raycast = PhysicsRayQueryParameters3D.create(ray_origin, target_center)
 				
-				raycast.exclude = [self.get_rid()]
+				#raycast.exclude = [self.get_rid()]
 				
 				for h in hitted_enemies:
 					raycast.exclude.append(h)
