@@ -5,6 +5,10 @@ var rigid: RigidBody3D = null
 var counter: float = 0.0
 @export var detonation_time: float = 2.0
 
+enum GrenadeType {Time, Impact, TimeAndImpact}
+@export var grenade_Type: GrenadeType = GrenadeType.Time
+var armed: bool = false
+
 func set_shape_cast() -> void:
 	var col = $CollisionShape3D
 	col.queue_free()
@@ -14,6 +18,11 @@ func set_shape_cast() -> void:
 	if not rigid:
 		queue_free()
 		return
+	
+	if grenade_Type != GrenadeType.Time:
+		rigid.contact_monitor = true
+		rigid.max_contacts_reported = 1
+		rigid.body_entered.connect(_on_body_entered)
 	
 	proy.call_deferred("reparent",rigid)
 	fake_light.call_deferred("reparent",rigid)
@@ -26,8 +35,13 @@ func set_shape_cast() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	if grenade_Type == GrenadeType.Impact:
+		return
 	counter += delta
 	if counter > detonation_time:
+		if grenade_Type == GrenadeType.TimeAndImpact:
+			armed = true
+			return
 		if detonated:
 			return
 		detonate()
@@ -95,6 +109,7 @@ func activate() -> void:
 	if not rigid:
 		return
 	
+	armed = false
 	rigid.visible = true
 	rigid.process_mode = Node.PROCESS_MODE_INHERIT
 	rigid.set_deferred("monitoring", true)
@@ -114,7 +129,7 @@ func deactivate() -> void:
 		return
 	
 	rigid.visible = false
-	rigid.process_mode = Node.PROCESS_MODE_DISABLED
+	rigid.set_deferred("process_mode", Node.PROCESS_MODE_DISABLED)
 	rigid.set_deferred("monitoring", false)
 	rigid.set_deferred("monitorable", false)
 
@@ -146,10 +161,15 @@ func move(delta: float) -> void:
 	global_position += global_basis.z * speed * delta
 
 func _on_body_entered(body):
-	pass
+	if body == origin:
+		return
+	detonate()
 
 
 func detonate() -> void:
+	if grenade_Type == GrenadeType.TimeAndImpact and not armed:
+		return
+	
 	if detonated:
 		return
 	
