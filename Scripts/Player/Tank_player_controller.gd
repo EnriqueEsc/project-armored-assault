@@ -122,6 +122,13 @@ func _ready() -> void:
 	
 	tank_rigid = tank_load.instantiate() as Tank_Rigid
 	
+	if tank_rigid:
+		for c in tank_rigid.get_children():
+			if c is Sprite3D:
+				c.layers = 2
+				for ch in c.get_children():
+					if ch is MeshInstance3D:
+						ch.layers = 2
 	
 	add_child(tank_rigid)
 	
@@ -255,6 +262,7 @@ func _ready() -> void:
 		#new_aim_3d.set_layer_mask_value(11, true)
 		new_aim_3d.render_priority = 100
 		new_ready_3d.render_priority = 99
+		new_aim_3d.layers = 2
 		
 		get_tree().current_scene.add_child(new_aim_3d)
 		new_aim_3d.add_child(new_ready_3d)
@@ -264,6 +272,7 @@ func _ready() -> void:
 		mat.render_priority = 99
 		mat.set_shader_parameter("texture_albedo", new_ready_3d.texture)
 		new_ready_3d.material_override = mat
+		new_ready_3d.layers = 2
 		new_ready_3d.rotation.x = deg_to_rad(180)
 		HUD_Shoot_Ready_3D.append(new_ready_3d)
 		

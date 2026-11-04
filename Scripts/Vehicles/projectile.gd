@@ -92,6 +92,9 @@ func _ready() -> void:
 	
 	effects_manager = Effects_Manager.INSTANCE
 	
+	if proy:
+		proy.layers = 2
+	
 	set_shape_cast()
 	
 	_additional_setup()

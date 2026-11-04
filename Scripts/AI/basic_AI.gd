@@ -62,6 +62,8 @@ var next_node: Vector3 = Vector3.ZERO
 
 var map_icon: Sprite3D = null
 
+var occlusion_node: AIDistanceOccluder = AIDistanceOccluder.new(self)
+
 func _init_rigid() -> void:
 	
 	tank_rigid = get_parent() as Vehicle_Rigid
@@ -70,6 +72,8 @@ func _init_rigid() -> void:
 func _ready() -> void:
 	set_physics_process(false)
 	
+	if occlusion_node:
+		get_tree().current_scene.call_deferred("add_child",occlusion_node)
 	
 	_init_rigid()
 	

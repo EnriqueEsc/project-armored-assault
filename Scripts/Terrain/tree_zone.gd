@@ -19,7 +19,15 @@ var vehicles_within: Array[Vehicle_Rigid] = []
 
 var active_count: int = 0
 
+@export var material: ShaderMaterial = null
+
+
+var occlusion_node: DistanceOccluder = DistanceOccluder.new(self)
+
 func _ready() -> void:
+	
+	if occlusion_node:
+		get_tree().current_scene.call_deferred("add_child",occlusion_node)
 	
 	#multimesh_instance.call_deferred("set_global_position",collision.global_position)
 	#multimesh_instance.call_deferred("set_global_rotation",collision.global_rotation)
@@ -41,9 +49,13 @@ func init_grid() -> void:
 	multimesh.transform_format = MultiMesh.TRANSFORM_3D
 	
 	if tree_prefab:
-		multimesh.mesh = tree_prefab.mesh
+		multimesh.mesh = tree_prefab.mesh.duplicate()
+		if material:
+			multimesh.mesh.surface_set_material(0,material)
 	else:
-		multimesh.mesh = tree_mesh
+		multimesh.mesh = tree_mesh.duplicate()
+		if material:
+			multimesh.mesh.surface_set_material(0,material)
 	multimesh.instance_count = col_size_x * col_size_z
 
 	tree_grid.resize(col_size_x)

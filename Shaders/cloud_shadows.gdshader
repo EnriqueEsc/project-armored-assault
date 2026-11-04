@@ -1,4 +1,5 @@
 shader_type spatial;
+
 render_mode blend_mix, depth_prepass_alpha;
 
 uniform sampler2D cloud_noise_tex : filter_linear_mipmap, repeat_enable;

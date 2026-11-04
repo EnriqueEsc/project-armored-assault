@@ -149,6 +149,8 @@ func _ready() -> void:
 
 		material = material.duplicate(true) as BaseMaterial3D
 		material.stencil_outline_thickness = 0.05
+		material.disable_receive_shadows = true
+		
 		#print("DESPUÉS: ", name, " ", material.get_instance_id())
 		update_stencil(2)
 	

@@ -55,7 +55,7 @@ shader_parameter/intensity = 1.0
 shader_parameter/softness = 2.5
 
 [sub_resource type="QuadMesh" id="QuadMesh_vphup"]
-size = Vector2(0.5, 1)
+size = Vector2(1, 1.5)
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_bhunq"]
 height = 0.4
@@ -63,7 +63,7 @@ radius = 0.15
 
 [node name="Projectile" type="Node3D" unique_id=674001631]
 script = ExtResource("1_a3xg5")
-grenade_Type = 1
+grenade_Type = 2
 speed = 20.0
 blast_rad = 3.0
 blast_det_max_entities = 160

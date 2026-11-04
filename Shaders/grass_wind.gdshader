@@ -22,9 +22,9 @@ float rand(vec2 point){
 void vertex() {
 	vec3 player_view_pos = (VIEW_MATRIX * vec4(player_pos, 1.0)).xyz;
 	vec3 world_pos = (MODEL_MATRIX * vec4(VERTEX,1.0)).xyz;
-	float mask = UV.y;
+	float mask = 1.0 - UV.y;
 	
-	float wind = get_wind(world_pos.xyz, TIME) * wind_strength * mask;
+	float wind = sin(world_pos.x * 0.5 +world_pos.z * 0.5 +TIME * wind_speed) * wind_strength * mask;
 	vec3 wind_offset = vec3(wind, 0.0,wind*0.5);
 	
 	vec3 push_offset = vec3(0.0);

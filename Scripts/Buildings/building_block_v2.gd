@@ -73,6 +73,7 @@ func destroy_now(point: Vector3 = global_position) -> void:
 		if settings_manager.destruction_effects_mode == settings_manager.Destruction_Effects_Mode.Always or settings_manager.destruction_effects_mode == settings_manager.Destruction_Effects_Mode.On_Block_Only:
 			effects_manager.debris_from_pool(destruction_point)
 	
+	disabled = true
 	return
 	
 	if shape:

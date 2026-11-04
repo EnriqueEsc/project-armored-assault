@@ -274,10 +274,10 @@ func check_enemies_inside_box() -> void:
 			return
 
 func add_unprojected(n: NodeInGameData) -> void:
-	print("INTENTA ",n)
+	#print("INTENTA ",n)
 	if not enemies_unprojected.has(n):
 		enemies_unprojected.append(n)
-		print("LO LOGRA",enemies_unprojected)
+		#print("LO LOGRA",enemies_unprojected)
 
 func remove_unprojected(n: NodeInGameData) -> void:
 	if enemies_unprojected.has(n):

@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://dk2ejhum7dj0e" path="res://Models/Test/Projectile.fbx" id="2_ebnqi"]
 [ext_resource type="PackedScene" uid="uid://koxj0b8ls2xa" path="res://Models/Test/Gun.fbx" id="3_a8cj0"]
 [ext_resource type="Shader" uid="uid://r0dpspjp6381" path="res://Shaders/fake_light.gdshader" id="4_13ysn"]
+[ext_resource type="Shader" uid="uid://bdag2ocjc2qiy" path="res://Shaders/distorsion.gdshader" id="4_ebnqi"]
 [ext_resource type="Script" uid="uid://pk4lo6kji8hu" path="res://Scripts/Game/Effects/meshinstance3d_as_effect.gd" id="5_dkapd"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lofw3"]
@@ -53,9 +54,32 @@ shader_parameter/intensity = 1.0
 shader_parameter/softness = 2.5
 
 [sub_resource type="QuadMesh" id="QuadMesh_sehpw"]
+size = Vector2(1.5, 1.5)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_sn0t7"]
-size = Vector3(0.2, 0.2, 0.5)
+size = Vector3(0.2, 0.2, 1)
+
+[sub_resource type="Curve" id="Curve_6uj0r"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.56424576, 0.57142866), 0.0, 0.0, 0, 0, Vector2(1, 0.3303572), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_sn0t7"]
+curve = SubResource("Curve_6uj0r")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_bhunq"]
+gravity = Vector3(0, 0, 0)
+scale_curve = SubResource("CurveTexture_sn0t7")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ebnqi"]
+render_priority = 0
+shader = ExtResource("4_ebnqi")
+shader_parameter/distortion_strength = 0.10000000149012
+shader_parameter/transparency = 1.0
+shader_parameter/noise_scale = 8.0
+shader_parameter/noise_speed = 0.5
+
+[sub_resource type="TorusMesh" id="TorusMesh_riqys"]
+material = SubResource("ShaderMaterial_ebnqi")
 
 [node name="Railgun" type="Node3D" unique_id=813876752]
 script = ExtResource("1_6uj0r")
@@ -74,7 +98,7 @@ transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.23
 visible = false
 
 [node name="Proy" type="MeshInstance3D" parent="." unique_id=1746565957]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 4, 0, 0, 0)
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 6, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_lofw3")
 mesh = SubResource("ArrayMesh_i80v1")
 
@@ -87,3 +111,10 @@ script = ExtResource("5_dkapd")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1897963084]
 shape = SubResource("BoxShape3D_sn0t7")
 debug_color = Color(0, 0.6485492, 0.20114565, 0.41960785)
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=949654003]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0.07188654, 0)
+lifetime = 0.5
+fixed_fps = 24
+process_material = SubResource("ParticleProcessMaterial_bhunq")
+draw_pass_1 = SubResource("TorusMesh_riqys")

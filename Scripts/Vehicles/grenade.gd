@@ -24,6 +24,9 @@ func set_shape_cast() -> void:
 		rigid.max_contacts_reported = 1
 		rigid.body_entered.connect(_on_body_entered)
 	
+	if fake_light:
+		fake_light.mesh = fake_light.mesh.duplicate()
+	
 	proy.call_deferred("reparent",rigid)
 	fake_light.call_deferred("reparent",rigid)
 	#rigid.call_deferred("reparent",get_tree().current_scene)
@@ -35,9 +38,14 @@ func set_shape_cast() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	rotate_fake_light()
 	if grenade_Type == GrenadeType.Impact:
 		return
 	counter += delta
+	if grenade_Type == GrenadeType.Time:
+		update_fake_light()
+	if grenade_Type == GrenadeType.TimeAndImpact and armed:
+		update_fake_light()
 	if counter > detonation_time:
 		if grenade_Type == GrenadeType.TimeAndImpact:
 			armed = true
@@ -47,6 +55,22 @@ func _process(delta: float) -> void:
 		detonate()
 	pass
 	#move(delta)
+
+func rotate_fake_light() -> void:
+	if not fake_light:
+		return
+	fake_light.global_rotation_degrees.x = -90
+
+func update_fake_light() -> void:
+	if not fake_light:
+		return
+	var start_value = 0.75 if grenade_Type == GrenadeType.TimeAndImpact else 0.2
+	var factor = 1 if grenade_Type == GrenadeType.TimeAndImpact else 5
+	var light = start_value + abs(sin(counter * factor))
+	#print("LIGHT ",light)
+	light = clampf(light,start_value,1.5)
+	var scale = fake_light_original_size * light #* randf_range(0.8,1.2)
+	fake_light.mesh.size = scale
 
 func _additional_shoot_process() -> void:
 	pass
@@ -109,6 +133,10 @@ func activate() -> void:
 	if not rigid:
 		return
 	
+	if grenade_Type != GrenadeType.Impact:
+		fake_light.mesh.size = Vector2.ZERO
+	else:
+		fake_light.mesh.size = fake_light_original_size
 	armed = false
 	rigid.visible = true
 	rigid.process_mode = Node.PROCESS_MODE_INHERIT
@@ -132,6 +160,7 @@ func deactivate() -> void:
 	rigid.set_deferred("process_mode", Node.PROCESS_MODE_DISABLED)
 	rigid.set_deferred("monitoring", false)
 	rigid.set_deferred("monitorable", false)
+
 
 func _additional_deactivate_process() -> void:
 	pass
