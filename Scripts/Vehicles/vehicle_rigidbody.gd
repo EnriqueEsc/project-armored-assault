@@ -58,7 +58,7 @@ signal shakes(shake_time: float, intensity: float)
 signal embraces_damage(damage: int)
 signal gets_crushed()
 
-@export var model: Array[GeometryInstance3D] = []
+@export var model: Array[MeshInstance3D] = []
 @export var material: BaseMaterial3D = null
 
 var tick: float = 1.0
@@ -143,7 +143,12 @@ func _ready() -> void:
 	
 	max_turn_velocity = 1.2 * turn_speed
 	
+	initialize_stencil()
+	
 	await get_tree().physics_frame
+	
+	
+	
 	if material:
 		#print("ANTES: ", name, " ", material.get_instance_id())
 
@@ -164,6 +169,23 @@ func _ready() -> void:
 	calculate_collision_lenght()
 	
 
+
+func initialize_stencil() -> void:
+	material = StandardMaterial3D.new()
+	if not model.is_empty():
+		for m in model:
+			if is_instance_valid(m):
+				m.material_override = m.get_active_material(0).duplicate()
+				m.material_override.specular = 0.0
+				m.material_override.metallic = 0.0
+				m.material_override.roughness = 0.0
+				var overlay = StandardMaterial3D.new()
+				overlay.transparency =BaseMaterial3D.TRANSPARENCY_ALPHA
+				overlay.stencil_mode = BaseMaterial3D.STENCIL_MODE_OUTLINE
+				#overlay.stencil_outline_thickness = 0.3
+				overlay.albedo_color.a = 0.0
+				m.material_overlay = overlay
+
 func update_stencil(stencil_mode: BaseMaterial3D.StencilMode) -> void:
 	if not material:
 		return
@@ -174,7 +196,13 @@ func update_stencil(stencil_mode: BaseMaterial3D.StencilMode) -> void:
 		for m in model:
 			if is_instance_valid(m):
 				#print("sssss ",m," ",material.stencil_mode)
-				m.material_override = material
+				#m.material_override = material
+				#m.material_override = m.get_active_material(0).duplicate()
+				var mat = m.material_override.stencil_mode
+				if mat == material.stencil_mode:
+					continue
+				m.material_override.stencil_mode = material.stencil_mode
+				#print("SEXO ",m)
 
 func update_stencil_color(color: Color) -> void:
 	if not material:
@@ -186,7 +214,12 @@ func update_stencil_color(color: Color) -> void:
 		for m in model:
 			if is_instance_valid(m):
 				#print("sssss ",m," ",material.stencil_mode)
-				m.material_override = material
+				#m.material_override = material
+				#m.material_override = m.get_active_material(0).duplicate()
+				var mat = m.material_override.stencil_color
+				if mat == material.stencil_color:
+					continue
+				m.material_override.stencil_color = material.stencil_color
 
 
 func initialize_effects() -> void:

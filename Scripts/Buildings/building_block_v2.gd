@@ -12,7 +12,7 @@ var id: int = 0
 
 var is_being_destroyed: bool = false
 
-enum Block_Types {STREET, INNER, CORNER, SIDE, ROOF}
+enum Block_Types {STREET, INNER, CORNER, SIDE, ROOF, ROOF_CORNER, ROOF_SIDE}
 var block_type: Block_Types = Block_Types.INNER
 
 var block_visual_rotation: float = 0.0

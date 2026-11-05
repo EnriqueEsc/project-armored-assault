@@ -47,7 +47,11 @@ func disconnect_heat_effect() -> void:
 
 func move(delta: float) -> void:
 	if active_tracking and is_instance_valid(objective_node):
+		#objective = objective_node.global_position
 		objective = objective_node.global_position
+	if impact_preview:
+		objective = impact_preview.global_position
+	#print("OBJECTIVe", objective)
 	
 	#print("SEXO ",active_tracking," ",objective_node," ",objective)
 	
@@ -65,14 +69,46 @@ func move(delta: float) -> void:
 
 	var current_forward = -global_basis.z.normalized()
 
-	if current_forward.angle_to(target_direction) < 1.5:
+	if current_forward.angle_to(target_direction) < 1.0:
 		global_position += -global_basis.z * speed * delta
+		
+		
+		var current_pos_2d: Vector2 = (Vector2(0,1).rotated(-rotation.y))
+		var dist = speed * delta
+		var mov = -global_basis.z * dist
+		
+		caster.target_position = Vector3(0,0,-dist)
+		caster.force_shapecast_update()
+		
+		if caster.is_colliding():
+			for i in range(caster.get_collision_count()):
+				var col = caster.get_collider(i)
+				if is_instance_valid(col):
+					body_entered.emit(col)
+					#detonate()
+					#print("EXP")
+		
 		return
 		
 	var corrected_direction = current_forward.slerp(target_direction,clamp(25 * delta, 0.0, 1.0)).normalized()
 
 	look_at(global_position + corrected_direction, Vector3.UP)
 	#print(current_forward.angle_to(target_direction))
+	
+	var current_pos_2d: Vector2 = (Vector2(0,1).rotated(-rotation.y))
+	var dist = speed * delta
+	var mov = -global_basis.z * dist
+	
+	caster.target_position = Vector3(0,0,-dist)
+	caster.force_shapecast_update()
+	
+	if caster.is_colliding():
+		for i in range(caster.get_collision_count()):
+			var col = caster.get_collider(i)
+			if is_instance_valid(col):
+				body_entered.emit(col)
+				#detonate()
+				print("EXP")
 	
 	
 	global_position += -global_basis.z * speed * delta

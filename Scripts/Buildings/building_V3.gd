@@ -32,6 +32,15 @@ var corner_pref_mesh: Mesh
 @export var street_pref_mesh_instance: MeshInstance3D
 var street_pref_mesh: Mesh
 
+@export var roof_pref_mesh_instance: MeshInstance3D
+var roof_pref_mesh: Mesh
+
+@export var roof_corner_pref_mesh_instance: MeshInstance3D
+var roof_corner_pref_mesh: Mesh
+
+@export var roof_side_pref_mesh_instance: MeshInstance3D
+var roof_side_pref_mesh: Mesh
+
 signal got_destroyed
 
 var col_size_x: int = 0
@@ -93,6 +102,22 @@ func _ready() -> void:
 		street_pref_mesh = street_pref_mesh_instance.mesh
 	else:
 		street_pref_mesh = pref_mesh
+		
+	if roof_pref_mesh_instance:
+		roof_pref_mesh = roof_pref_mesh_instance.mesh
+	else:
+		roof_pref_mesh = pref_mesh
+		
+	if roof_corner_pref_mesh_instance:
+		roof_corner_pref_mesh = roof_corner_pref_mesh_instance.mesh
+	else:
+		roof_corner_pref_mesh = pref_mesh
+	
+	
+	if roof_side_pref_mesh_instance:
+		roof_side_pref_mesh = roof_side_pref_mesh_instance.mesh
+	else:
+		roof_side_pref_mesh = pref_mesh
 	
 	var item_id = Building_Block_V2.Block_Types.INNER
 	var item_name = "Inner"
@@ -118,6 +143,24 @@ func _ready() -> void:
 	mesh_library.create_item(item_id)
 	mesh_library.set_item_name(item_id, item_name)
 	mesh_library.set_item_mesh(item_id, street_pref_mesh)
+	
+	item_id = Building_Block_V2.Block_Types.ROOF
+	item_name = "Roof"
+	mesh_library.create_item(item_id)
+	mesh_library.set_item_name(item_id, item_name)
+	mesh_library.set_item_mesh(item_id, roof_pref_mesh)
+	
+	item_id = Building_Block_V2.Block_Types.ROOF_CORNER
+	item_name = "Roof_Corner"
+	mesh_library.create_item(item_id)
+	mesh_library.set_item_name(item_id, item_name)
+	mesh_library.set_item_mesh(item_id, roof_corner_pref_mesh)
+	
+	item_id = Building_Block_V2.Block_Types.ROOF_SIDE
+	item_name = "Roof_SIDE"
+	mesh_library.create_item(item_id)
+	mesh_library.set_item_name(item_id, item_name)
+	mesh_library.set_item_mesh(item_id, roof_side_pref_mesh)
 	
 	
 	if csg_active:
@@ -174,6 +217,14 @@ func init_grid() -> void:
 		if b.block_type == b.Block_Types.SIDE:
 			b.block_type = b.Block_Types.STREET
 	
+	for b in levels[levels.size()-1].blocks:
+		if b.block_type == b.Block_Types.SIDE:
+			b.block_type = b.Block_Types.ROOF_SIDE
+		if b.block_type == b.Block_Types.CORNER:
+			b.block_type = b.Block_Types.ROOF_CORNER
+		if b.block_type == b.Block_Types.INNER:
+			b.block_type = b.Block_Types.ROOF
+		#b.block_type = b.Block_Types.ROOF
 	
 	lowest_height = levels[0].lowest_height
 	
@@ -210,6 +261,12 @@ func init_grid() -> void:
 			if street_pref_mesh:
 				street_pref_mesh.surface_set_material(0,material)
 				
+			if roof_pref_mesh:
+				roof_pref_mesh.surface_set_material(0,material)
+			if roof_corner_pref_mesh:
+				roof_corner_pref_mesh.surface_set_material(0,material)
+			if roof_side_pref_mesh:
+				roof_side_pref_mesh.surface_set_material(0,material)
 		
 		
 	var start_x = -col_size_x * 0.5 + 1 * 0.5
@@ -220,6 +277,9 @@ func init_grid() -> void:
 	var counter = 0
 	var side_counter = 0
 	var corner_counter = 0
+	var roof_counter = 0
+	var roof_corner_counter = 0
+	var roof_side_counter = 0
 	
 	
 	for c in levels:
@@ -266,6 +326,23 @@ func init_grid() -> void:
 					b.got_destroyed.connect(destroy_block.bind(corner_counter))
 					corner_counter += 1
 					grid_map.set_cell_item(Vector3i(b.position.x,b.global_position.y,b.position.z),b.block_type,grid_map.get_orthogonal_index_from_basis(transform.basis))
+				if b.block_type == b.Block_Types.ROOF:
+						b.id = roof_counter
+						b.got_destroyed.connect(destroy_block.bind(roof_counter))
+						roof_counter += 1
+						grid_map.set_cell_item(Vector3i(b.position.x,b.global_position.y,b.position.z),b.block_type,grid_map.get_orthogonal_index_from_basis(transform.basis))
+						
+				if b.block_type == b.Block_Types.ROOF_CORNER:
+						b.id = roof_corner_counter
+						b.got_destroyed.connect(destroy_block.bind(roof_corner_counter))
+						roof_corner_counter += 1
+						grid_map.set_cell_item(Vector3i(b.position.x,b.global_position.y,b.position.z),b.block_type,grid_map.get_orthogonal_index_from_basis(transform.basis))
+			
+				if b.block_type == b.Block_Types.ROOF_SIDE:
+						b.id = roof_side_counter
+						b.got_destroyed.connect(destroy_block.bind(roof_side_counter))
+						roof_side_counter += 1
+						grid_map.set_cell_item(Vector3i(b.position.x,b.global_position.y,b.position.z),b.block_type,grid_map.get_orthogonal_index_from_basis(transform.basis))
 			#b.queue_free()
 			#var tree: Tree_data = Tree_data.new(1,counter, multimesh_instance.to_global(transform.origin) ,Vector2i(x,z))
 			#tree.got_destroyed.connect(destroy_tree)

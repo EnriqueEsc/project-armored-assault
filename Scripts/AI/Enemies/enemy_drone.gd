@@ -103,7 +103,7 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 	
 	if tank_rigid.attachment and current_state == AI_State.ENGAGED and distance_to_target > 5.5:
 		#print(distance_to_target)
-		tank_rigid.attachment.set_objective(target_pos + Vector3(randi_range(-5,5),-2.0,randi_range(-5,5)),player_ref)
+		tank_rigid.attachment.set_objective(target_pos + Vector3(randi_range(-5,5),0.0,randi_range(-5,5)),player_ref)
 		#print("SEXOOOOO ",player_ref," ",)
 		tank_rigid.attachment._use_attachment()
 	

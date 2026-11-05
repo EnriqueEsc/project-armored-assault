@@ -114,10 +114,16 @@ func _ready() -> void:
 			var on_z_edge = is_equal_approx(abs(b.position.z), aux.y)
 
 			if on_x_edge and on_z_edge:
-				b.block_type = b.Block_Types.CORNER
+				if b.block_type == b.Block_Types.ROOF:
+					b.block_type = b.Block_Types.ROOF_CORNER
+				else:
+					b.block_type = b.Block_Types.CORNER
 
 			elif on_x_edge:
-				b.block_type = b.Block_Types.SIDE
+				if b.block_type == b.Block_Types.ROOF:
+					b.block_type = b.Block_Types.ROOF_SIDE
+				else:
+					b.block_type = b.Block_Types.SIDE
 
 				if b.position.x > 0:
 					b.block_visual_rotation = 0
@@ -125,7 +131,10 @@ func _ready() -> void:
 					b.block_visual_rotation = 180
 
 			elif on_z_edge:
-				b.block_type = b.Block_Types.SIDE
+				if b.block_type == b.Block_Types.ROOF:
+					b.block_type = b.Block_Types.ROOF_SIDE
+				else:
+					b.block_type = b.Block_Types.SIDE
 
 				if b.position.z < 0:
 					b.block_visual_rotation = 90
@@ -135,7 +144,10 @@ func _ready() -> void:
 		
 		if abs(Vector2(b.position.x,b.position.z)) == aux:
 			#print("OLASI")
-			b.block_type = b.Block_Types.CORNER
+			if b.block_type == b.Block_Types.ROOF:
+				b.block_type = b.Block_Types.ROOF_CORNER
+			else:
+				b.block_type = b.Block_Types.CORNER
 			if b.position.x <= 0 and b.position.z >= 0:
 				b.block_visual_rotation = 270
 			

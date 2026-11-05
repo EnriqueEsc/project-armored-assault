@@ -26,7 +26,22 @@ func move(delta: float) -> void:
 
 	look_at(global_position + corrected_direction,up)
 
-	global_position -= corrected_direction * speed * delta
+	
+	var current_pos_2d: Vector2 = (Vector2(0,1).rotated(-rotation.y))
+	var dist = speed * delta
+	var mov = global_basis.z * dist
+	
+	caster.target_position = Vector3(0,0,dist)
+	caster.force_shapecast_update()
+	
+	if caster.is_colliding():
+		for i in range(caster.get_collision_count()):
+			var col = caster.get_collider(i)
+			if is_instance_valid(col):
+				body_entered.emit(col)
+				#print("FUEGO")
+	
+	global_position += global_basis.z * speed * delta
 
 
 func _on_body_entered(body):
@@ -64,6 +79,13 @@ func _on_body_entered(body):
 			deactivate()
 		else:
 			detonate()
+		return
+	
+	direction = Vector3.ZERO
+	if not is_explosive:
+		deactivate()
+	else:
+		detonate()
 
 func activate() -> void:
 	visible = true

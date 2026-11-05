@@ -39,6 +39,8 @@ var buffer_width: int = 1024
 var buffer_height: int = 0
 
 @export var use_shader: bool = true
+var vertex_map: Dictionary = {}
+@export var vertex_map_accuracy: float = 0.001
 
 func visual_process(delta: float) -> void:
 	
@@ -74,9 +76,22 @@ func _ready() -> void:
 func generate() -> void:
 	get_visuals_from_existing_mesh()
 	generate_visuals()
+	generate_vertex_map()
 	generate_collisions()
 	generate_navmesh()
 
+
+func generate_vertex_map() -> void:
+	vertex_map.clear()
+	
+	for i in range(vertices.size()):
+		var v = vertices[i]
+		var aux = Vector2(snapped(v.x,vertex_map_accuracy),snapped(v.z,vertex_map_accuracy))
+		
+		if not vertex_map.has(aux):
+			vertex_map[aux] = []
+		vertex_map[aux].append(i)
+	
 
 func generate_navmesh() -> void:
 	
@@ -128,6 +143,19 @@ func get_visuals_from_existing_mesh() -> void:
 	uvs = aux[Mesh.ARRAY_TEX_UV] 
 	normals = aux[Mesh.ARRAY_NORMAL]
 	
+	
+	var original_transform = mesh_instance.transform
+	
+	for i in range(vertices.size()):
+		vertices[i] = original_transform * vertices[i]
+	
+	if not normals.is_empty():
+		
+		for i in range(normals.size()):
+			normals[i] = (original_transform.basis * normals[i]).normalized()
+	
+	mesh_instance.scale = Vector3.ONE
+	
 	var mat: StandardMaterial3D = StandardMaterial3D.new()
 	if mat:
 		mat.albedo_texture = terrain_texture
@@ -136,7 +164,8 @@ func get_visuals_from_existing_mesh() -> void:
 		mesh_instance.material_override = mat
 	
 	for v in vertices:
-		min_max_height.append(Vector2(v.y-max_deformation_in_runtime,v.y+max_deformation_in_runtime))
+		#min_max_height.append(Vector2(v.y-max_deformation_in_runtime,v.y+max_deformation_in_runtime))
+		min_max_height.append(Vector2(v.y-max_deformation_in_runtime,0.0))
 	
 
 	
@@ -166,7 +195,8 @@ func generate_visuals() -> void:
 			var x_ratio = float(x) / subdivisions.x
 			#var pos: Vector3 = Vector3((x_ratio - 0.5) * size.x,randf_range(-1,1),(z_ratio - 0.5) * size.y)
 			var pos: Vector3 = Vector3((x_ratio - 0.5) * size.x,0.0,(z_ratio - 0.5) * size.y)
-			min_max_height.append(Vector2(pos.y-max_deformation_in_runtime,pos.y+max_deformation_in_runtime))
+			#min_max_height.append(Vector2(pos.y-max_deformation_in_runtime,pos.y+max_deformation_in_runtime))
+			min_max_height.append(Vector2(pos.y-max_deformation_in_runtime,0.0))
 			vertices.append(pos)
 			uvs.append(Vector2(x_ratio, z_ratio))
 			normals.append(Vector3.UP)
@@ -282,10 +312,8 @@ func update_collisions() -> void:
 
 func generate_collisions() -> void:
 	
-	
 	var shape = ConcavePolygonShape3D.new()
 	var faces = PackedVector3Array()
-	
 	faces.resize(indexes.size())
 	
 	for i in range(indexes.size()):
@@ -295,7 +323,6 @@ func generate_collisions() -> void:
 	
 	collision_shape = CollisionShape3D.new()
 	collision_layer = 3
-	
 	collision_shape.shape = shape
 	
 	call_deferred("add_child", collision_shape)
@@ -310,6 +337,7 @@ func generate_collisions() -> void:
 	collision_shape.shape = data
 	
 	call_deferred("add_child", collision_shape)
+
 
 
 func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3, status_effect: Vehicle_Rigid.StatusEffects = Vehicle_Rigid.StatusEffects.None) -> void:
@@ -372,8 +400,11 @@ func take_explosion(damage: int,source: Vehicle_Rigid,impact_point: Vector3,radi
 func deform_terrain_by_index(index: int, damage: float = 1) -> void:
 	if deformation_mode == DeformationMode.None:
 		return
-	if index < 0:
+	if index < 0 or index >= vertices.size():
 		return
+		
+	var target = vertices[index]
+	
 	var new_height: float = vertices[index].y
 	new_height -= 1.0
 	new_height *= (float(damage) * randf_range(0.6,1.4))
@@ -385,13 +416,18 @@ func deform_terrain_by_index(index: int, damage: float = 1) -> void:
 	if new_height < min_max_height[index].x or new_height > min_max_height[index].y:
 		return
 	
-	vertices[index].y = new_height
 	
-	if use_shader:
-		var x = index % buffer_width
-		var y = int(index / buffer_width)
-		var vertex = vertices[index]
-		image_buffer.set_pixel(x,y,Color(vertex.x, vertex.y, vertex.z, 1.0))
+	var aux = Vector2(snapped(target.x,vertex_map_accuracy), snapped(target.z,vertex_map_accuracy))
+	
+	if vertex_map.has(aux):
+		var shared_indexes: Array = vertex_map[aux]
+		for i in shared_indexes:
+			vertices[i].y = new_height
+			
+			if use_shader:
+				var x = i % buffer_width
+				var y = int(i / buffer_width)
+				image_buffer.set_pixel(x, y, Color(vertices[i].x, vertices[i].y, vertices[i].z, 1.0))
 	
 	if not update_visual_next_tick:
 		update_visual_next_tick = true
