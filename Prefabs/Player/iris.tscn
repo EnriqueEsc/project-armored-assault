@@ -10,26 +10,11 @@
 [ext_resource type="Script" uid="uid://bjh2nh20l8im4" path="res://Scripts/Vehicles/turret_weapon.gd" id="8_id1vq"]
 [ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="9_jf3hx"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6k30k"]
-render_priority = 2
-transparency = 1
-no_depth_test = true
-shading_mode = 0
-albedo_color = Color(0, 1, 0, 1)
-grow_amount = 0.02
-stencil_mode = 3
-stencil_flags = 1
-stencil_compare = 5
-metadata/_stencil_owned = true
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h4ant"]
 resource_name = "Material"
-render_priority = 1
-next_pass = SubResource("StandardMaterial3D_6k30k")
 vertex_color_use_as_albedo = true
 albedo_color = Color(0.9063318, 0.9063318, 0.9063318, 1)
 emission_enabled = true
-stencil_mode = 2
 stencil_flags = 2
 stencil_color = Color(0, 1, 0, 1)
 stencil_outline_thickness = 0.02
@@ -80,23 +65,6 @@ shader = ExtResource("3_j3v34")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_6blnc"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4s2y8"]
-render_priority = 1
-transparency = 1
-no_depth_test = true
-shading_mode = 0
-albedo_color = Color(0, 1, 0, 1)
-stencil_mode = 3
-stencil_flags = 1
-stencil_compare = 5
-metadata/_stencil_owned = true
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_apxmf"]
-next_pass = SubResource("StandardMaterial3D_4s2y8")
-stencil_mode = 2
-stencil_flags = 2
-stencil_color = Color(0, 1, 0, 1)
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_crptk"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_v2k0h"]
@@ -130,23 +98,6 @@ _surfaces = [{
 }]
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_v2k0h")
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8xwsb"]
-render_priority = 1
-transparency = 1
-no_depth_test = true
-shading_mode = 0
-albedo_color = Color(0, 1, 0, 1)
-stencil_mode = 3
-stencil_flags = 1
-stencil_compare = 5
-metadata/_stencil_owned = true
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vwfjx"]
-next_pass = SubResource("StandardMaterial3D_8xwsb")
-stencil_mode = 2
-stencil_flags = 2
-stencil_color = Color(0, 1, 0, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mogsj"]
 
@@ -233,23 +184,6 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_vqn0w")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lppq2"]
-render_priority = 1
-transparency = 1
-no_depth_test = true
-shading_mode = 0
-albedo_color = Color(0, 1, 0, 1)
-stencil_mode = 3
-stencil_flags = 1
-stencil_compare = 5
-metadata/_stencil_owned = true
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wk2jl"]
-next_pass = SubResource("StandardMaterial3D_lppq2")
-stencil_mode = 2
-stencil_flags = 2
-stencil_color = Color(0, 1, 0, 1)
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h1ok1"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_egim8"]
@@ -284,11 +218,12 @@ _surfaces = [{
 blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_egim8")
 
-[node name="Tank_Player" type="CharacterBody3D" unique_id=975234286 node_paths=PackedStringArray("vehicle_turrets")]
+[node name="Tank_Player" type="CharacterBody3D" unique_id=975234286 node_paths=PackedStringArray("vehicle_turrets", "model")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0, 0, 0)
 script = ExtResource("1_h1ok1")
 vehicle_turrets = [NodePath("Turret"), NodePath("Turret3")]
 max_armor_points = 300
+model = [NodePath("tanque_V3/Cube_001"), NodePath("Turret/turret_V3/Cube_002"), NodePath("Turret/Gun/Gun"), NodePath("Turret/Gun2/Gun"), NodePath("Turret/Gun3/Gun"), NodePath("Turret/Gun4/Gun"), NodePath("Turret3/Gun/Gun"), NodePath("Turret3/Gun2/Gun")]
 
 [node name="tanque_V3" type="Node3D" parent="." unique_id=1683942184]
 transform = Transform3D(1.002, 0, 0, 0, 1.3, 0, 0, 0, 1.002, 0, -0.28692198, 0)
@@ -328,7 +263,6 @@ shoot_by_n_turrets = 2
 transform = Transform3D(1.6391772e-07, 0, 1.25, 0, 1.25, 0, -1.25, 0, 1.6391772e-07, 0, -0.29506743, 0)
 
 [node name="Cube_002" type="MeshInstance3D" parent="Turret/turret_V3" unique_id=311775343]
-material_override = SubResource("StandardMaterial3D_apxmf")
 mesh = SubResource("ArrayMesh_s8kdm")
 
 [node name="torreta_V2" parent="Turret" unique_id=29810314 instance=ExtResource("7_ecrt6")]
@@ -345,7 +279,6 @@ cooling_factor = 5.0
 
 [node name="Gun" type="MeshInstance3D" parent="Turret/Gun" unique_id=1346115680]
 transform = Transform3D(0.3, 0, 0, 0, 0.39999998, 0, 0, 0, 1.0000001, 0, 0, 0)
-material_override = SubResource("StandardMaterial3D_vwfjx")
 mesh = SubResource("ArrayMesh_bdpwl")
 
 [node name="Gun2" type="Node3D" parent="Turret" unique_id=1115701518]
@@ -358,7 +291,6 @@ cooling_factor = 5.0
 
 [node name="Gun" type="MeshInstance3D" parent="Turret/Gun2" unique_id=1460588150]
 transform = Transform3D(0.3, 0, 0, 0, 0.39999998, 0, 0, 0, 1.0000001, 0, 0, 0)
-material_override = SubResource("StandardMaterial3D_vwfjx")
 mesh = SubResource("ArrayMesh_bdpwl")
 
 [node name="Gun3" type="Node3D" parent="Turret" unique_id=1262219485]
@@ -371,7 +303,6 @@ cooling_factor = 5.0
 
 [node name="Gun" type="MeshInstance3D" parent="Turret/Gun3" unique_id=1076089126]
 transform = Transform3D(0.3, 0, 0, 0, 0.39999998, 0, 0, 0, 1.0000001, 0, 0, 0)
-material_override = SubResource("StandardMaterial3D_vwfjx")
 mesh = SubResource("ArrayMesh_bdpwl")
 
 [node name="Gun4" type="Node3D" parent="Turret" unique_id=1712975162]
@@ -384,7 +315,6 @@ cooling_factor = 5.0
 
 [node name="Gun" type="MeshInstance3D" parent="Turret/Gun4" unique_id=2105652170]
 transform = Transform3D(0.3, 0, 0, 0, 0.39999998, 0, 0, 0, 1.0000001, 0, 0, 0)
-material_override = SubResource("StandardMaterial3D_vwfjx")
 mesh = SubResource("ArrayMesh_bdpwl")
 
 [node name="Forward" type="Sprite3D" parent="." unique_id=1585055350]
@@ -423,7 +353,6 @@ cooling_factor = 20.0
 
 [node name="Gun" type="MeshInstance3D" parent="Turret3/Gun" unique_id=331916779]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
-material_override = SubResource("StandardMaterial3D_wk2jl")
 mesh = SubResource("ArrayMesh_j3v34")
 
 [node name="Gun2" type="Node3D" parent="Turret3" unique_id=1052755653]
@@ -439,5 +368,4 @@ cooling_factor = 20.0
 
 [node name="Gun" type="MeshInstance3D" parent="Turret3/Gun2" unique_id=1844995124]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
-material_override = SubResource("StandardMaterial3D_wk2jl")
 mesh = SubResource("ArrayMesh_j3v34")

@@ -74,3 +74,30 @@ func special_action() -> bool:
 		Move_Type.Skating:
 			move_type = Move_Type.Walking
 	return true
+
+func recoil(dir: Vector3, force: float = 1.0,rot: bool = false) -> void:
+	
+	if rot:
+		if move_type == Move_Type.Skating:
+			return
+		var compensation = velocity.length_squared() / max_speed
+		compensation = clampf(compensation,0.0,1.0)
+		compensation = 1.0 - compensation
+		if is_zero_approx(compensation):
+			return
+		var horizontal_dir = Vector3(dir.x, 0.0, dir.z).normalized()
+		if horizontal_dir.is_zero_approx():
+			return
+		var rotation_axis = Vector3.UP.cross(horizontal_dir).normalized()
+		var current_rotation = global_basis.get_rotation_quaternion()
+		var limit = clampf(10*force*compensation,0.0,10.0)
+		var recoil_rotation = Quaternion(rotation_axis, deg_to_rad(limit))
+		global_basis = Basis(recoil_rotation * current_rotation)
+		var push = Vector3.ZERO.move_toward(dir, friction)
+		#push = Vector3(push.x, 0 ,push.z)
+		velocity += push * (force / 1.5) * compensation
+		return
+	force = 1
+	var push = Vector3.ZERO.move_toward(dir, friction)
+	#push = Vector3(push.x, 0 ,push.z)
+	velocity += push * force

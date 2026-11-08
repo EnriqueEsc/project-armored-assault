@@ -39,7 +39,7 @@ var direction: Vector3 = Vector3.ZERO
 var armor_points: int = 40
 
 
-signal shoot_recharge(charge: float)
+signal shoot_recharge(charge: float, is_reloading: bool)
 signal velocimeter(velocity: float)
 signal got_hit(source: Vehicle_Rigid, impact_point: Vector3)
 signal shoot_signal()
@@ -59,7 +59,7 @@ signal embraces_damage(damage: int)
 signal gets_crushed()
 
 @export var model: Array[MeshInstance3D] = []
-@export var material: BaseMaterial3D = null
+var material: BaseMaterial3D = null
 
 var tick: float = 1.0
 var last_tick: float = 0.0
@@ -120,10 +120,11 @@ func _ready() -> void:
 				vehicle_turrets.append(c)
 	
 	for t in vehicle_turrets:
-		t.recoil.connect(recoil)
+		t.recoil.connect(recoil.bind(true))
+		#t.recoil.connect(recoil)
 		t.shakes_on_shoot.connect(shakes.emit)
 		t.origin = self
-		await t.create_projectiles()
+		await t.create_projectiles(current_team)
 		
 		for c in self.get_children():
 			if c is Node3D:
@@ -179,12 +180,35 @@ func initialize_stencil() -> void:
 				m.material_override.specular = 0.0
 				m.material_override.metallic = 0.0
 				m.material_override.roughness = 0.0
+				m.material_override.render_priority = 0
+				m.material_override.stencil_mode = BaseMaterial3D.STENCIL_MODE_OUTLINE
+				m.material_override.stencil_color = Color.BLACK
+				
+				m.material_overlay = null
 				var overlay = StandardMaterial3D.new()
 				overlay.transparency =BaseMaterial3D.TRANSPARENCY_ALPHA
-				overlay.stencil_mode = BaseMaterial3D.STENCIL_MODE_OUTLINE
+				overlay.render_priority = 1
 				#overlay.stencil_outline_thickness = 0.3
 				overlay.albedo_color.a = 0.0
+				if Settings_Manager.INSTANCE.enable_emmisions:
+					#overlay.emission_enabled = true
+					overlay.emission = Color.ORANGE
+					overlay.albedo_color = Color.BLACK
+					#overlay.emission_energy_multiplier = 10.0
+					var noise_texture = NoiseTexture2D.new()
+					noise_texture.seamless = true
+					noise_texture.noise = FastNoiseLite.new()
+					var ramp = Gradient.new()
+					ramp.add_point(0.0,Color.from_rgba8(0,0,0,0))
+					ramp.add_point(0.5,Color.from_rgba8(0,0,0,255))
+					ramp.add_point(1.0,Color.WHITE)
+					noise_texture.color_ramp = ramp
+					overlay.albedo_color = Color.from_rgba8(255,155,50,255)
+					overlay.albedo_texture = noise_texture
+					
 				m.material_overlay = overlay
+				m.material_overlay.albedo_color.a = 0.0
+				
 
 func update_stencil(stencil_mode: BaseMaterial3D.StencilMode) -> void:
 	if not material:
@@ -198,10 +222,10 @@ func update_stencil(stencil_mode: BaseMaterial3D.StencilMode) -> void:
 				#print("sssss ",m," ",material.stencil_mode)
 				#m.material_override = material
 				#m.material_override = m.get_active_material(0).duplicate()
-				var mat = m.material_override.stencil_mode
+				var mat = m.material_overlay.stencil_mode
 				if mat == material.stencil_mode:
 					continue
-				m.material_override.stencil_mode = material.stencil_mode
+				m.material_overlay.stencil_mode = material.stencil_mode
 				#print("SEXO ",m)
 
 func update_stencil_color(color: Color) -> void:
@@ -216,10 +240,10 @@ func update_stencil_color(color: Color) -> void:
 				#print("sssss ",m," ",material.stencil_mode)
 				#m.material_override = material
 				#m.material_override = m.get_active_material(0).duplicate()
-				var mat = m.material_override.stencil_color
+				var mat = m.material_overlay.stencil_color
 				if mat == material.stencil_color:
 					continue
-				m.material_override.stencil_color = material.stencil_color
+				m.material_overlay.stencil_color = material.stencil_color
 
 
 func initialize_effects() -> void:
@@ -253,11 +277,35 @@ func initialize_effects() -> void:
 	ap_percent.connect(show_visual_damage)
 
 
-func recoil(dir: Vector3, force: float) -> void:
+func recoil(dir: Vector3, force: float = 1.0,rot: bool = false) -> void:
+	
+	if rot:
+		var compensation = velocity.length_squared() / max_speed
+		compensation = clampf(compensation,0.0,1.0)
+		compensation = 1.0 - compensation
+		if is_zero_approx(compensation):
+			return
+		var horizontal_dir = Vector3(dir.x, 0.0, dir.z).normalized()
+		if horizontal_dir.is_zero_approx():
+			return
+		var rotation_axis = Vector3.UP.cross(horizontal_dir).normalized()
+		var current_rotation = global_basis.get_rotation_quaternion()
+		var limit = clampf(10*force*compensation,0.0,10.0)
+		var recoil_rotation = Quaternion(rotation_axis, deg_to_rad(limit))
+		global_basis = Basis(recoil_rotation * current_rotation)
+		var push = Vector3.ZERO.move_toward(dir, friction)
+		#push = Vector3(push.x, 0 ,push.z)
+		velocity += push * (force / 1.5) * compensation
+		return
 	force = 1
 	var push = Vector3.ZERO.move_toward(dir, friction)
 	#push = Vector3(push.x, 0 ,push.z)
 	velocity += push * force
+	
+	return
+	var lateral_force = push.dot(transform.basis.x)
+	turning_velocity += lateral_force * 0.05
+	
 
 
 func boost(force: float) -> void:
@@ -459,9 +507,30 @@ func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3, stat
 		deactivate() 
 		return
 	
+	update_visual_damage_overlay()
+	
+	
 	embraces_damage.emit(damage)
 	got_hit.emit(source, impact_point)
 
+
+func update_visual_damage_overlay() -> void:
+	
+	if not Settings_Manager.INSTANCE.enable_emmisions:
+		return
+		#overlay.emission_energy_multiplier = 10.0
+	if not model.is_empty():
+		for m in model:
+			if is_instance_valid(m):
+				#print("sssss ",m," ",material.stencil_mode)
+				#m.material_override = material
+				#m.material_override = m.get_active_material(0).duplicate()
+				var percent = 1.0 - (float(armor_points) / float(max_armor_points))
+				percent = clampf(remap(percent, 0.0, 0.7, 0.0, 1.0), 0.0, 1.0)
+				#var mat = m.material.albedo_color.a
+				if is_equal_approx(percent, m.material_overlay.albedo_color.a):
+					continue
+				m.material_overlay.albedo_color.a = percent
 
 func take_heal(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> void:
 	armor_points += damage

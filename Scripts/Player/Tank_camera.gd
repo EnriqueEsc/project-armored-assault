@@ -242,7 +242,8 @@ func check_enemy_visibility(enemy: Node3D) -> bool:
 	var space = get_world_3d().direct_space_state
 	var query = PhysicsRayQueryParameters3D.create(from,to)
 	
-	query.collide_with_areas = false
+	#query.collide_with_areas = false
+	query.collide_with_areas = true
 	query.exclude = [enemy]
 	
 	var point = space.intersect_ray(query)

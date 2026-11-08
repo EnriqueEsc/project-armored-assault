@@ -21,7 +21,7 @@ var turret_pos_2d: Vector2 = Vector2.ZERO
 @export var side_angle_limit: float = 30
 var original_side_angle_limit: float = 30
 
-signal recoil (dir: Vector3)
+signal recoil(dir: Vector3, force: float)
 
 var ignore = []
 
@@ -29,7 +29,7 @@ var ignore = []
 
 var origin: Vehicle_Rigid
 
-signal shoot_recharge(charge: float)
+signal shoot_recharge(charge: float, is_reloading: bool)
 
 @export var fire_mode: Turret_Weapon.Fire_Mode = Turret_Weapon.Fire_Mode.Semi
 @export var bullets_per_burst: int = 1
@@ -115,7 +115,7 @@ func calculate_mean_bullet_speed() -> void:
 	
 	mean_bullet_speed /= (counter)
 	mean_fire_rate /= counter
-	mean_fire_rate +=  + 0.2
+	#mean_fire_rate +=  + 0.2
 
 func calculate_sight_pos() -> void:
 	sight_pos = Node3D.new()
@@ -177,13 +177,20 @@ func _ready() -> void:
 	
 	max_compensation = 1.0 - turret_turning_speed
 	
+	if turret_barrel.size() > 1:
+		for t in turret_barrel:
+			if not is_instance_valid(t):
+				continue
+			t.overheat_signal.connect(equal_overheat)
+	
 	if bullets_per_burst < 0:
 		bullets_per_burst = 0
 	
 	#muzzle_pos = global_position + muzzle_pos
 	pass
 
-func create_projectiles() -> void:
+
+func create_projectiles(team: Basic_AI.Team) -> void:
 	
 	if static_model:
 		return
@@ -206,10 +213,12 @@ func create_projectiles() -> void:
 					w.shoot_recharge.connect(shoot_recharge.emit)
 			w.ignore.append_array(ignore)
 			w.shakes_on_shoot.connect(shakes_on_shoot.emit)
-			await w.create_projectiles()
+			w.recoil.connect(recoil.emit)
+			await w.create_projectiles(team)
 			w.barrel_lower_limit = barrel_lower_limit
 			w.barrel_upper_limit = barrel_upper_limit
 			ignore.append_array(w.ignore)
+
 
 func rotate_turret(rot: float) -> void:
 	final_rotation = rot
@@ -444,8 +453,6 @@ func all_weapons_can_shoot() -> bool:
 	
 	for t in turret_barrel:
 		res = res and t.can_shoot()
-	
-	
 	return res
 
 func set_fire_mode(mode: Turret_Weapon.Fire_Mode) -> void:
@@ -470,22 +477,32 @@ func set_fire_mode(mode: Turret_Weapon.Fire_Mode) -> void:
 		set_process(false)
 	'''
 
+func equal_overheat(overheat: bool) -> void:
+	print("SEXOOOOOOO")
+	for t in turret_barrel:
+		if t.overheat == overheat:
+			continue
+		t.overheat = overheat
+
 func _process(delta: float) -> void:
 	if fire_mode != Turret_Weapon.Fire_Mode.Burst:
 		return
 	if waiting_time < time_between_burst:
 		waiting_time += delta
 		
-		shoot_recharge.emit((waiting_time/time_between_burst)*100.0)
+		var load: float = (waiting_time/time_between_burst)*100.0
+		var is_reloading: bool = load < 100.0
+		
+		shoot_recharge.emit(load,is_reloading)
 
 
-func calculate_burst_charge(value: float) -> void:
+func calculate_burst_charge(value: float, is_reloading: bool = false) -> void:
 	if waiting_time < time_between_burst:
 		return
 	if remaining_burst_bullets < 1:
-		shoot_recharge.emit(100.0)
+		shoot_recharge.emit(100.0,false)
 		return
-	shoot_recharge.emit(float(remaining_burst_bullets)/float(bullets_per_burst)*100.0)
+	shoot_recharge.emit(float(remaining_burst_bullets)/float(bullets_per_burst)*100.0,false)
 	return
 	for w in turret_barrel:
 		if not is_instance_valid(w):

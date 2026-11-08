@@ -40,6 +40,9 @@ func _additional_setup() -> void:
 	var mat = proy.material_override as StandardMaterial3D
 	if mat and fake_light:
 		fake_light.set_instance_shader_parameter("light_color",mat.emission)
+	if mat:
+		mat.disable_receive_shadows = true
+		proy.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	pass
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -65,6 +68,10 @@ func shoot(pos: Vector3, rot: Vector2, pot: bool = false, mult: float = 2.0) -> 
 	
 	life_timer = 0.0
 	
+	var overlay = proy.material_overlay
+	if overlay and proy.material_overlay.stencil_color != stencil_color:
+		proy.material_overlay.stencil_color = stencil_color
+		
 	current_pos = pos
 	position = current_pos
 	rotation.y = rot.y

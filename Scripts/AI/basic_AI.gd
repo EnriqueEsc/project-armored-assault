@@ -64,6 +64,9 @@ var map_icon: Sprite3D = null
 
 var occlusion_node: AIDistanceOccluder = AIDistanceOccluder.new(self)
 
+var thinking_counter: float = 0.0
+var thinking_tick: float = 0.01
+
 func _init_rigid() -> void:
 	
 	tank_rigid = get_parent() as Vehicle_Rigid
@@ -193,6 +196,7 @@ func _ready() -> void:
 
 
 func init_whiskers() -> void:
+	thinking_tick *= randf_range(0.8,1.2)
 	for i in 30:
 		await get_tree().physics_frame
 	if not is_instance_valid(tank_rigid.collision_shape):
@@ -322,6 +326,12 @@ func destroyed_dialog() -> void:
 	pass
 
 func _physics_process(delta: float) -> void:
+	'''
+	thinking_counter += delta
+	if thinking_counter < thinking_tick:
+		return
+	thinking_counter = 0.0
+	'''
 	
 	var static_model: bool = false
 	if is_instance_valid(tank_rigid) and tank_rigid is Vehicle_Rigid:
@@ -519,6 +529,7 @@ func handle_turret_and_shooting(aim_pos: Vector3, can_shoot: bool, can_see_playe
 			if can_see_player and not is_enemy_in_front(): 
 				#tank_rigid.shoot()
 				t.shoot()
+				
 				if t.projectile_type == 4:
 					break
 				var rng = randi_range(1,20)

@@ -10,26 +10,11 @@
 [ext_resource type="PackedScene" uid="uid://b8u4pylde5yu4" path="res://Models/Test/torreta_V2.fbx" id="11_kqa3r"]
 [ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="13_jxxtf"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6k30k"]
-render_priority = 2
-transparency = 1
-no_depth_test = true
-shading_mode = 0
-albedo_color = Color(0, 1, 0, 1)
-grow_amount = 0.02
-stencil_mode = 3
-stencil_flags = 1
-stencil_compare = 5
-metadata/_stencil_owned = true
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h4ant"]
 resource_name = "Material"
-render_priority = 1
-next_pass = SubResource("StandardMaterial3D_6k30k")
 vertex_color_use_as_albedo = true
 albedo_color = Color(0.9063318, 0.9063318, 0.9063318, 1)
 emission_enabled = true
-stencil_mode = 2
 stencil_flags = 2
 stencil_color = Color(0, 1, 0, 1)
 stencil_outline_thickness = 0.02
@@ -80,22 +65,8 @@ shader = ExtResource("3_6k30k")
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_6blnc"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0i11f"]
-render_priority = 1
-transparency = 1
-no_depth_test = true
-shading_mode = 0
-albedo_color = Color(0, 1, 0, 1)
-stencil_mode = 3
-stencil_flags = 1
-stencil_compare = 5
-metadata/_stencil_owned = true
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_apxmf"]
-next_pass = SubResource("StandardMaterial3D_0i11f")
-stencil_mode = 2
 stencil_flags = 2
-stencil_color = Color(0, 1, 0, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_crptk"]
 
@@ -313,7 +284,6 @@ cooling_factor = 20.0
 
 [node name="Gun" type="MeshInstance3D" parent="Turret2/Gun" unique_id=559271173]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.4, 0, 0, 0)
-material_override = SubResource("StandardMaterial3D_vwfjx")
 mesh = SubResource("ArrayMesh_bdpwl")
 
 [node name="Forward" type="Sprite3D" parent="." unique_id=1585055350]

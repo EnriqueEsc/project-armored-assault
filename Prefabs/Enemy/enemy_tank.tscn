@@ -58,6 +58,7 @@ blend_shape_mode = 0
 shadow_mesh = SubResource("ArrayMesh_488pe")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lkfqm"]
+stencil_flags = 2
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_6p7xs"]
 _surfaces = [{

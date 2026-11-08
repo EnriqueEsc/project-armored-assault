@@ -47,14 +47,14 @@ func occlude() -> void:
 	
 	#print("DIST ",dist)
 	
-	if dist > 2000:
+	if dist > max_process_distance:
 		if ai_parent.tank_rigid.visible:
 			ai_parent.tank_rigid.visible = false
 		if ai_parent.process_mode != ProcessMode.PROCESS_MODE_DISABLED:
 			ai_parent.process_mode = Node.PROCESS_MODE_DISABLED
 			ai_parent.tank_rigid.process_mode = Node.PROCESS_MODE_DISABLED
 		return
-	elif dist > 1000:
+	elif dist > max_render_distance:
 		if ai_parent.tank_rigid.visible:
 			ai_parent.tank_rigid.visible = false
 		if ai_parent.process_mode != ProcessMode.PROCESS_MODE_INHERIT:

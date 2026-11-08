@@ -66,6 +66,8 @@ func _ready() -> void:
 	
 	max_armor_points = randi_range(3,7)
 	
+	destroy_blocks_tick *= randf_range(0.8,1.2)
+	
 	for b in get_children():
 		
 		if b is CollisionShape3D and b.visible:

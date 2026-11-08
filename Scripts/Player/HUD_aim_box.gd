@@ -5,9 +5,11 @@ var marker: Sprite2D = null
 var original_color: Color = Color.WHITE
 var secondary_container: HBoxContainer = null
 var secondary_weapon_indicators: Array[ProgressBar] = []
+var secondary_reload_label: RichTextLabel = null
 
 var primary_container: HBoxContainer = null
 var primary_weapon_indicators: Array[ProgressBar] = []
+var primary_reload_label: RichTextLabel = null
 
 var upper_container: VBoxContainer = null
 
@@ -225,46 +227,82 @@ func set_primary_indicator_fill(value: float, index: int) -> void:
 
 
 
-func set_indicator_fill(value: float, priority: Vehicle_turret.Turret_Priority, index: int) -> void:
+func set_indicator_fill(value: float, is_reloading: bool, priority: Vehicle_turret.Turret_Priority, index: int, fire_mode: Turret_Weapon.Fire_Mode) -> void:
 	#print("aaaaaaaaaaaaaaaa ",value," | ",index," | ",secondary_weapon_indicators.size())
 	var indicators: Array[ProgressBar] = []
+	var reload_label: RichTextLabel = null
 	match priority:
 		Vehicle_turret.Turret_Priority.Main:
 			indicators = primary_weapon_indicators
+			reload_label = primary_reload_label
+			
 			
 		Vehicle_turret.Turret_Priority.Secondary:
 			indicators = secondary_weapon_indicators
+			reload_label = secondary_reload_label
 			
 		_:
 			indicators = primary_weapon_indicators
+			reload_label = primary_reload_label
 			
 	if index >= indicators.size():
 		return
 	if indicators[index].value == value:
 		return
 	indicators[index].value = value
+	
+
+	if not is_instance_valid(reload_label):
+		return
+		
+	if reload_label.visible != is_reloading:
+		
+		
+		match priority:
+			Vehicle_turret.Turret_Priority.Main:
+		
+				primary_reload_label.visible = is_reloading
+				
+			Vehicle_turret.Turret_Priority.Secondary:
+		
+				secondary_reload_label.visible = is_reloading
+				
+			_:
+		
+				primary_reload_label.visible = is_reloading
 
 
 
-func create_indicator(priority: Vehicle_turret.Turret_Priority) -> int:
+func create_indicator(priority: Vehicle_turret.Turret_Priority, fire_type: Turret_Weapon.Fire_Mode) -> int:
 	if aim_assist_type != Settings_Manager.Aim_Assist_Type.Box:
 		return 0
 	var container: HBoxContainer = null
 	var indicators: Array[ProgressBar] = []
+	var reload_label: RichTextLabel = null
 	var pivot = Vector2(10,0)
 	match priority:
 		Vehicle_turret.Turret_Priority.Main:
 			container = primary_container
 			indicators = primary_weapon_indicators
+			reload_label = primary_reload_label
 			pivot *= -1
 			
 		Vehicle_turret.Turret_Priority.Secondary:
 			container = secondary_container
 			indicators = secondary_weapon_indicators
+			reload_label = secondary_reload_label
 			
 		_:
 			container = primary_container
 			indicators = primary_weapon_indicators
+			reload_label = primary_reload_label
+	
+	
+	
+	if reload_label != null:
+		reload_label.reparent(get_tree().current_scene)
+		reload_label.queue_free()
+		reload_label = null
 	
 	var weapon_indicator = ProgressBar.new()
 	weapon_indicator.value = 100.0
@@ -275,6 +313,49 @@ func create_indicator(priority: Vehicle_turret.Turret_Priority) -> int:
 	weapon_indicator.show_percentage = false
 	weapon_indicator.custom_minimum_size = weapon_indicator.size
 	indicators.append(weapon_indicator)
+	
+	var label_text: String = ""
+	
+	match fire_type:
+		Turret_Weapon.Fire_Mode.Auto:
+			label_text = "OVERHEAT"
+		_:
+			label_text = "RELOADING"
+	
+	var label = RichTextLabel.new()
+	label.scroll_active = false
+	label.size = Vector2(200.0,50.0)
+	container.call_deferred("add_child",label)
+	label.call_deferred("set_position",points[2] + (pivot*2.0))
+	label.custom_maximum_size = label.size
+	label.text = label_text
+	
+	
+	match priority:
+		Vehicle_turret.Turret_Priority.Main:
+			primary_reload_label = label
+	
+			#primary_reload_label.size = Vector2(200.0,50.0)
+			primary_reload_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+			primary_reload_label.custom_minimum_size = Vector2(200.0,50.0)
+			primary_reload_label.visible = false
+			
+		Vehicle_turret.Turret_Priority.Secondary:
+			secondary_reload_label = label
+			#secondary_reload_label.size = Vector2(200.0,50.0)
+			primary_reload_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			secondary_reload_label.custom_minimum_size = Vector2(200.0,50.0)
+	
+			secondary_reload_label.visible = false
+			
+		_:
+			primary_reload_label = label
+			#primary_reload_label.size = Vector2(200.0,50.0)
+			primary_reload_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+			primary_reload_label.custom_minimum_size = Vector2(200.0,50.0)
+	
+			primary_reload_label.visible = false
+	
 	return indicators.size() - 1
 
 func hits_enemy() -> void:

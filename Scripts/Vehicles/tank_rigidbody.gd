@@ -53,6 +53,9 @@ func _physics_process(delta: float) -> void:
 		var normal = collision.get_normal()
 		var impact = pre_impact_vel.dot(-normal)
 		
+		if last_building_impact < 0.1:
+			return
+		
 		if impact > 2.0:
 			shakes.emit(0.5,0.2)
 			
@@ -77,7 +80,7 @@ func _physics_process(delta: float) -> void:
 			
 		#print(last_building_impact)
 		
-		if last_building_impact < 1:
+		if last_building_impact < 1.0:
 			return
 		
 		

@@ -61,12 +61,15 @@ var fixated_ignore: Array = []
 @export var vertical_disp: Vector2 = Vector2.ZERO
 
 @onready var proy: MeshInstance3D = $Proy
+@export var additional_proy_meshes: Array[MeshInstance3D] = []
 
 var power_multiplier: float = 1.0
 
 signal body_entered
 
 @export var caster: ShapeCast3D = null
+
+var stencil_color : Color = Color.WHITE
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -101,6 +104,19 @@ func _ready() -> void:
 	
 	_set_originals()
 	
+	var overlay = StandardMaterial3D.new()
+	overlay.albedo_color.a = 0.0
+	overlay.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	overlay.stencil_mode = BaseMaterial3D.STENCIL_MODE_XRAY
+	
+	proy.material_overlay = overlay
+	
+	for a in additional_proy_meshes:
+		if not is_instance_valid(a):
+			continue
+		a.material_overlay = overlay
+	
+	
 	if not uses_slug:
 		return
 	
@@ -131,6 +147,7 @@ func _ready() -> void:
 		pref.blast_det_max_entities = blast_det_max_entities
 		pref.recursivity = recursivity - 1
 		pref.origin = origin
+		pref.stencil_color = stencil_color
 		get_tree().current_scene.call_deferred("add_child",pref)
 		slugs.append(pref)
 		#fixated_ignore.append(pref.get_rid())
@@ -196,6 +213,15 @@ func set_origin(vehicle: Vehicle_Rigid) -> void:
 	
 	fixated_ignore = [origin.get_rid()]
 	
+	
+	set_projectile_team(origin.current_team)
+
+func set_projectile_team(team: Basic_AI.Team) -> void:
+	match team:
+		Basic_AI.Team.ENEMY:
+			stencil_color = Color.RED
+		Basic_AI.Team.ALLY:
+			stencil_color = Color.GREEN
 
 func _additional_shoot_process() -> void:
 	pass
@@ -210,6 +236,10 @@ func shoot(pos: Vector3, rot: Vector2, pot: bool = false, mult: float = 2.0) -> 
 		power_multiplier = 1.0
 		change_material_color()
 	
+	var overlay = proy.material_overlay
+	if overlay and proy.material_overlay.stencil_color != stencil_color:
+		proy.material_overlay.stencil_color = stencil_color
+		
 	current_pos = pos
 	position = current_pos
 	

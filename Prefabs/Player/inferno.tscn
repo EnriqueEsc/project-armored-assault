@@ -336,6 +336,7 @@ turret_barrel = [NodePath("Gun")]
 side_angle_limit = 360.0
 fire_mode = 2
 bullets_per_burst = 5
+time_between_burst = 1.0
 turret_priority = 1
 
 [node name="torreta_V2" parent="Turret3" unique_id=1120156078 instance=ExtResource("7_lrqip")]
@@ -347,7 +348,7 @@ transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0
 script = ExtResource("8_niw7e")
 projectile_type = 2
 muzzle_pos = Vector3(0, 0, 0.3)
-fire_rate_prim = 0.1
+fire_rate_prim = 0.05
 max_heat = 150.0
 cooling_factor = 20.0
 

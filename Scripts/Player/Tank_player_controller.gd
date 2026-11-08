@@ -214,8 +214,8 @@ func _ready() -> void:
 		
 		for i in 15:
 			await get_tree().process_frame
-		var index = HUD_Aim_box.create_indicator(t.turret_priority)
-		t.shoot_recharge.connect(HUD_Aim_box.set_indicator_fill.bind(t.turret_priority,index))
+		var index = HUD_Aim_box.create_indicator(t.turret_priority,t.fire_mode)
+		t.shoot_recharge.connect(HUD_Aim_box.set_indicator_fill.bind(t.turret_priority,index,t.fire_mode))
 		
 		
 		
@@ -374,7 +374,7 @@ func color_HUD() -> void:
 		for s in HUD_Shoot_Ready_3D:
 			s.material_override.set_shader_parameter("tint", color)
 
-func shoot_ready(charge: float, index: int) -> void:
+func shoot_ready(charge: float, is_reloading: bool, index: int) -> void:
 	#print("SOOOT ",charge)
 	#for s in HUD_Shoot_Ready:
 	#	s.value = charge

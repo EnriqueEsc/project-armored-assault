@@ -11,11 +11,6 @@ stencil_flags = 2
 stencil_reference = 2
 stencil_color = Color(1, 0, 0, 1)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vwfjx"]
-distance_fade_max_distance = 1.0
-stencil_flags = 2
-stencil_color = Color(0.99607843, 0, 0, 1)
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dw7m3"]
 resource_name = "Material.002"
 vertex_color_use_as_albedo = true
@@ -274,7 +269,6 @@ visible = false
 transform = Transform3D(1.578931, 0, 0, 0, 0.5427247, 0, 0, 0, 0.80999994, 0, 0.068902135, -0.19809344)
 
 [node name="Minor" type="MeshInstance3D" parent="Minor" unique_id=967436107]
-material_override = SubResource("StandardMaterial3D_vwfjx")
 mesh = SubResource("ArrayMesh_bobet")
 
 [node name="Torso" type="Node3D" parent="Minor" unique_id=100538207]
@@ -312,7 +306,6 @@ muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.2
 
 [node name="Gun" type="MeshInstance3D" parent="Minor/Torso/Turret/Gun" unique_id=1346115680]
-material_override = SubResource("StandardMaterial3D_vwfjx")
 mesh = SubResource("ArrayMesh_bdpwl")
 
 [node name="Cube_017" type="MeshInstance3D" parent="Minor/Torso/Turret" unique_id=144843593]
@@ -341,7 +334,6 @@ fire_rate_prim = 0.1
 
 [node name="Gun" type="MeshInstance3D" parent="Minor/Torso/Turret2/Gun2" unique_id=799299687]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.8, 0, 0, 0)
-material_override = SubResource("StandardMaterial3D_vwfjx")
 mesh = SubResource("ArrayMesh_bdpwl")
 
 [node name="Gun3" type="Node3D" parent="Minor/Torso/Turret2" unique_id=1034716367]
@@ -353,7 +345,6 @@ fire_rate_prim = 0.1
 
 [node name="Gun" type="MeshInstance3D" parent="Minor/Torso/Turret2/Gun3" unique_id=1621242431]
 transform = Transform3D(0.4, 0, 0, 0, 0.4, 0, 0, 0, 0.8, 0, 0, 0)
-material_override = SubResource("StandardMaterial3D_vwfjx")
 mesh = SubResource("ArrayMesh_bdpwl")
 
 [node name="Cube_016" type="MeshInstance3D" parent="Minor/Torso/Turret2" unique_id=1947862217]

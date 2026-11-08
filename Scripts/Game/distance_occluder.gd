@@ -6,6 +6,9 @@ var occlusion_timer: float = 1.0
 var cam: Tank_camera = null
 var parent_node: Node3D = null
 
+@export var max_render_distance: float = 1000
+@export var max_process_distance: float = 2000
+
 func _init(parent_node: Node3D) -> void:
 	self.parent_node = parent_node
 
@@ -33,7 +36,7 @@ func occlude() -> void:
 	
 	var dist = cam.distance_squared_to_point(parent_node.global_position)
 	
-	if dist > 2000:
+	if dist > max_process_distance:
 		if parent_node.visible:
 			parent_node.visible = false
 		if parent_node.process_mode != ProcessMode.PROCESS_MODE_DISABLED:
@@ -43,7 +46,7 @@ func occlude() -> void:
 				parent_node.queue_free()
 				queue_free()
 		return
-	elif dist > 1000:
+	elif dist > max_render_distance:
 		if parent_node.visible:
 			parent_node.visible = false
 		if parent_node.process_mode != ProcessMode.PROCESS_MODE_INHERIT:

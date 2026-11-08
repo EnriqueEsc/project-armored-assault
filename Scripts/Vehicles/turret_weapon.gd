@@ -13,7 +13,7 @@ var turret_pos_2d: Vector2 = Vector2.ZERO
 @export var barrel_lower_limit: float = -10
 @export var side_angle_limit: float = 30
 
-signal recoil (dir: Vector3)
+signal recoil(dir: Vector3, force: float)
 
 var ignore = []
 
@@ -39,7 +39,7 @@ var case_active: Array[Case] = []
 
 
 
-signal shoot_recharge(charge: float)
+signal shoot_recharge(charge: float, is_reloading: bool)
 @export var muzzle_pos: Vector3 = Vector3.ZERO
 var time_controller: Time_Controller
 @export var fire_rate_prim: float = 2
@@ -75,6 +75,12 @@ signal shakes_on_shoot(intensity: float, duration: float)
 
 var effects_manager: Effects_Manager = null
 var heat_effect: GPUParticles3D = null
+
+var meshes: Array[MeshInstance3D] = []
+var override: StandardMaterial3D = null
+
+var use_emmisions: bool = false
+signal overheat_signal
 
 func spawn() -> void:
 	
@@ -121,7 +127,7 @@ func _ready() -> void:
 			projectile_prefab = load("res://Prefabs/Test/nuke.tscn")
 		Projectile_Type.Flak:
 			projectile_prefab = load("res://Prefabs/Test/flak_bullet.tscn")
-			case_prefab = load("res://Prefabs/Test/machine_gun_case.tscn")
+			#case_prefab = load("res://Prefabs/Test/machine_gun_case.tscn")
 		Projectile_Type.Flamethrower:
 			projectile_prefab = load("res://Prefabs/Test/flamethrower.tscn")
 		Projectile_Type.Slug:
@@ -154,6 +160,31 @@ func _ready() -> void:
 	shoot_recharge.connect(show_heat_effects)
 	
 	set_fire_mode(fire_mode)
+	
+	use_emmisions = Settings_Manager.INSTANCE.enable_emmisions
+	
+	if not use_emmisions:
+		meshes.clear()
+		return
+	
+	for c in get_children():
+		if c is MeshInstance3D:
+			meshes.append(c)
+			if not override:
+				if not c.material_override:
+					continue
+				override = c.material_override
+	if not override:
+		override = StandardMaterial3D.new()
+		#override.albedo_color.a = 0.0
+		#override.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	override.emission_enabled = true
+	override.emission = Color.ORANGE_RED
+	override.emission_energy_multiplier = 0.0
+	for m in meshes:
+		m.material_override = override
+		#override = m.material_override
+	
 	#muzzle_pos = global_position + muzzle_pos
 	pass
 
@@ -180,7 +211,7 @@ func modify_parameters(rate: float = 1.0, heat: float = 1.0, cooling: float = 1.
 		_:
 			pass
 
-func show_heat_effects(vel: float) -> void:
+func show_heat_effects(vel: float, is_reloading: bool = true) -> void:
 	if effects_manager and (overheat and not heat_effect):
 		heat_effect = effects_manager.heat_from_pool(to_global(muzzle_pos))
 		if heat_effect:
@@ -237,10 +268,11 @@ func rotate_weapon_to_point_3d(point: Vector3) -> void:
 
 
 
-func create_projectiles() -> void:
+func create_projectiles(team: Basic_AI.Team) -> void:
 	for i in 27:
 		projectile = projectile_prefab.instantiate() as Projectile
 		projectile.deactivate()
+		projectile.set_projectile_team(team)
 		if origin:
 			projectile.set_origin(origin)
 		elif not ignore.is_empty():
@@ -305,7 +337,8 @@ func shoot(shake_mult: float = 1.0) -> void:
 	if effects_manager and projectile_type != Projectile_Type.Flamethrower and projectile_type != Projectile_Type.Railgun:
 		effects_manager.shoot_from_pool(to_global(muzzle_pos), global_rotation, projectile.muzzle_flash_scale)
 	
-	recoil.emit(forward,recoil_force)
+	#recoil.emit(forward,recoil_force)
+	recoil.emit(forward,projectile.recoil_force * shake_mult/2.0)
 	
 	shakes_on_shoot.emit(0.2,projectile.recoil_force * shake_mult/2.0)
 	
@@ -313,8 +346,11 @@ func shoot(shake_mult: float = 1.0) -> void:
 		current_heat += heat
 		if current_heat >= max_heat:
 			overheat = true
+			overheat_signal.emit(overheat)
 	
 	time_passed = 0
+
+
 
 func projectile_to_pool(current_projectile: Projectile) -> void:
 	projectile_active.erase(current_projectile)
@@ -343,6 +379,7 @@ func cooling(delta: float) -> void:
 	
 	if current_heat <= 0:
 		overheat = false
+		overheat_signal.emit(overheat)
 
 func set_fire_mode(mode: Fire_Mode) -> void:
 	fire_mode = mode
@@ -363,13 +400,31 @@ func can_shoot() -> bool:
 
 func calculate_charge(delta: float) -> void:
 	#print("ASGAGASGASGASGASGASGASGA")
+	var is_reloading: bool = false
 	match fire_mode:
 		Fire_Mode.Semi:
 			time_passed += delta
 			percent = time_passed / fire_rate_prim
 			percent = clampf(percent,0,1)
 			percent *= 100
+			if percent < 99.0:
+				is_reloading = true
 		Fire_Mode.Auto:
 			percent = (current_heat / max_heat) * 100
+			is_reloading = overheat
+			for m in meshes:
+				var value: float = 0.0
+				if percent < 50.0 and not overheat:
+					value = 0.0
+				elif not overheat:
+					value = (percent - 50.0)/ 100.0
+				else:
+					value = (percent) / 100.0
+				value *= 5.0
+				#value = clampf(value,0.0,3.0)
+				var mult = m.material_override.emission_energy_multiplier
+				if value >= 0.0 and not is_equal_approx(mult, value):
+					m.material_override.emission_energy_multiplier = value
+			
 		
-	shoot_recharge.emit(percent)
+	shoot_recharge.emit(percent, is_reloading)

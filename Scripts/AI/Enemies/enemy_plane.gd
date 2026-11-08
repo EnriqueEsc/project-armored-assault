@@ -12,6 +12,9 @@ var counter: int = 0
 var active: bool = false
 
 func _init_rigid() -> void:
+	if is_instance_valid(occlusion_node):
+		#occlusion_node.queue_free()
+		occlusion_node.max_process_distance = 9999
 	tank_rigid = get_parent() as Plane_Rigid
 	#current_team = randi_range(1,Team.size()-1)
 	#tank_rigid.is_kamikaze = is_kamikaze
@@ -175,6 +178,11 @@ func deliver_package() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	
+	thinking_counter += delta
+	if thinking_counter < thinking_tick:
+		return
+	thinking_counter = 0.0
 	
 	#print(next_path)
 	var static_model: bool = false
