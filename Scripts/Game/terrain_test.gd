@@ -406,8 +406,10 @@ func deform_terrain_by_index(index: int, damage: float = 1) -> void:
 	var target = vertices[index]
 	
 	var new_height: float = vertices[index].y
-	new_height -= 1.0
-	new_height *= (float(damage) * randf_range(0.6,1.4))
+	var factor = - 1.0
+	factor *= (float(damage) * randf_range(0.6,1.4))
+	
+	new_height += factor
 	
 	#print("NEW ", new_height < vertices[index].y," ",vertices[index].y," ",new_height)
 	

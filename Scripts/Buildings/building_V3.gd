@@ -75,6 +75,8 @@ var ghost_colission: Area3D = null
 
 var occlusion_node: DistanceOccluder = DistanceOccluder.new(self)
 
+var color = Color(randf_range(170,240)/255.0, randf_range(170,240)/255.0, randf_range(170,240)/255.0)
+
 func _ready() -> void:
 	
 	if occlusion_node:
@@ -85,37 +87,45 @@ func _ready() -> void:
 	
 	mesh_library = MeshLibrary.new()
 	
+	
 	if inner_pref_mesh_instance:
-		pref_mesh = inner_pref_mesh_instance.mesh
+		inner_pref_mesh_instance = inner_pref_mesh_instance.duplicate()
+		pref_mesh = inner_pref_mesh_instance.mesh.duplicate()
 	
 	if side_pref_mesh_instance:
-		side_pref_mesh = side_pref_mesh_instance.mesh
+		side_pref_mesh_instance = side_pref_mesh_instance.duplicate()
+		side_pref_mesh = side_pref_mesh_instance.mesh.duplicate()
 	else:
 		side_pref_mesh = pref_mesh
 	
 	if corner_pref_mesh_instance:
-		corner_pref_mesh = corner_pref_mesh_instance.mesh
+		corner_pref_mesh_instance = corner_pref_mesh_instance.duplicate()
+		corner_pref_mesh = corner_pref_mesh_instance.mesh.duplicate()
 	else:
 		corner_pref_mesh = pref_mesh
 		
 	if street_pref_mesh_instance:
-		street_pref_mesh = street_pref_mesh_instance.mesh
+		street_pref_mesh_instance = street_pref_mesh_instance.duplicate()
+		street_pref_mesh = street_pref_mesh_instance.mesh.duplicate()
 	else:
 		street_pref_mesh = pref_mesh
 		
 	if roof_pref_mesh_instance:
-		roof_pref_mesh = roof_pref_mesh_instance.mesh
+		roof_pref_mesh_instance = roof_pref_mesh_instance.duplicate()
+		roof_pref_mesh = roof_pref_mesh_instance.mesh.duplicate()
 	else:
 		roof_pref_mesh = pref_mesh
 		
 	if roof_corner_pref_mesh_instance:
-		roof_corner_pref_mesh = roof_corner_pref_mesh_instance.mesh
+		roof_corner_pref_mesh_instance = roof_corner_pref_mesh_instance.duplicate()
+		roof_corner_pref_mesh = roof_corner_pref_mesh_instance.mesh.duplicate()
 	else:
 		roof_corner_pref_mesh = pref_mesh
 	
 	
 	if roof_side_pref_mesh_instance:
-		roof_side_pref_mesh = roof_side_pref_mesh_instance.mesh
+		roof_side_pref_mesh_instance = roof_side_pref_mesh_instance.duplicate()
+		roof_side_pref_mesh = roof_side_pref_mesh_instance.mesh.duplicate()
 	else:
 		roof_side_pref_mesh = pref_mesh
 	
@@ -250,23 +260,14 @@ func init_grid() -> void:
 	
 	if not csg_active:
 		#print("ola")
-		
-		
 		if see_trough:
-			pref_mesh.surface_set_material(0,material)
-			if side_pref_mesh:
-				side_pref_mesh.surface_set_material(0,material)
-			if corner_pref_mesh:
-				corner_pref_mesh.surface_set_material(0,material)
-			if street_pref_mesh:
-				street_pref_mesh.surface_set_material(0,material)
-				
-			if roof_pref_mesh:
-				roof_pref_mesh.surface_set_material(0,material)
-			if roof_corner_pref_mesh:
-				roof_corner_pref_mesh.surface_set_material(0,material)
-			if roof_side_pref_mesh:
-				roof_side_pref_mesh.surface_set_material(0,material)
+			apply_shader_to_prefab(pref_mesh)
+			apply_shader_to_prefab(side_pref_mesh)
+			apply_shader_to_prefab(corner_pref_mesh)
+			apply_shader_to_prefab(street_pref_mesh)
+			apply_shader_to_prefab(roof_pref_mesh)
+			apply_shader_to_prefab(roof_corner_pref_mesh)
+			apply_shader_to_prefab(roof_side_pref_mesh)
 		
 		
 	var start_x = -col_size_x * 0.5 + 1 * 0.5
@@ -358,6 +359,27 @@ func init_grid() -> void:
 		pass
 
 
+func apply_shader_to_prefab(target_mesh: Mesh) -> void:
+	if not target_mesh:
+		return
+		
+	var original_material = target_mesh.surface_get_material(0)
+	if not original_material:
+		return
+		
+	var texture: Texture2D = null
+	
+	
+	if original_material is StandardMaterial3D:
+		texture = original_material.albedo_texture
+	elif original_material is ShaderMaterial:
+		texture = original_material.get_shader_parameter("texture_albedo")
+		
+		
+	var new_material = material.duplicate() as ShaderMaterial
+	new_material.set_shader_parameter("texture_albedo", texture)
+	new_material.set_shader_parameter("albedo", color)
+	target_mesh.surface_set_material(0, new_material)
 
 func set_ghost_colission() -> void:
 	var min_pos: Vector3 = Vector3.INF

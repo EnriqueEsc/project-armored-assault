@@ -2,10 +2,18 @@ extends Tank_Rigid
 class_name Siege_Rigid
 
 var emplaced: bool = false
+@export var legs_retracted: MeshInstance3D = null
+@export var legs_extended: MeshInstance3D = null
 
 func special_action() -> bool:
 	emplaced = not emplaced
 	velocity = Vector3.ZERO
+	
+	if is_instance_valid(legs_retracted):
+		legs_retracted.visible = not emplaced
+	if is_instance_valid(legs_extended):
+		legs_extended.visible = emplaced
+	
 	for t in vehicle_turrets:
 		if t.turret_priority == Vehicle_turret.Turret_Priority.Secondary:
 			continue

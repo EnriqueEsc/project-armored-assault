@@ -171,9 +171,9 @@ func _ready() -> void:
 		if c is MeshInstance3D:
 			meshes.append(c)
 			if not override:
-				if not c.material_override:
+				if not c.get_active_material(0):
 					continue
-				override = c.material_override
+				override = c.get_active_material(0)
 	if not override:
 		override = StandardMaterial3D.new()
 		#override.albedo_color.a = 0.0
