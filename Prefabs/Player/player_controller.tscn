@@ -3,15 +3,21 @@
 [ext_resource type="Script" uid="uid://b44xtts1goeo7" path="res://Scripts/Player/Tank_player_controller.gd" id="1_uaa60"]
 [ext_resource type="Script" uid="uid://dgldqtulm4ymj" path="res://Scripts/Player/Tank_camera.gd" id="2_emxqw"]
 [ext_resource type="Script" uid="uid://c1amjgu5fo0td" path="res://Scripts/Player/HUD_boss_info.gd" id="3_7k3ju"]
+[ext_resource type="Script" uid="uid://dku4ev0ttriae" path="res://Scripts/Player/HUD_Minimap.gd" id="3_bnpm6"]
 [ext_resource type="Texture2D" uid="uid://b86g6wukndswo" path="res://Sprites/Test/lock_on.png" id="6_dem1y"]
 [ext_resource type="Texture2D" uid="uid://dnmrnp8u32y7x" path="res://icon.svg" id="7_x6g45"]
 [ext_resource type="Script" uid="uid://btlgcwps55nxo" path="res://Scripts/Game/Text/HUD_Dialog.gd" id="7_y13j2"]
 [ext_resource type="Script" uid="uid://h846my1p00nw" path="res://Scripts/Game/Text/typing_text.gd" id="8_dem1y"]
+[ext_resource type="Shader" uid="uid://dlvnmq2ns6l8v" path="res://Shaders/minimap_shader.gdshader" id="11_bnpm6"]
 [ext_resource type="Texture2D" uid="uid://dv167uv5xah61" path="res://Sprites/Characters/default.png" id="11_imkmc"]
 [ext_resource type="Texture2D" uid="uid://hv6ow2efb3rm" path="res://Sprites/Test/1771646306126.png" id="13_yfrtn"]
 [ext_resource type="Texture2D" uid="uid://yqsnwiuau3g7" path="res://Sprites/Test/ShootingPoint.png" id="14_rjqdq"]
 [ext_resource type="Script" uid="uid://hg6l1epqoto0" path="res://Scripts/Player/HUD_Map.gd" id="15_6grxy"]
 [ext_resource type="Script" uid="uid://b4qtvehq7gqo6" path="res://Scripts/Menu/Utilities_menus/pause_menu.gd" id="16_u0f3t"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_sn0t7"]
+shader = ExtResource("11_bnpm6")
+shader_parameter/albedo = Color(1, 1, 1, 1)
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_q50ch"]
 viewport_path = NodePath("HUD/HUD_Player/Map/SubViewport")
@@ -20,7 +26,7 @@ viewport_path = NodePath("HUD/HUD_Player/Map/SubViewport")
 script = ExtResource("1_uaa60")
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=857435729]
-transform = Transform3D(-1, 1.3429813e-07, -6.901981e-08, 0, 0.45709756, 0.88941634, 1.509958e-07, 0.88941634, -0.45709756, 0, 7.033662, -2.980245)
+transform = Transform3D(-1, 1.3429815e-07, -6.90198e-08, 0, 0.45709744, 0.88941634, 1.509958e-07, 0.88941634, -0.45709744, 0, 7.033662, -2.980245)
 cull_mask = 3
 size = 10.0
 script = ExtResource("2_emxqw")
@@ -41,6 +47,27 @@ offset_right = 576.0
 offset_bottom = 324.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="HUD_Minimap" type="Panel" parent="HUD/HUD_Player" unique_id=215204647]
+clip_contents = true
+layout_mode = 0
+offset_left = 921.0
+offset_top = 101.0
+offset_right = 1121.0
+offset_bottom = 301.0
+script = ExtResource("3_bnpm6")
+
+[node name="Control" type="Control" parent="HUD/HUD_Player/HUD_Minimap" unique_id=883799741]
+anchors_preset = 0
+rotation = 6.2831855
+pivot_offset = Vector2(100, 100)
+
+[node name="Minimap" type="TextureRect" parent="HUD/HUD_Player/HUD_Minimap/Control" unique_id=1649043862]
+material = SubResource("ShaderMaterial_sn0t7")
+layout_mode = 0
+offset_right = 512.0
+offset_bottom = 512.0
+pivot_offset = Vector2(256, 0)
 
 [node name="HUD_Boss_Info" type="Control" parent="HUD/HUD_Player" unique_id=166122214]
 anchors_preset = 0

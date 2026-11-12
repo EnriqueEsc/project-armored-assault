@@ -335,7 +335,8 @@ func shoot(shake_mult: float = 1.0) -> void:
 	
 	last_shoot_prim = time_controller.running_time if is_instance_valid(time_controller) else 0.0
 	if effects_manager and projectile_type != Projectile_Type.Flamethrower and projectile_type != Projectile_Type.Railgun:
-		effects_manager.shoot_from_pool(to_global(muzzle_pos), global_rotation, projectile.muzzle_flash_scale)
+		#effects_manager.shoot_from_pool(to_global(muzzle_pos), global_rotation, projectile.muzzle_flash_scale)
+		effects_manager.shoot_3d_from_pool(to_global(muzzle_pos), global_rotation,projectile.muzzle_flash_scale)
 	
 	#recoil.emit(forward,recoil_force)
 	recoil.emit(forward,projectile.recoil_force * shake_mult/2.0)

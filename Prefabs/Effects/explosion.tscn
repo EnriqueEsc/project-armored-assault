@@ -7,11 +7,20 @@ colors = PackedColorArray(1, 1, 0, 1, 0.15487584, 0.15487605, 0.15487596, 0.3176
 gradient = SubResource("Gradient_kuf18")
 
 [sub_resource type="Curve" id="Curve_kuf18"]
-_data = [Vector2(0, 0.50000006), 0.0, 0.0, 0, 0, Vector2(0.20430106, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+_limits = [0.0, 1.0, 0.0, 0.8100558]
+_data = [Vector2(0, 0.50000006), 0.0, 0.0, 0, 0, Vector2(0.23984894, 0.49107146), 0.0, 0.0, 0, 0, Vector2(0.8100558, 0), 0.0, 0.0, 0, 0]
 point_count = 3
 
 [sub_resource type="CurveTexture" id="CurveTexture_q8sys"]
 curve = SubResource("Curve_kuf18")
+
+[sub_resource type="Curve" id="Curve_w5yva"]
+_limits = [0.0, 3.0, 0.0, 1.0]
+_data = [Vector2(0.044692725, 0.45535707), 0.0, 2.5970984, 0, 0, Vector2(0.3854748, 0.32142854), 0.0, 0.0, 0, 0, Vector2(0.69832397, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_wvylw"]
+curve = SubResource("Curve_w5yva")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_n0wup"]
 emission_shape = 1
@@ -23,7 +32,9 @@ initial_velocity_max = 8.0
 gravity = Vector3(0, 2, 0)
 scale_min = 0.0
 scale_curve = SubResource("CurveTexture_q8sys")
+scale_over_velocity_curve = SubResource("CurveTexture_wvylw")
 color_ramp = SubResource("GradientTexture1D_q8sys")
+turbulence_noise_scale = 10.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kuf18"]
 transparency = 1
@@ -35,6 +46,7 @@ particles_anim_loop = false
 
 [sub_resource type="QuadMesh" id="QuadMesh_kuf18"]
 material = SubResource("StandardMaterial3D_kuf18")
+size = Vector2(0.5, 0.5)
 
 [node name="Explosion" type="GPUParticles3D" unique_id=447795717]
 emitting = false

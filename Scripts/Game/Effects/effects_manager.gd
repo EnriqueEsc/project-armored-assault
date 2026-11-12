@@ -56,6 +56,20 @@ var shoot_active: Array[Sprite_Effect] = []
 
 
 
+
+var shoot_3d_prefab = load("res://Prefabs/Effects/shoot_3d.tscn")
+var shoot_3d_pool: Array[GPUParticles3D] = []
+var shoot_3d_active: Array[GPUParticles3D] = []
+
+
+
+
+
+var explosion_3d_prefab = load("res://Prefabs/Effects/explosion_3d.tscn")
+var explosion_3d_pool: Array[GPUParticles3D] = []
+var explosion_3d_active: Array[GPUParticles3D] = []
+
+
 var fake_light_prefab = load("res://Prefabs/Effects/fake_light.tscn")
 var fake_light_pool: Array[MeshInstance3D] = []
 var fake_light_active: Array[MeshInstance3D] = []
@@ -195,6 +209,26 @@ func create_effects() -> void:
 		shoot.rotation_degrees.x = 90
 		deactivate_sprite(shoot)
 		shoot_pool.append(shoot)
+		
+		#continue
+		
+		var shoot_3d = shoot_3d_prefab.instantiate() as GPUParticles3D
+		get_tree().current_scene.call_deferred("add_child",shoot_3d)
+		shoot_3d.finished.connect(shoot_3d_to_pool.bind(shoot_3d))
+		shoot_3d.finished.connect(remove_from_global_active.bind(shoot_3d))
+		deactivate_effect(shoot_3d)
+		shoot_3d_pool.append(shoot_3d)
+		set_emission_in_gpu_particles(shoot_3d)
+		
+		
+		
+		var explosion_3d = explosion_3d_prefab.instantiate() as GPUParticles3D
+		get_tree().current_scene.call_deferred("add_child",explosion_3d)
+		explosion_3d.finished.connect(explosion_3d_to_pool.bind(explosion_3d))
+		explosion_3d.finished.connect(remove_from_global_active.bind(explosion_3d))
+		deactivate_effect(explosion_3d)
+		explosion_3d_pool.append(explosion_3d)
+		set_emission_in_gpu_particles(explosion_3d)
 
 
 
@@ -213,6 +247,7 @@ func explosion_from_pool(position: Vector3, radius: float, wave_scale: int = -1)
 		
 		to_global_active(explosion)
 		
+		explosion.lifetime = radius * 0.15
 		explosion.process_mode = Node.PROCESS_MODE_ALWAYS
 		explosion.global_position = position
 		explosion.show()
@@ -273,6 +308,112 @@ func explo_wave_to_pool(explo_wave: GPUParticles3D) -> void:
 	deactivate_effect(explo_wave)
 
 
+
+
+func explosion_3d_from_pool(position: Vector3, scale: float = -1, color: Color = Color.BLACK) -> void:
+	var cam = Tank_camera.INSTANCE
+	if cam and cam.is_outside_camera_range(position):
+		return
+	
+	explosion_from_pool(position,scale,scale)
+	
+	var explosion_3d: GPUParticles3D = null
+	if explosion_3d_pool.size() <= 0:
+		explosion_3d = explosion_3d_active.pop_front()
+	else:
+		explosion_3d = explosion_3d_pool.pop_front()
+	if explosion_3d:
+		explosion_3d_active.push_back(explosion_3d)
+		
+		to_global_active(explosion_3d)
+		#scale *= 10.0
+		if scale < 0:
+			scale = 1
+		var mat = explosion_3d.process_material as ParticleProcessMaterial
+		mat.scale_max = scale
+		mat.scale_min = scale / 5.0
+		#print("WAVE SCALE ",wave_scale)
+		'''
+		var p = explosion_3d.draw_pass_1
+		if p:
+			p.radius = wave_scale
+			p.height = wave_scale * 2
+		'''
+		if color != Color.BLACK:
+			mat = explosion_3d.draw_pass_1.surface_get_material(0) as StandardMaterial3D
+			if mat:
+				mat.emission = color
+				mat.albedo_color = color
+				#mat.albedo_color.a = 0.06
+		
+		explosion_3d.process_mode = Node.PROCESS_MODE_ALWAYS
+		explosion_3d.global_position = position
+		explosion_3d.show()
+		explosion_3d.restart()
+		#fake_light_from_pool(position, Vector2.ONE * radius)
+		return
+	
+
+func explosion_3d_to_pool(explosion_3d: GPUParticles3D) -> void:
+	explosion_3d_active.erase(explosion_3d)
+	explosion_3d_pool.push_back(explosion_3d)
+	deactivate_effect(explosion_3d)
+
+func shoot_3d_from_pool(position: Vector3, rotation: Vector3 = Vector3.ZERO, scale: float = -1, color: Color = Color.BLACK) -> void:
+	var cam = Tank_camera.INSTANCE
+	if cam and cam.is_outside_camera_range(position):
+		return
+	
+	
+	var shoot_3d: GPUParticles3D = null
+	if shoot_3d_pool.size() <= 0:
+		shoot_3d = shoot_3d_active.pop_front()
+	else:
+		shoot_3d = shoot_3d_pool.pop_front()
+	if shoot_3d:
+		shoot_3d_active.push_back(shoot_3d)
+		
+		to_global_active(shoot_3d)
+		scale *= 10.0
+		if scale < 0:
+			scale = 1
+		var mat = shoot_3d.process_material as ParticleProcessMaterial
+		mat.scale_max = scale
+		mat.scale_min = scale / 5.0
+		#print("WAVE SCALE ",wave_scale)
+		'''
+		var p = shoot_3d.draw_pass_1
+		if p:
+			p.radius = wave_scale
+			p.height = wave_scale * 2
+		'''
+		if color != Color.BLACK:
+			mat = shoot_3d.draw_pass_1.surface_get_material(0) as StandardMaterial3D
+			if mat:
+				mat.emission = color
+				mat.albedo_color = color
+				#mat.albedo_color.a = 0.06
+		
+		shoot_3d.process_mode = Node.PROCESS_MODE_ALWAYS
+		shoot_3d.global_position = position
+		shoot_3d.global_rotation = rotation
+		shoot_3d.rotate_object_local(Vector3.RIGHT,deg_to_rad(90))
+		#shoot.rotation_degrees.x += 90
+		#shoot.rotation.y = deg_to_rad(randi_range(0,180))
+		shoot_3d.rotate_object_local(Vector3.UP,randf_range(0.0, TAU))
+		#print(shoot.rotation)
+		#shoot_3d.scale = Vector3.ONE * scale * randf_range(0.7,1.3)
+		shoot_3d.show()
+		shoot_3d.restart()
+		#fake_light_from_pool(position, Vector2.ONE * radius)
+		return
+	
+	shoot_from_pool(position,rotation,scale)
+
+func shoot_3d_to_pool(shoot_3d: GPUParticles3D) -> void:
+	shoot_3d_active.erase(shoot_3d)
+	shoot_3d_pool.push_back(shoot_3d)
+	deactivate_effect(shoot_3d)
 
 
 

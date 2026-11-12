@@ -378,7 +378,7 @@ func detonate() -> void:
 	
 	
 	if effects_manager:
-		effects_manager.explosion_from_pool(global_position,blast_rad)
+		effects_manager.explosion_3d_from_pool(global_position,blast_rad)
 	
 	explodes.emit(global_position,blast_rad,blast_damage * power_multiplier)
 	

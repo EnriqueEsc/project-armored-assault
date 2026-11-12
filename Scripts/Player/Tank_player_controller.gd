@@ -43,6 +43,8 @@ var HUD_height_line: Array[Line2D] = []
 @onready var HUD_Black_screen: ColorRect = $HUD/HUD_Player/Black_screen/HUD_Black_Screen
 @onready var HUD_Mission_info: Typing_Text = $HUD/HUD_Player/Black_screen/HUD_Black_Screen/Mission_info
 
+@onready var HUD_minimap: HUD_Minimap = $HUD/HUD_Player/HUD_Minimap
+
 var mission_finished = false
 var is_destroyed = false
 
@@ -151,6 +153,7 @@ func _ready() -> void:
 	HUD_Map.visible = false
 	HUD_Boss_info.show_boss_info()
 	
+	HUD_minimap.set_player(tank_rigid.ingame_data)
 	
 	HUD_Lock_on.visible = lock_on
 	
@@ -357,6 +360,7 @@ func color_HUD() -> void:
 		HUD_AP_Bar.modulate = color
 		#HUD_Hitmarker.modulate = color
 		HUD_Boss_info.color_boss_info(color)
+		HUD_minimap.update_color(color)
 		
 		if HUD_Aim_box:
 			HUD_Aim_box.change_color(color)
@@ -877,6 +881,7 @@ func show_HUD(state: bool) -> void:
 	HUD_Boss_info.show_boss_info()
 	#HUD_height_line.visible = state
 	HUD_Map.visible = false
+	HUD_minimap.visible = state
 	
 	if HUD_Aim_box:
 		HUD_Aim_box.show_visible(state)

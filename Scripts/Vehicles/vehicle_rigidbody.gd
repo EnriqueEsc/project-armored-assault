@@ -244,6 +244,7 @@ func update_stencil_color(color: Color) -> void:
 				if mat == material.stencil_color:
 					continue
 				m.material_overlay.stencil_color = material.stencil_color
+	ingame_data.update_color(color)
 
 
 func initialize_effects() -> void:
