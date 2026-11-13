@@ -38,8 +38,7 @@ func _update_current_objectives() -> void:
 	
 	if not boss_killed:
 	
-		objectives_text = ^"[font_size=28]Objectives:[/font_size]
-		
+		objectives_text = ^"[font_size=22]Objectives:[/font_size]
 		> Kill [{ctk}]"
 		
 		objectives_text = objectives_text.format({"ctk": boss.vehicle_pilot_name})
@@ -56,8 +55,7 @@ Next time at least give us some AA equipment...","rhino3")
 			dialog_manager.add_text_to_buffer("Rhino 2","Everyone shut up, my head aches.","rhino2")
 		
 		
-		objectives_text = ^"[font_size=28]Objectives:[/font_size]
-		
+		objectives_text = ^"[font_size=22]Objectives:[/font_size]
 		>>> Go to Exfil (Blue zone on the map)"
 	
 	#_check_success_conditions()

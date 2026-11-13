@@ -336,7 +336,7 @@ turret_barrel = [NodePath("Gun")]
 side_angle_limit = 360.0
 fire_mode = 2
 bullets_per_burst = 5
-time_between_burst = 1.0
+time_between_burst = 0.2
 turret_priority = 1
 
 [node name="torreta_V2" parent="Turret3" unique_id=1120156078 instance=ExtResource("7_lrqip")]

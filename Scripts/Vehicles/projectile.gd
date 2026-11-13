@@ -273,6 +273,8 @@ func activate() -> void:
 	set_deferred("monitoring", true)
 	set_deferred("monitorable", true)
 	
+	_additional_activate_process()
+	
 	if is_explosive:
 		detonated = false
 	
@@ -289,6 +291,8 @@ func deactivate() -> void:
 	deactivated.emit(self)
 
 func _additional_deactivate_process() -> void:
+	pass
+func _additional_activate_process() -> void:
 	pass
 
 func move(delta: float) -> void:

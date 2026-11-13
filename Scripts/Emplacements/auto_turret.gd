@@ -34,7 +34,7 @@ var thinking_counter: float = 0.0
 var thinking_tick: float = 0.1
 
 
-func _ready() -> void:
+func _start() -> void:
 	turret.barrel_lower_limit = barrel_lower_limit
 	turret.barrel_upper_limit = barrel_upper_limit
 	turret.turret_turning_speed = 0.05
@@ -44,7 +44,8 @@ func _ready() -> void:
 	var parent_col = get_parent_node_3d()
 	var grand_parent_col = parent_col.get_parent_node_3d()
 	turret.ignore.append_array([parent_col, grand_parent_col])
-	
+	if parent_col is Emplacement:
+		current_team = parent_col.current_team
 	
 	#current_team = randi_range(0,Team.size()-1)
 	
@@ -90,6 +91,50 @@ func _ready() -> void:
 	if mission:
 		mission.add_entity(self)
 
+func _start_turret() -> void:
+	turret.barrel_lower_limit = barrel_lower_limit
+	turret.barrel_upper_limit = barrel_upper_limit
+	turret.turret_turning_speed = 0.05
+	
+	if self.is_in_group("Enemy"):
+		self.remove_from_group("Enemy")
+	if self.is_in_group("Player"):
+		self.remove_from_group("Player")
+	
+	match current_team:
+		Basic_AI.Team.ENEMY:
+			self.add_to_group("Enemy")
+		Basic_AI.Team.ALLY:
+			self.add_to_group("Player")
+	
+	var parent_col = get_parent_node_3d()
+	var grand_parent_col = parent_col.get_parent_node_3d()
+	turret.ignore.clear()
+	turret.ignore.append_array([parent_col, grand_parent_col])
+	turret.discard_projectiles()
+	turret.create_projectiles(current_team)
+	
+	await get_tree().physics_frame
+	
+	
+	
+	match current_team:
+		Basic_AI.Team.ENEMY:
+			player_ref = get_tree().get_first_node_in_group("Player")
+		Basic_AI.Team.ALLY:
+			player_ref = get_tree().get_first_node_in_group("Enemy")
+	
+	
+	
+	if deg_to_rad(turret.side_angle_limit) < max_shoot_angle:
+		max_shoot_angle = deg_to_rad(turret.side_angle_limit)
+	
+	
+	var mission: Mission = Mission.INSTANCE
+	#print(mission)
+	if mission:
+		mission.remove_entity(self)
+		mission.add_entity(self)
 
 func got_hit(source: Node3D, impact_point: Vector3) -> void:
 	current_state = AI_State.ENGAGED

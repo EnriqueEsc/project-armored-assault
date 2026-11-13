@@ -313,7 +313,7 @@ func get_aim_point_3d(distance: float) -> Vector3:
 	if point:
 		res = point.position
 		aim_point_normal = point.normal
-		if point.collider is Vehicle_Rigid:
+		if point.collider is Vehicle_Rigid or point.collider is Emplacement:
 			target.emit(point.collider)
 		else:
 			target.emit(null)
@@ -507,3 +507,9 @@ func calculate_burst_charge(value: float, is_reloading: bool = false) -> void:
 	for w in turret_barrel:
 		if not is_instance_valid(w):
 			continue
+
+func discard_projectiles() -> void:
+	for w in turret_barrel:
+		if not is_instance_valid(w):
+			continue
+		w.discard_projectiles()

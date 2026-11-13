@@ -294,7 +294,7 @@ visible = false
 [node name="Gun" type="Node3D" parent="Turret2" unique_id=1493998052]
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0, 0)
 script = ExtResource("8_6k30k")
-projectile_type = 2
+projectile_type = 8
 muzzle_pos = Vector3(0, 0, 0.3)
 fire_rate_prim = 0.1
 max_heat = 150.0

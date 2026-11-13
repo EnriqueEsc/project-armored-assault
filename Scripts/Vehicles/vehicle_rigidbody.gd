@@ -177,7 +177,9 @@ func initialize_stencil() -> void:
 		for m in model:
 			if is_instance_valid(m):
 				m.material_override = m.get_active_material(0).duplicate()
-				m.material_override.specular = 0.0
+				if not m.material_override is StandardMaterial3D:
+					continue
+				m.material_override.metallic_specular = 0.0
 				m.material_override.metallic = 0.0
 				m.material_override.roughness = 0.0
 				m.material_override.render_priority = 0
@@ -508,7 +510,6 @@ func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3, stat
 		deactivate() 
 		return
 	
-	update_visual_damage_overlay()
 	
 	
 	embraces_damage.emit(damage)
@@ -523,6 +524,8 @@ func update_visual_damage_overlay() -> void:
 	if not model.is_empty():
 		for m in model:
 			if is_instance_valid(m):
+				if not is_instance_valid(m.material_overlay):
+					continue
 				#print("sssss ",m," ",material.stencil_mode)
 				#m.material_override = material
 				#m.material_override = m.get_active_material(0).duplicate()
@@ -550,6 +553,7 @@ func get_ap_percent() -> float:
 	return (float(armor_points)/float(max_armor_points) * 100.0)
 
 func show_visual_damage(ap: float) -> void:
+	update_visual_damage_overlay()
 	if not damage_effect:
 		return
 	if ap >= 50.0:

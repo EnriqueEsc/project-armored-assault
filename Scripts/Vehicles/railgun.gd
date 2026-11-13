@@ -1,6 +1,7 @@
 extends Projectile
 class_name Railgun
 
+@onready var trail: GPUParticles3D = $GPUParticles3D
 
 
 func shoot(pos: Vector3, rot: Vector2, pot: bool = false, mult: float = 2.0) -> void:
@@ -12,6 +13,11 @@ func shoot(pos: Vector3, rot: Vector2, pot: bool = false, mult: float = 2.0) -> 
 	elif power_multiplier != 1.0:
 		power_multiplier = 1.0
 		change_material_color()
+	
+	var overlay = proy.material_overlay
+	if overlay and proy.material_overlay.stencil_color != stencil_color:
+		proy.material_overlay.stencil_color = stencil_color
+		
 	
 	current_pos = pos
 	position = current_pos
@@ -39,6 +45,21 @@ func shoot(pos: Vector3, rot: Vector2, pot: bool = false, mult: float = 2.0) -> 
 	rotation.y += deg_to_rad(randf_range(horizontal_disp.x,horizontal_disp.y))
 	
 
+func _additional_deactivate_process() -> void:
+	if not trail:
+		return
+	trail.emitting = false
+	trail.hide()
+	trail.process_mode = Node.PROCESS_MODE_DISABLED
+
+func _additional_activate_process() -> void:
+	
+	if not trail:
+		return
+	trail.process_mode = Node.PROCESS_MODE_ALWAYS
+	trail.show()
+	trail.restart()
+	#trail.emitting = true
 
 
 func move(delta: float) -> void:
@@ -78,12 +99,20 @@ func _on_body_entered(body):
 	
 	#print(body)
 	
+	if body.is_in_group("Terrain"):
+		if not body.has_method("calculate_impact_chunk"):
+			if is_explosive:
+				detonate()
+			else:
+				deactivate()
+			
+	
 	if body is Vehicle_Rigid or body is Emplacement:
 		hits_enemy.emit()
 	
 	if body is Vehicle_Rigid:
 		body.shakes.emit(0.1,0.2)
-		
+	
 	
 	if body.has_method("take_damage"):
 		#direction = Vector3.ZERO

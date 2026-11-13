@@ -78,6 +78,7 @@ var heat_effect: GPUParticles3D = null
 
 var meshes: Array[MeshInstance3D] = []
 var override: StandardMaterial3D = null
+var stencil_color: Color = Color.WHITE
 
 var use_emmisions: bool = false
 signal overheat_signal
@@ -287,6 +288,15 @@ func create_projectiles(team: Basic_AI.Team) -> void:
 		recoil_force = projectile_pool[0].recoil_force
 		heat = projectile_pool[0].heat
 	
+	if origin:
+		team = origin.current_team
+	
+	match team:
+		Basic_AI.Team.ENEMY:
+			stencil_color = Color.RED
+		Basic_AI.Team.ALLY:
+			stencil_color = Color.GREEN
+	
 	if projectile_type == Projectile_Type.Flamethrower:
 		return
 	
@@ -429,3 +439,13 @@ func calculate_charge(delta: float) -> void:
 			
 		
 	shoot_recharge.emit(percent, is_reloading)
+
+func discard_projectiles() -> void:
+	for c in case_active:
+		c.queue_free()
+	for c in case_pool:
+		c.queue_free()
+	for c in projectile_active:
+		c.queue_free()
+	for c in projectile_pool:
+		c.queue_free()

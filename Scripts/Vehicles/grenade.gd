@@ -2,6 +2,7 @@ extends Projectile
 class_name Grenade
 
 var rigid: RigidBody3D = null
+var rigid_mesh: MeshInstance3D = null
 var counter: float = 0.0
 @export var detonation_time: float = 2.0
 
@@ -18,6 +19,10 @@ func set_shape_cast() -> void:
 	if not rigid:
 		queue_free()
 		return
+	
+	for c in rigid.get_children():
+		if c is MeshInstance3D:
+			rigid_mesh = c
 	
 	if grenade_Type != GrenadeType.Time:
 		rigid.contact_monitor = true
@@ -84,6 +89,12 @@ func shoot(pos: Vector3, rot: Vector2, pot: bool = false, mult: float = 2.0) -> 
 	elif power_multiplier != 1.0:
 		power_multiplier = 1.0
 		change_material_color()
+	
+	
+	var overlay = rigid_mesh.material_overlay
+	if overlay and rigid_mesh.material_overlay.stencil_color != stencil_color:
+		rigid_mesh.material_overlay.stencil_color = stencil_color
+		
 	
 	current_pos = pos
 	position = current_pos
@@ -209,7 +220,7 @@ func detonate() -> void:
 	
 	
 	if effects_manager:
-		effects_manager.explosion_from_pool(rigid.global_position,blast_rad)
+		effects_manager.explosion_3d_from_pool(rigid.global_position,blast_rad)
 	
 	explodes.emit(rigid.global_position,blast_rad,blast_damage * power_multiplier)
 	

@@ -1,9 +1,9 @@
 extends Control
 class_name HUD_Dialog
 
-@onready var dialog_name: RichTextLabel = $Dialog_Name
-@onready var dialog_text: Typing_Text = $Dialog_Text
-@onready var dialog_sprite: Sprite2D = $Dialog_Sprite
+@onready var dialog_name: RichTextLabel = $DialogBox/Dialog_Name
+@onready var dialog_text: Typing_Text = $DialogBox/Dialog_Text
+@onready var dialog_sprite: Sprite2D = $SpriteBox/Dialog_Sprite
 
 var screen_time: float = 3.0
 var time_active: float = 0.0

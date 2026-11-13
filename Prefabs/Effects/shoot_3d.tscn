@@ -32,6 +32,7 @@ emission_enabled = true
 emission = Color(1.353256, 0.31155747, 0, 1)
 emission_energy_multiplier = 13.0
 disable_receive_shadows = true
+stencil_flags = 2
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_an4go"]
 _surfaces = [{

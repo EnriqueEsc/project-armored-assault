@@ -14,7 +14,7 @@ signal ap_percent (ap: float)
 var damage_effect: GPUParticles3D = null
 
 var ingame_data: NodeInGameData = null
-var current_team: Basic_AI.Team = Basic_AI.Team.ENEMY
+var current_team: Basic_AI.Team = Basic_AI.Team.ALLY
 @export var emplacement_name: String = "Emplacement"
 
 
@@ -32,18 +32,34 @@ var stagger_max_time: float = 5.0
 var stagger_timer: float = 5.0
 var staggered: bool = false
 
+var message_color: Color = Color.GREEN
+
+
+@export var model: Array[MeshInstance3D] = []
+var material: BaseMaterial3D = null
+
+var tick: float = 1.0
+var last_tick: float = 0.0
+
+var collision_size: Vector3 = Vector3.ZERO
+
 func _ready() -> void:
 	if is_enemy:
+		message_color = Color.RED
+		current_team = Basic_AI.Team.ENEMY
 		self.add_to_group("Enemy")
 	initialize_effects()
 	
-	ingame_data = NodeInGameData.new(self)
+	ingame_data = NodeInGameData.new(self,message_color)
 	call_deferred("add_child",ingame_data)
 	if ingame_data:
 		#gets_enabled.connect(ingame_data.activate)
 		gets_disabled.connect(ingame_data.deactivate)
 		#ingame_data.activate()
 	calculate_collision_lenght()
+	
+	initialize_stencil()
+	#update_stencil(BaseMaterial3D.STENCIL_MODE_XRAY)
 	
 	call_deferred("get_functioning_children")
 
@@ -86,9 +102,11 @@ func initialize_effects() -> void:
 	ap_percent.connect(show_visual_damage)
 
 func show_visual_damage(ap: float) -> void:
+	
+	update_visual_damage_overlay()
+	
 	if not damage_effect:
 		return
-	
 	if ap <= 50.0:
 		if not damage_effect.emitting:
 			damage_effect.emitting = true
@@ -186,6 +204,11 @@ func _process(delta: float) -> void:
 	
 	#process_mode = Node.PROCESS_MODE_DISABLED
 	
+	last_tick += delta
+	if last_tick > tick:
+		update_stencil(2)
+		last_tick = 0
+	
 	if status_effect_buildup > 0.0:
 		status_effect_buildup -= status_effect_recovery * delta
 		if status_effect_buildup < 0.0:
@@ -224,16 +247,124 @@ func enable_functioning_children(enable: bool) -> void:
 
 func calculate_collision_lenght() -> void:
 	collision_lenght = 0.0
+	collision_size = Vector3.ZERO
+	var counter: float = 0
 	
 	for c in get_children():
 		if c is CollisionShape3D and c.shape is BoxShape3D:
 			collision_lenght += c.shape.size.length()
+			collision_size += c.shape.size
+			counter += 1.0
 			if ingame_data and ingame_data.collision_lenght != collision_lenght:
 				ingame_data.collision_lenght = collision_lenght
-
+	collision_size *= counter
 func get_functioning_children() -> void:
 	functioning_children = []
 	
 	for c in get_children():
 		if c is Array_Comms or c is TurretAI:
 			functioning_children.append(c)
+
+func initialize_stencil() -> void:
+	
+	model.clear()
+	
+	for c in get_children():
+		find_model_recursive(c)
+	
+	material = StandardMaterial3D.new()
+	if not model.is_empty():
+		for m in model:
+			if is_instance_valid(m):
+				m.material_override = m.get_active_material(0).duplicate()
+				if not m.material_override is StandardMaterial3D:
+					continue
+				m.material_override.metallic_specular = 0.0
+				m.material_override.metallic = 0.0
+				m.material_override.roughness = 0.0
+				m.material_override.render_priority = 0
+				m.material_override.stencil_mode = BaseMaterial3D.STENCIL_MODE_OUTLINE
+				m.material_override.stencil_color = Color.BLACK
+				
+				m.material_overlay = null
+				var overlay = StandardMaterial3D.new()
+				overlay.transparency =BaseMaterial3D.TRANSPARENCY_ALPHA
+				overlay.render_priority = 1
+				#overlay.stencil_outline_thickness = 0.3
+				overlay.albedo_color.a = 0.0
+				overlay.stencil_color = message_color
+				if Settings_Manager.INSTANCE.enable_emmisions:
+					#overlay.emission_enabled = true
+					overlay.emission = Color.ORANGE
+					overlay.albedo_color = Color.BLACK
+					#overlay.emission_energy_multiplier = 10.0
+					var noise_texture = NoiseTexture2D.new()
+					noise_texture.seamless = true
+					noise_texture.noise = FastNoiseLite.new()
+					var ramp = Gradient.new()
+					ramp.add_point(0.0,Color.from_rgba8(0,0,0,0))
+					ramp.add_point(0.5,Color.from_rgba8(0,0,0,255))
+					ramp.add_point(1.0,Color.WHITE)
+					noise_texture.color_ramp = ramp
+					overlay.albedo_color = Color.from_rgba8(255,155,50,255)
+					overlay.albedo_texture = noise_texture
+					
+				m.material_overlay = overlay
+				m.material_overlay.albedo_color.a = 0.0
+				
+func update_stencil(stencil_mode: BaseMaterial3D.StencilMode) -> void:
+	
+	if not material:
+		return
+	if stencil_mode == material.stencil_mode:
+		return
+	if not model.is_empty():
+		material.stencil_mode = stencil_mode
+		for m in model:
+			if is_instance_valid(m):
+				#print("sssss ",m," ",material.stencil_mode)
+				#m.material_override = material
+				#m.material_override = m.get_active_material(0).duplicate()
+				if not m.material_overlay:
+					continue
+				var mat = m.material_overlay.stencil_mode
+				if mat == material.stencil_mode:
+					continue
+				m.material_overlay.stencil_mode = material.stencil_mode
+				#print("SEXO ",m)
+
+func find_model_recursive(node: Node) -> void:
+	if node is Emplacement:
+		node.current_team = current_team
+		return
+	if not node.visible:
+		return
+	if node is TurretAI:
+		node.current_team = current_team
+		node._start_turret()
+	if node is MeshInstance3D and not model.has(node):
+		model.append(node)
+	for child in node.get_children():
+		#if child is Building_Block_V2:
+		#	child.got_destroyed.connect(update_navmesh)
+		find_model_recursive(child)
+
+func update_visual_damage_overlay() -> void:
+	
+	if not Settings_Manager.INSTANCE.enable_emmisions:
+		return
+		#overlay.emission_energy_multiplier = 10.0
+	if not model.is_empty():
+		for m in model:
+			if is_instance_valid(m):
+				if not is_instance_valid(m.material_overlay):
+					continue
+				#print("sssss ",m," ",material.stencil_mode)
+				#m.material_override = material
+				#m.material_override = m.get_active_material(0).duplicate()
+				var percent = 1.0 - (float(armor_points) / float(max_armor_points))
+				percent = clampf(remap(percent, 0.0, 0.7, 0.0, 1.0), 0.0, 1.0)
+				#var mat = m.material.albedo_color.a
+				if is_equal_approx(percent, m.material_overlay.albedo_color.a):
+					continue
+				m.material_overlay.albedo_color.a = percent

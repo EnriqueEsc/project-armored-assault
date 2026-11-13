@@ -965,8 +965,12 @@ func target_enemy(e: Node3D, aim: Node3D) -> void:
 				c.material_override.set_shader_parameter("tint", aim.modulate)
 	
 		return
-	e = e as Vehicle_Rigid
-	
+	if e is Tank_Rigid:
+		e = e as Vehicle_Rigid
+	elif e is Emplacement:
+		e = e as Emplacement
+	else:
+		return
 	
 	if e.current_team != tank_rigid.current_team and aim.modulate != Color.RED:
 		aim.modulate = Color.RED

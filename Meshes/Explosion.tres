@@ -1,13 +1,6 @@
 [gd_resource type="ArrayMesh" format=4 uid="uid://d0m8fmct5fklb"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nx023"]
-transparency = 1
-albedo_color = Color(1.2112623, 0.99474686, 0.08161654, 0.22352941)
-metallic_specular = 0.0
-roughness = 0.0
-emission = Color(1.1364014, 0.33039808, 0, 1)
-emission_energy_multiplier = 12.27
-disable_receive_shadows = true
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_88lss"]
 _surfaces = [{

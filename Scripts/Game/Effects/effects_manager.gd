@@ -216,6 +216,10 @@ func create_effects() -> void:
 		get_tree().current_scene.call_deferred("add_child",shoot_3d)
 		shoot_3d.finished.connect(shoot_3d_to_pool.bind(shoot_3d))
 		shoot_3d.finished.connect(remove_from_global_active.bind(shoot_3d))
+		var mat = shoot_3d.draw_pass_1.surface_get_material(0) as StandardMaterial3D
+		if mat:
+			mat.stencil_color = Color.YELLOW
+			mat.stencil_mode = BaseMaterial3D.STENCIL_MODE_XRAY
 		deactivate_effect(shoot_3d)
 		shoot_3d_pool.append(shoot_3d)
 		set_emission_in_gpu_particles(shoot_3d)

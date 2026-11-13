@@ -19,7 +19,7 @@ var rect = null
 var message_color: Color = Color.GREEN
 
 
-func _init(parent_node: Node3D) -> void:
+func _init(parent_node: Node3D, message_color: Color = self.message_color) -> void:
 	self.parent_node = parent_node
 	if self.parent_node is Vehicle_Rigid:
 		self.parent_node = self.parent_node as Vehicle_Rigid
@@ -29,7 +29,7 @@ func _init(parent_node: Node3D) -> void:
 		self.parent_node = self.parent_node as Emplacement
 		type_of_node = TypeOfNode.Emplacement
 		self.collision_lenght = self.parent_node.collision_lenght
-	
+	self.message_color = message_color
 
 func create_node_test() -> void:
 	var texture = load("res://Sprites/Test/ShootingPoint.png")
@@ -67,8 +67,19 @@ func create_HUD_Icon() -> void:
 	HUD_Minimap.INSTANCE.view.call_deferred("add_child",rect)
 	return
 	'''
+	var icon_scale: Vector2 = Vector2.ONE
+	var col = null
+	if parent_node is Vehicle_Rigid:
+		#col = parent_node.collision_shape.size
+		pass
+	if parent_node is Emplacement:
+		var aux = parent_node.collision_size
+		if aux != Vector3.ZERO:
+			col = aux
+	if col:
+		icon_scale = Vector2(col.x, col.z)
 	rect = ColorRect.new()
-	rect.size = Vector2.ONE * 10
+	rect.size = icon_scale * 10
 	rect.pivot_offset = rect.size / 2.0
 	rect.modulate = message_color
 	HUD_Minimap.INSTANCE.view.call_deferred("add_child",rect)
@@ -93,7 +104,7 @@ func update_HUD_icon(delta: float) -> void:
 			
 		return
 		var rot = rect.rotation_degrees
-		aux = -rect.rotation_degrees
+		aux = -parent_node.rotation_degrees.y
 		if not is_equal_approx(aux,rot):
 			rect.rotation_degrees = aux
 

@@ -74,8 +74,7 @@ func _update_current_objectives() -> void:
 	
 	if not (current_tank_kills >= min_tank_kills and current_emplacement_kills >= min_emplacement_kills and current_desmadre >= min_desmadre):
 	
-		objectives_text = ^"[font_size=28]Objectives:[/font_size]
-		
+		objectives_text = ^"[font_size=22]Objectives:[/font_size]
 		> Destroy vehicles [{ctk}/{mtk}]
 		> Destroy emplacements [{cek}/{mek}]
 		> Spread chaos [{cd}/{md}]"
@@ -94,8 +93,7 @@ I saw a delicious fried chicken on the frigde back at the base.","rhino3")
 			dialog_manager.add_text_to_buffer("Rhino 2","Don't even think about it, get your own food, jerk.","rhino2")
 		
 		
-		objectives_text = ^"[font_size=28]Objectives:[/font_size]
-		
+		objectives_text = ^"[font_size=22]Objectives:[/font_size]
 		>>> Go to Exfil (Blue zone on the map)"
 	
 	_check_success_conditions()
