@@ -1,7 +1,6 @@
 [gd_scene format=4 uid="uid://ck7bkwrblsaia"]
 
 [ext_resource type="Script" uid="uid://dknecq3w31cmr" path="res://Scripts/Buildings/building_V3.gd" id="1_fava0"]
-[ext_resource type="Shader" uid="uid://c5r6qc4s673e8" path="res://Shaders/see_tank.gdshader" id="2_fava0"]
 [ext_resource type="Script" uid="uid://66okse7w7mtd" path="res://Scripts/Buildings/building_chunk.gd" id="3_fava0"]
 [ext_resource type="Texture2D" uid="uid://7hjju5g2xiny" path="res://Models/Test/Building_Blocks/BuildingBlocks_BuildingBlockBellow.png" id="4_e72r1"]
 [ext_resource type="Texture2D" uid="uid://bhiwihpdrgkto" path="res://Models/Test/Building_Blocks/BuildingBlocks_BuildingBlockCorner.png" id="5_3abig"]
@@ -16,13 +15,6 @@
 [sub_resource type="BoxMesh" id="BoxMesh_qr0ht"]
 material = SubResource("ShaderMaterial_1esiv")
 size = Vector3(2, 2, 2)
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_pni4c"]
-render_priority = 0
-shader = ExtResource("2_fava0")
-shader_parameter/albedo = Color(1, 1, 1, 1)
-shader_parameter/cutout_radius = 2.0
-shader_parameter/cutout_feather = 1.0
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_bhunq"]
 size = Vector3(2, 2, 2)
@@ -325,7 +317,6 @@ street_pref_mesh_instance = NodePath("Building_blocks/Bellow")
 roof_pref_mesh_instance = NodePath("Building_blocks/Roof")
 roof_corner_pref_mesh_instance = NodePath("Building_blocks/Roof_Corner")
 roof_side_pref_mesh_instance = NodePath("Building_blocks/Roof_Side")
-material = SubResource("ShaderMaterial_pni4c")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=509681043]
 script = ExtResource("3_fava0")

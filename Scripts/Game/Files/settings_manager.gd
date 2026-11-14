@@ -4,6 +4,11 @@ class_name Settings_Manager
 static var INSTANCE: Settings_Manager = null
 var running_time: float = 0
 
+static var Vehicle_Material_Override: StandardMaterial3D = null
+static var Vehicle_Material_Overlay: StandardMaterial3D = null
+static var Building_Shader_Material = preload("res://Shaders/see_tank.gdshader")
+static var Folliage_Shader_Material = preload("res://Shaders/tree_wind.gdshader")
+
 const SETTINGS_PATH = "user://settings.cfg"
 var settings_file: ConfigFile = ConfigFile.new()
 
@@ -43,6 +48,8 @@ func _ready() -> void:
 	singleton()
 	Settings_Manager.INSTANCE.load_settings()
 	
+	initialize_materials()
+	
 	await get_tree().process_frame
 	
 	Save_File_Manager.INSTANCE.CURRENT_PATH = current_save
@@ -57,6 +64,55 @@ func singleton() -> void:
 		queue_free()
 		return
 	Settings_Manager.INSTANCE = self
+
+
+
+
+func initialize_materials() -> void:
+	var shader = ShaderMaterial.new()
+	shader.shader = Building_Shader_Material
+	Building_Shader_Material = shader as ShaderMaterial
+	
+	shader = ShaderMaterial.new()
+	shader.shader = Folliage_Shader_Material
+	shader.set_shader_parameter("base_color",Color.WHITE)
+	shader.set_shader_parameter("tip_color",Color.WHITE)
+	shader.set_shader_parameter("max_height",0.0)
+	Folliage_Shader_Material = shader as ShaderMaterial
+	
+	Vehicle_Material_Overlay = StandardMaterial3D.new()
+	Vehicle_Material_Override = StandardMaterial3D.new()
+	
+	Vehicle_Material_Override.metallic_specular = 0.0
+	Vehicle_Material_Override.metallic = 0.0
+	Vehicle_Material_Override.roughness = 0.0
+	Vehicle_Material_Override.render_priority = 0
+	Vehicle_Material_Override.stencil_mode = BaseMaterial3D.STENCIL_MODE_OUTLINE
+	Vehicle_Material_Override.stencil_color = Color.BLACK
+	
+	Vehicle_Material_Overlay.transparency =BaseMaterial3D.TRANSPARENCY_ALPHA
+	Vehicle_Material_Overlay.render_priority = 1
+	#Vehicle_Material_Overlay.stencil_outline_thickness = 0.3
+	Vehicle_Material_Overlay.albedo_color.a = 0.0
+	if Settings_Manager.INSTANCE.enable_emmisions:
+		#Vehicle_Material_Overlay.emission_enabled = true
+		Vehicle_Material_Overlay.emission = Color.ORANGE
+		Vehicle_Material_Overlay.albedo_color = Color.BLACK
+		#Vehicle_Material_Overlay.emission_energy_multiplier = 10.0
+		var noise_texture = NoiseTexture2D.new()
+		noise_texture.seamless = true
+		noise_texture.noise = FastNoiseLite.new()
+		var ramp = Gradient.new()
+		ramp.add_point(0.0,Color.from_rgba8(0,0,0,0))
+		ramp.add_point(0.5,Color.from_rgba8(0,0,0,255))
+		ramp.add_point(1.0,Color.WHITE)
+		noise_texture.color_ramp = ramp
+		Vehicle_Material_Overlay.albedo_color = Color.from_rgba8(255,155,50,255)
+		Vehicle_Material_Overlay.albedo_texture = noise_texture
+		
+		Vehicle_Material_Overlay.albedo_color.a = 0.0
+				
+
 
 func save_settings() -> void:
 	settings_file.set_value("Video","fullscreen",fullscreen)

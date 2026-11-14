@@ -546,11 +546,11 @@ func collapse_to_pool(collapse: GPUParticles3D) -> void:
 	deactivate_effect(collapse)
 
 
-func fire_from_pool(position: Vector3) -> Fire_Effect:
+func fire_from_pool(position: Vector3, size: Vector3 = Vector3.ONE) -> Fire_Effect:
 	var cam = Tank_camera.INSTANCE
 	if cam and cam.is_outside_camera_range(position):
 		return
-	
+	#print("SCAASASFASF ",size)
 	#print("EXP ",position)
 	#print("Efectos activos: ",fire_active.size())
 	var fire: Fire_Effect
@@ -565,8 +565,8 @@ func fire_from_pool(position: Vector3) -> Fire_Effect:
 		fire.counter = 0.0
 		if fire.fake_light_effect:
 			fire.fake_light_effect.scale = Vector3.ONE
-		fire.show()
-		fire.restart()
+		fire.show_fire(size)
+		fire.restart_fire()
 		#fake_light_from_pool(position, Vector2.ONE * 2.0)
 	return fire
 

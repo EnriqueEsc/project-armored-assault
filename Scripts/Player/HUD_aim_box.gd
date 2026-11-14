@@ -64,7 +64,9 @@ func _ready() -> void:
 	marker.texture = texture
 	marker.scale = Vector2(0.15,0.15)
 	marker.visible = false
-	get_tree().current_scene.call_deferred("add_child",marker)
+	#get_tree().current_scene.call_deferred("add_child",marker)
+	get_parent().call_deferred("add_child",marker)
+	get_parent().call_deferred("move_child",marker,0)
 	
 	secondary_container = HBoxContainer.new()
 	secondary_container.size = Vector2(200.0,200.0)

@@ -176,59 +176,42 @@ func initialize_stencil() -> void:
 	if not model.is_empty():
 		for m in model:
 			if is_instance_valid(m):
-				m.material_override = m.get_active_material(0).duplicate()
-				if not m.material_override is StandardMaterial3D:
-					continue
-				m.material_override.metallic_specular = 0.0
-				m.material_override.metallic = 0.0
-				m.material_override.roughness = 0.0
-				m.material_override.render_priority = 0
-				m.material_override.stencil_mode = BaseMaterial3D.STENCIL_MODE_OUTLINE
-				m.material_override.stencil_color = Color.BLACK
+				var albedo_texture = null
+				var aux = m.get_active_material(0).duplicate()
+				if aux is StandardMaterial3D:
+					albedo_texture = aux.albedo_texture
+				var override = Settings_Manager.INSTANCE.Vehicle_Material_Override.duplicate() if Settings_Manager.INSTANCE else null
+				var overlay = Settings_Manager.INSTANCE.Vehicle_Material_Overlay.duplicate() if Settings_Manager.INSTANCE else null
+				if override:
+					if albedo_texture:
+						override.albedo_texture = albedo_texture
+					m.material_override = override
+				if overlay:
+					material = overlay.duplicate()
+					m.material_overlay = material
 				
-				m.material_overlay = null
-				var overlay = StandardMaterial3D.new()
-				overlay.transparency =BaseMaterial3D.TRANSPARENCY_ALPHA
-				overlay.render_priority = 1
-				#overlay.stencil_outline_thickness = 0.3
-				overlay.albedo_color.a = 0.0
-				if Settings_Manager.INSTANCE.enable_emmisions:
-					#overlay.emission_enabled = true
-					overlay.emission = Color.ORANGE
-					overlay.albedo_color = Color.BLACK
-					#overlay.emission_energy_multiplier = 10.0
-					var noise_texture = NoiseTexture2D.new()
-					noise_texture.seamless = true
-					noise_texture.noise = FastNoiseLite.new()
-					var ramp = Gradient.new()
-					ramp.add_point(0.0,Color.from_rgba8(0,0,0,0))
-					ramp.add_point(0.5,Color.from_rgba8(0,0,0,255))
-					ramp.add_point(1.0,Color.WHITE)
-					noise_texture.color_ramp = ramp
-					overlay.albedo_color = Color.from_rgba8(255,155,50,255)
-					overlay.albedo_texture = noise_texture
-					
-				m.material_overlay = overlay
-				m.material_overlay.albedo_color.a = 0.0
 				
 
 func update_stencil(stencil_mode: BaseMaterial3D.StencilMode) -> void:
+	
 	if not material:
 		return
 	if stencil_mode == material.stencil_mode:
 		return
 	if not model.is_empty():
-		material.stencil_mode = stencil_mode
+		#material.stencil_mode = stencil_mode
 		for m in model:
 			if is_instance_valid(m):
 				#print("sssss ",m," ",material.stencil_mode)
 				#m.material_override = material
 				#m.material_override = m.get_active_material(0).duplicate()
-				var mat = m.material_overlay.stencil_mode
-				if mat == material.stencil_mode:
+				if not m.material_overlay:
 					continue
-				m.material_overlay.stencil_mode = material.stencil_mode
-				#print("SEXO ",m)
+				var mat = m.material_overlay.stencil_mode
+				if mat == stencil_mode:
+					continue
+				material.stencil_mode = stencil_mode
+				m.material_overlay.stencil_mode = stencil_mode
 
 func update_stencil_color(color: Color) -> void:
 	if not material:
@@ -440,12 +423,14 @@ func show_move_effects(vel: float) -> void:
 			
 		return
 	if vel < 0.1:
-		move_effect.emitting = false
-		move_effect.hide()
-		move_effect.process_mode = Node.PROCESS_MODE_DISABLED
+		if move_effect.emitting:
+			move_effect.emitting = false
+			move_effect.hide()
+			move_effect.process_mode = Node.PROCESS_MODE_DISABLED
 		return
 	if vel < 0.3:
-		move_effect.one_shot = true
+		if not move_effect.one_shot:
+			move_effect.one_shot = true
 		return
 	
 	if not move_effect.emitting:
@@ -719,7 +704,7 @@ func exec_status_effect() -> void:
 		StatusEffects.Burning:
 			take_damage(max_armor_points * 0.10,self,global_position)
 			if Effects_Manager.INSTANCE:
-				Effects_Manager.INSTANCE.fire_from_pool(global_position)
+				Effects_Manager.INSTANCE.fire_from_pool(global_position,collision_shape.size)
 			#print("ME QUEMO")
 		StatusEffects.PEM:
 			if Effects_Manager.INSTANCE:

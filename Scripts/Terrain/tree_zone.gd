@@ -19,7 +19,7 @@ var vehicles_within: Array[Vehicle_Rigid] = []
 
 var active_count: int = 0
 
-@export var material: ShaderMaterial = null
+var material: ShaderMaterial = null
 
 
 var occlusion_node: DistanceOccluder = DistanceOccluder.new(self)
@@ -40,6 +40,9 @@ func _ready() -> void:
 
 
 func init_grid() -> void:
+	
+	material = Settings_Manager.INSTANCE.Folliage_Shader_Material.duplicate()
+	
 	var box = collision.shape as BoxShape3D
 
 	col_size_x = int(box.size.x / tree_spacing)
@@ -49,6 +52,9 @@ func init_grid() -> void:
 	multimesh.transform_format = MultiMesh.TRANSFORM_3D
 	
 	if tree_prefab:
+		var albedo_texture = tree_prefab.mesh.surface_get_material(0).albedo_texture
+		if albedo_texture:
+			material.set_shader_parameter("albedo_texture", albedo_texture)
 		multimesh.mesh = tree_prefab.mesh.duplicate()
 		if material:
 			multimesh.mesh.surface_set_material(0,material)

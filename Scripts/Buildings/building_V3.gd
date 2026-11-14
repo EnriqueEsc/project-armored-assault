@@ -51,7 +51,7 @@ var lowest_height: float = INF
 
 var combiner: CSGCombiner3D = null
 
-@export var material: Material = null
+var material: Material = null
 
 var csg_active: bool = true
 var see_trough: bool = false
@@ -216,6 +216,9 @@ func _ready() -> void:
 		#grid_map.position -= Vector3(0,1.0,0)
 		grid_map.position -= Vector3(0.5,1.75,0.5)
 	
+	
+	material = Settings_Manager.INSTANCE.Building_Shader_Material
+	
 	init_grid()
 
 
@@ -374,7 +377,6 @@ func apply_shader_to_prefab(target_mesh: Mesh) -> void:
 		texture = original_material.albedo_texture
 	elif original_material is ShaderMaterial:
 		texture = original_material.get_shader_parameter("texture_albedo")
-		
 		
 	var new_material = material.duplicate() as ShaderMaterial
 	new_material.set_shader_parameter("texture_albedo", texture)

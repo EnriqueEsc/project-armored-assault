@@ -157,6 +157,8 @@ func _physics_process(delta: float) -> void:
 	execute_current_state(delta, can_see_player)
 
 func update_state_machine(delta: float, can_see_player: bool) -> void:
+	if not is_instance_valid(player_ref):
+		return
 	var distance = global_position.distance_to(player_ref.global_position)
 	
 	match current_state:
