@@ -131,6 +131,7 @@ func shoot(pos: Vector3, rot: Vector2, pot: bool = false, mult: float = 2.0) -> 
 
 func activate() -> void:
 	visible = true
+	tick = 0.0
 	set_deferred("process_mode", Node.PROCESS_MODE_INHERIT)
 	set_deferred("monitoring", true)
 	set_deferred("monitorable", true)
@@ -181,7 +182,7 @@ func move(delta: float) -> void:
 	if direction == Vector3.ZERO:
 		return
 	
-	if origin_point.distance_to(rigid.global_position) > range:
+	if origin_point.distance_squared_to(rigid.global_position) > range:
 		deactivate()
 		return
 	

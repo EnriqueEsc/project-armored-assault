@@ -442,6 +442,8 @@ func show_move_effects(vel: float) -> void:
 		move_effect.one_shot = false
 	
 	current_effect_time = ((vel/max_speed) * original_effect_time ) + 0.1
+	if is_equal_approx(move_effect.lifetime, current_effect_time):
+		return
 	move_effect.lifetime = current_effect_time
 	
 	#print(vel," ",move_effect.lifetime," ",original_effect_time," ",max_speed)

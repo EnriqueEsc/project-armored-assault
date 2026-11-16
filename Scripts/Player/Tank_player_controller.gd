@@ -793,26 +793,40 @@ func update_HUD() -> void:
 	update_Score(tank_rigid.score)
 
 func update_AP(ap: int) -> void:
-	HUD_AP.text = (str(ap) +" AP")
+	var final_text = (str(ap) +" AP")
+	if HUD_AP.text == final_text:
+		return
+	HUD_AP.text = final_text
 	
 	if ap <= 0:
 		destruction()
 
 func change_HUD_color(c: Color) -> void:
+	if color == c:
+		return
 	color = c
 	color_HUD()
 
 func update_Score(score: int) -> void:
-	HUD_Score.text = ("Score: "+str(score))
+	var final_text = "Score: "+str(score)
+	if HUD_Score.text == final_text:
+		return
+	HUD_Score.text = (final_text)
 
 func update_Velocimeter(velocity: float) -> void:
 	var final_vel = "%.2f" % (velocity * 5)
-	HUD_Velocimeter.text = (final_vel+" Km/h")
+	var final_text = final_vel+" Km/h"
+	if HUD_Velocimeter.text == final_text:
+		return
+	HUD_Velocimeter.text = (final_text)
 
 func update_Objectives(objectives: String) -> void:
 	HUD_Objectives.text = objectives
 
 func update_AP_Bar(percent: float) -> void:
+	if is_equal_approx(HUD_AP_Bar.value,percent):
+		return
+	
 	HUD_AP_Bar.value = percent
 	
 	if percent <= 75 and bellow_75:

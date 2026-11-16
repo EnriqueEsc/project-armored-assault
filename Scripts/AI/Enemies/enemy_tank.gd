@@ -18,11 +18,11 @@ func destroyed_dialog() -> void:
 
 
 func update_state_machine(delta: float, can_see_player: bool) -> void:
-	var distance_to_player = tank_rigid.global_position.distance_to(player_ref.global_position)
+	var distance_squared_to_player = tank_rigid.global_position.distance_squared_to(player_ref.global_position)
 	
 	match current_state:
 		AI_State.IDLE:
-			update_detection_meter(delta, can_see_player, distance_to_player)
+			update_detection_meter(delta, can_see_player, distance_squared_to_player)
 			
 			if detection_meter >= 1.0:
 				update_current_state(AI_State.ENGAGED)
@@ -37,7 +37,7 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 		AI_State.ENGAGED:
 			detection_meter = 1.0
 			
-			if can_see_player and distance_to_player <= max_chase_distance * 2:
+			if can_see_player and distance_squared_to_player <= max_chase_distance * 2:
 				last_known_position = player_ref.global_position
 				engage_time = engage_max_time
 			else:
@@ -49,7 +49,7 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 				
 				
 		AI_State.INVESTIGATING:
-			update_detection_meter(delta, can_see_player, distance_to_player)
+			update_detection_meter(delta, can_see_player, distance_squared_to_player)
 			
 			if detection_meter >= 1.0:
 				update_current_state(AI_State.ENGAGED)
@@ -67,8 +67,8 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 						HUD_boss_info.update_boss_active(false)
 
 
-func update_detection_meter(delta: float, can_see_player: bool, distance_to_player: float) -> void:
-	if can_see_player and distance_to_player <= max_chase_distance:
+func update_detection_meter(delta: float, can_see_player: bool, distance_squared_to_player: float) -> void:
+	if can_see_player and distance_squared_to_player <= max_chase_distance:
 		
 		var player_in_any_cone: bool = false
 
@@ -189,7 +189,7 @@ func is_on_sight_range() -> bool:
 	if not is_instance_valid(player_ref) or not player_ref.visible:
 		return false
 	
-	if tank_rigid.global_position.distance_to(player_ref.global_position) > (max_chase_distance * 2):
+	if tank_rigid.global_position.distance_squared_to(player_ref.global_position) > (max_chase_distance * 2):
 		return false
 	
 	if is_omniscent:
@@ -217,7 +217,7 @@ func is_enemy_in_front() -> bool:
 	if not is_instance_valid(player_ref) or not player_ref.visible:
 		return false
 	
-	if tank_rigid.global_position.distance_to(player_ref.global_position) > (max_chase_distance * 2):
+	if tank_rigid.global_position.distance_squared_to(player_ref.global_position) > (max_chase_distance * 2):
 		return false
 	
 	if is_omniscent:

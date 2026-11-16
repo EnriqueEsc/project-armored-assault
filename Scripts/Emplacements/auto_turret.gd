@@ -159,7 +159,7 @@ func _physics_process(delta: float) -> void:
 func update_state_machine(delta: float, can_see_player: bool) -> void:
 	if not is_instance_valid(player_ref):
 		return
-	var distance = global_position.distance_to(player_ref.global_position)
+	var distance = global_position.distance_squared_to(player_ref.global_position)
 	
 	match current_state:
 		AI_State.IDLE:
@@ -286,7 +286,7 @@ func get_closest_foe() -> void:
 		Basic_AI.Team.ENEMY:
 			for e in get_tree().get_nodes_in_group("Player"):
 				if e is Tank_Rigid:
-					var distance = global_position.distance_to(e.global_position)
+					var distance = global_position.distance_squared_to(e.global_position)
 					if distance < min_distance:
 						closest_foe = e
 						min_distance = distance
@@ -294,7 +294,7 @@ func get_closest_foe() -> void:
 		Basic_AI.Team.ALLY:
 			for e in get_tree().get_nodes_in_group("Enemy"):
 				if e is Tank_Rigid:
-					var distance = global_position.distance_to(e.global_position)
+					var distance = global_position.distance_squared_to(e.global_position)
 					if distance < min_distance:
 						closest_foe = e
 						min_distance = distance

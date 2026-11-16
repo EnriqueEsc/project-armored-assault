@@ -111,7 +111,7 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 	target_position = target_pos
 	
 	var dir_to_path = target_position - tank_rigid.global_position
-	#print(tank_rigid.global_position.y - target_pos.y," ",tank_rigid.distance_to_ground," ",dir_to_path.length_squared())
+	#print(tank_rigid.global_position.y - target_pos.y," ",tank_rigid.distance_squared_to_ground," ",dir_to_path.length_squared())
 	if dir_to_path.length_squared() < 2.0:
 		match current_mode:
 			AI_Mode.COMBAT:
@@ -122,10 +122,10 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 					deliver_package()
 					return
 				else:
-					tank_rigid.distance_to_ground = 1.0
+					tank_rigid.distance_squared_to_ground = 1.0
 					return
 	elif current_mode == AI_Mode.DELIEVER:
-		if tank_rigid.distance_to_ground == 1.0:
+		if tank_rigid.distance_squared_to_ground == 1.0:
 			var dir = clampf(-dir_to_path.length(),-1.0,1.0)
 			tank_rigid.move(Vector2(0.0, dir), delta,0.0,target_pos)
 			return
@@ -133,9 +133,9 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 		if tank_rigid.attachment:
 			tank_rigid.attachment.set_objective(target_pos + Vector3(randi_range(-5,5),-2.0,randi_range(-5,5)),player_ref)
 			tank_rigid.attachment._use_attachment()
-		tank_rigid.distance_to_ground = 10.0
+		tank_rigid.distance_squared_to_ground = 10.0
 	
-	var distance_to_target = dir_to_path.length()
+	var distance_squared_to_target = dir_to_path.length_squared()
 	dir_to_path = dir_to_path.normalized()
 	
 	var forward = tank_rigid.global_transform.basis.z
@@ -170,7 +170,7 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 		return
 	
 	
-	if distance_to_target < 5:
+	if distance_squared_to_target < 25:
 		tank_rigid.move(Vector2(0.0, 0.0), delta,0.0,target_pos)
 		if is_kamikaze and current_state == AI_State.ENGAGED:
 			shoot_angle = forward.angle_to(target_pos)
@@ -178,18 +178,18 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 				#print(abs(shoot_angle)," | ",max_shoot_angle)
 				tank_rigid.is_armed = true
 				tank_rigid.objective = target_pos
-			#tank_rigid.set_distance_to_ground(-3.0,delta)
+			#tank_rigid.set_distance_squared_to_ground(-3.0,delta)
 			return
 	
-	if tank_rigid.attachment and current_state == AI_State.ENGAGED and distance_to_target > 5.5:
-		#print(distance_to_target)
+	if tank_rigid.attachment and current_state == AI_State.ENGAGED and distance_squared_to_target > (5.5*5.5):
+		#print(distance_squared_to_target)
 		tank_rigid.use_attachment()
 	
 	var input_y: float = 1.0 if abs(angle) < 1.8 else 0.0
 	
-	#print(distance_to_target)
-	if distance_to_target < 5:
-		input_y = -1.0 * (5.0/(distance_to_target)) + 0.1
+	#print(distance_squared_to_target)
+	if distance_squared_to_target < 5:
+		input_y = -1.0 * (5.0/(distance_squared_to_target)) + 0.1
 		#input_y = -1
 		#tank_rigid.use_attachment()
 	
@@ -205,7 +205,7 @@ func deliver_package() -> void:
 		#tank_rigid.move(Vector2.ZERO, delta)
 	get_next_path_node()
 	target_position = next_node
-	tank_rigid.distance_to_ground = 10.0
+	tank_rigid.distance_squared_to_ground = 10.0
 
 
 
@@ -225,12 +225,12 @@ func _physics_process(delta: float) -> void:
 	
 	#aim_to.emit(next_path + Vector3(randf_range(-50.0,50.0),0.0,randf_range(-50.0,50.0)))
 	aim_to.emit(next_path)
-	if tank_rigid.global_position.distance_to(next_path) > 10.0 and counter == middle_point:
+	if tank_rigid.global_position.distance_squared_to(next_path) > 100.0 and counter == middle_point:
 		tank_rigid.use_attachment(next_path)
 		tank_rigid.shoot()
 	
 	
-	if tank_rigid.global_position.distance_to(next_path) < 20.0:
+	if tank_rigid.global_position.distance_squared_to(next_path) < (20.0 * 20.0):
 		if path_array.is_empty():
 			#plan_attack_route(Vector3.ZERO)
 			deactivate()

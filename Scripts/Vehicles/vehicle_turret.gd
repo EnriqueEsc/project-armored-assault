@@ -114,6 +114,7 @@ func calculate_mean_bullet_speed() -> void:
 	#mean_bullet_speed /= (turret_barrel.size())
 	
 	mean_bullet_speed /= (counter)
+	mean_bullet_speed *= mean_bullet_speed
 	mean_fire_rate /= counter
 	#mean_fire_rate +=  + 0.2
 
@@ -140,7 +141,7 @@ func calculate_sight_pos() -> void:
 func calculate_travel_time_to_point(point: Vector3) -> float:
 	var res: float = 1.0
 	
-	res = global_position.distance_to(point)
+	res = global_position.distance_squared_to(point)
 	
 	res /= mean_bullet_speed
 	
@@ -276,7 +277,7 @@ func rotate_turret_to_point_3d(point: Vector3,node_info: NodeInGameData = null, 
 
 func get_aim_point(point: Vector2) -> Vector2:
 
-	var res = turret_pos_2d + Vector2(turret_pos_2d.distance_to(point),0).rotated(-rotation.y - get_parent_node_3d().rotation.y)
+	var res = turret_pos_2d + Vector2(turret_pos_2d.distance_squared_to(point),0).rotated(-rotation.y - get_parent_node_3d().rotation.y)
 	
 	return res
 

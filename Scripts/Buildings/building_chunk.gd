@@ -3,6 +3,7 @@ class_name Building_Chunk
 
 
 var blocks: Array[Building_Block_V2] = []
+var block_global_pos: Dictionary = {}
 var key_blocks: Array[Building_Block_V2] = []
 
 var building_bounds: Vector2 = Vector2.ZERO
@@ -44,7 +45,24 @@ var destroy_timer: float = 1.0
 var destroy_blocks: bool = false
 var blocks_to_destroy: Array[Dictionary] = []
 
+var thread_queue: Array[int] = []
+
+func clear_thread_queue() -> void:
+	for i in range(thread_queue.size() -1, -1,-1):
+		var id = thread_queue[i]
+		if WorkerThreadPool.is_task_completed(id):
+			WorkerThreadPool.wait_for_task_completion(id)
+			thread_queue.remove_at(i)
+
+func _exit_tree() -> void:
+	for id in thread_queue:
+		WorkerThreadPool.wait_for_task_completion(id)
+	thread_queue.clear()
+		
+
 func _process(delta: float) -> void:
+	clear_thread_queue()
+	
 	if not destroy_blocks:
 		return
 		
@@ -57,7 +75,7 @@ func _process(delta: float) -> void:
 			
 			if not is_instance_valid(aux["Block"]):
 				continue
-			
+			aux["Block"].check_disabling(aux["Damage"])
 			aux["Block"].take_damage(aux["Damage"], aux["Source"], aux["ImpactPoint"])
 			
 		destroy_blocks = false
@@ -95,7 +113,10 @@ func _ready() -> void:
 	aux = Vector2(aux)
 	#print(aux)
 	for b in blocks:
-		
+		var pos = b.global_position
+		if not block_global_pos.has(b):
+			block_global_pos[b] = pos
+			
 		if b.position.x < 0 and b.position.z >= 0:
 			b.block_visual_rotation = 180
 		elif b.position.x >= 0 and b.position.z < 0:
@@ -269,10 +290,35 @@ func block_destroyed(block: Building_Block_V2, type: Building_Block_V2.Block_Typ
 		return
 		deactivate()
 
+func async_take_explosion(glob_pos: Vector3, blocks: Array[Building_Block_V2], damage: int, source: Vehicle_Rigid, impact_point: Vector3, radius: float,block_global_pos: Dictionary) -> void:
+	if impact_point.distance_to(glob_pos) + building_max_radius <= radius:
+		for b in blocks:
+			b.destroy_now.call_deferred()
+		#destroyed = true
+		#deactivate()
+		return
+	
+	var radius_squared: float = radius * radius
+	var affected_blocks: Array[Dictionary] = []
+	for b in blocks:
+		var dist_squared = block_global_pos[b].distance_squared_to(impact_point)
+		if dist_squared <= radius_squared:
+			
+			#b.check_disabling.call_deferred(damage)
+			var to_buffer = {"Block": b,"Damage":damage,"Source":source,"ImpactPoint":impact_point}
+			affected_blocks.append(to_buffer)
+	blocks_to_destroy.append_array.call_deferred(affected_blocks)
+	set_deferred("destroy_blocks", true)
+			#b.take_damage(damage, source, impact_point)
+	
+
 func take_explosion(damage: int, source: Vehicle_Rigid, impact_point: Vector3, radius: float) -> void:
 	if destroyed:
 		return
 	
+	var id = WorkerThreadPool.add_task(async_take_explosion.bind(global_position,blocks.duplicate(),damage,source,impact_point,radius,block_global_pos.duplicate()))
+	thread_queue.append(id)
+	return
 	if impact_point.distance_to(global_position) + building_max_radius <= radius:
 		for b in blocks.duplicate():
 			b.destroy_now()

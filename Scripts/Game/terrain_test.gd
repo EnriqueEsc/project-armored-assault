@@ -45,6 +45,26 @@ var vertex_map: Dictionary = {}
 var spatial_grid: Dictionary = {}
 @export var spatial_grid_cell_size: float = 1.0
 
+var modified_indexes: Array[int] = []
+var indexes_per_tick: int = 15
+
+var vertex_faces: Dictionary = {}
+
+var thread_queue: Array[int] = []
+
+func clear_thread_queue() -> void:
+	for i in range(thread_queue.size() -1, -1,-1):
+		var id = thread_queue[i]
+		if WorkerThreadPool.is_task_completed(id):
+			WorkerThreadPool.wait_for_task_completion(id)
+			thread_queue.remove_at(i)
+
+func _exit_tree() -> void:
+	for id in thread_queue:
+		WorkerThreadPool.wait_for_task_completion(id)
+	thread_queue.clear()
+		
+
 func visual_process(delta: float) -> void:
 	
 	if not update_visual_next_tick:
@@ -68,6 +88,7 @@ func collision_process(delta: float) -> void:
 			update_collision_next_tick = false
 
 func _process(delta: float) -> void:
+	clear_thread_queue()
 	visual_process(delta)
 	collision_process(delta)
 
@@ -295,18 +316,33 @@ func update_visuals() -> void:
 	
 	update_collision_next_tick = true
 
-func update_collisions() -> void:
+func apply_collision(shape: ConcavePolygonShape3D) -> void:
+	collision_shape.shape = shape
+
+func async_update_collisions(modified_indexes: Array[int], faces: PackedVector3Array) -> void:
 	#var shape = mesh_instance.mesh.create_trimesh_shape()
 	var shape = ConcavePolygonShape3D.new()
-	var faces = PackedVector3Array()
+	#var faces: PackedVector3Array = collision_shape.shape.get_faces().duplicate()
 	
-	faces.resize(indexes.size())
-	
-	for i in range(indexes.size()):
-		faces[i] = vertices[indexes[i]]
-		
+	#faces.resize(indexes.size())
+	var aux: int = 0
+	while not modified_indexes.is_empty():# and aux < indexes_per_tick:
+		var index = modified_indexes.pop_front()
+		#faces[index] = vertices[indexes[index]]
+		var vertex: Array = vertex_faces.get(index)
+		for v in vertex:
+			faces[v] = vertices[index]
+		#print("VERTEX ",aux," ",index," ",faces[index])
+		aux += 1
 	shape.set_faces(faces)
-	collision_shape.shape = shape
+	apply_collision.call_deferred(shape)
+
+func update_collisions() -> void:
+	var mod: Array[int] = modified_indexes.duplicate()
+	var faces: PackedVector3Array = collision_shape.shape.get_faces().duplicate()
+	modified_indexes.clear()
+	var id = WorkerThreadPool.add_task(async_update_collisions.bind(mod,faces))
+	thread_queue.append(id)
 	return
 	
 	
@@ -321,8 +357,8 @@ func update_collisions() -> void:
 	
 	#var shape = collision_mesh.create_trimesh_shape()
 	
-	if collision_shape.shape != shape:
-		collision_shape.shape = shape
+	#if collision_shape.shape != shape:
+	#	collision_shape.shape = shape
 
 func generate_collisions() -> void:
 	
@@ -330,8 +366,16 @@ func generate_collisions() -> void:
 	var faces = PackedVector3Array()
 	faces.resize(indexes.size())
 	
+	vertex_faces.clear()
+	
 	for i in range(indexes.size()):
-		faces[i] = vertices[indexes[i]]
+		var index: int = indexes[i]
+		faces[i] = vertices[index]
+		
+		if not vertex_faces.has(index):
+			vertex_faces[index] = []
+		
+		vertex_faces[index].append(i)
 		
 	shape.set_faces(faces)
 	
@@ -426,11 +470,13 @@ func deform_terrain_by_index(index: int, damage: float = 1) -> void:
 		var shared_indexes: Array = vertex_map[aux]
 		for i in shared_indexes:
 			vertices[i].y = new_height
+			modified_indexes.append(i)
 			
 			if use_shader:
 				var x = i % buffer_width
 				var y = int(i / buffer_width)
 				image_buffer.set_pixel(x, y, Color(vertices[i].x, vertices[i].y, vertices[i].z, 1.0))
+	
 	
 	if not update_visual_next_tick:
 		update_visual_next_tick = true

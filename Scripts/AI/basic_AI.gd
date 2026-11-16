@@ -67,8 +67,23 @@ var occlusion_node: AIDistanceOccluder = AIDistanceOccluder.new(self)
 var thinking_counter: float = 0.0
 var thinking_tick: float = 0.01
 
-var whisker_tick: float = 0.5
+var whisker_tick: float = 0.01
 var whisker_counter: float = 0.0
+
+var thread_queue: Array[int] = []
+
+func clear_thread_queue() -> void:
+	for i in range(thread_queue.size() -1, -1,-1):
+		var id = thread_queue[i]
+		if WorkerThreadPool.is_task_completed(id):
+			WorkerThreadPool.wait_for_task_completion(id)
+			thread_queue.remove_at(i)
+
+func _exit_tree() -> void:
+	for id in thread_queue:
+		WorkerThreadPool.wait_for_task_completion(id)
+	thread_queue.clear()
+		
 
 func _init_rigid() -> void:
 	
@@ -182,6 +197,8 @@ func _ready() -> void:
 		message_color = (Color.YELLOW)
 	
 	tank_rigid.update_stencil_color(message_color)
+	
+	max_chase_distance *= max_chase_distance
 	
 	set_physics_process(true)
 	
@@ -341,6 +358,12 @@ func _physics_process(delta: float) -> void:
 		return
 	thinking_counter = 0.0
 	
+	var player: bool = false
+	if is_instance_valid(player_ref):
+		player = player_ref.visible
+	var id = WorkerThreadPool.add_task(async_process.bind(delta,player,is_on_sight_range()))
+	thread_queue.append(id)
+	return
 	
 	var static_model: bool = false
 	if is_instance_valid(tank_rigid) and tank_rigid is Vehicle_Rigid:
@@ -363,15 +386,38 @@ func _physics_process(delta: float) -> void:
 	update_state_machine(delta, can_see_player)
 	execute_current_state(delta, can_see_player)
 	
+
+
+func async_process(delta: float, player_ref: bool, can_see_player: bool) -> void:
 	
+	var static_model: bool = false
+	if is_instance_valid(tank_rigid) and tank_rigid is Vehicle_Rigid:
+		static_model = tank_rigid.static_model
+	
+	if not player_ref or static_model:
+		update_current_state.call_deferred(AI_State.IDLE)
+		if is_instance_valid(tank_rigid):
+			tank_rigid.move.call_deferred(Vector2.ZERO, delta)
+		return
+	
+	get_closest_foe.call_deferred()
+	
+	if not is_instance_valid(tank_rigid):
+		return
+	
+	
+	#var can_see_player: bool = is_on_sight_range()
+	
+	update_state_machine.call_deferred(delta, can_see_player)
+	execute_current_state.call_deferred(delta, can_see_player)
 
 
 func update_state_machine(delta: float, can_see_player: bool) -> void:
-	var distance_to_player = tank_rigid.global_position.distance_to(player_ref.global_position)
+	var distance_squared_to_player = tank_rigid.global_position.distance_squared_to(player_ref.global_position)
 	
 	match current_state:
 		AI_State.IDLE:
-			update_detection_meter(delta, can_see_player, distance_to_player)
+			update_detection_meter(delta, can_see_player, distance_squared_to_player)
 			
 			if detection_meter >= 1.0:
 				update_current_state(AI_State.ENGAGED)
@@ -385,7 +431,7 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 		AI_State.ENGAGED:
 			detection_meter = 1.0
 			
-			if can_see_player and distance_to_player <= max_chase_distance * 2:
+			if can_see_player and distance_squared_to_player <= max_chase_distance * 2:
 				last_known_position = player_ref.global_position
 				engage_time = engage_max_time
 			else:
@@ -397,7 +443,7 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 				
 				
 		AI_State.INVESTIGATING:
-			update_detection_meter(delta, can_see_player, distance_to_player)
+			update_detection_meter(delta, can_see_player, distance_squared_to_player)
 			
 			if detection_meter >= 1.0:
 				update_current_state(AI_State.ENGAGED)
@@ -418,8 +464,8 @@ func update_state_machine(delta: float, can_see_player: bool) -> void:
 						HUD_boss_info.update_boss_active(false)
 
 
-func update_detection_meter(delta: float, can_see_player: bool, distance_to_player: float) -> void:
-	if can_see_player and distance_to_player <= max_chase_distance:
+func update_detection_meter(delta: float, can_see_player: bool, distance_squared_to_player: float) -> void:
+	if can_see_player and distance_squared_to_player <= max_chase_distance:
 		
 		var player_in_any_cone: bool = false
 
@@ -503,7 +549,7 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 	var forward = tank_rigid.global_transform.basis.z.normalized()
 	var angle = forward.signed_angle_to(dir_to_path, tank_rigid.global_basis.y)
 	
-	if tank_rigid.global_position.distance_to(player_ref.global_position) < 5:
+	if tank_rigid.global_position.distance_squared_to(player_ref.global_position) < 25:
 		angle = -(1/angle)
 		
 	var input_x: float = -clamp(angle, -1.0, 1.0)
@@ -565,7 +611,7 @@ func is_on_sight_range() -> bool:
 	if not is_instance_valid(player_ref) or not player_ref.visible:
 		return false
 	
-	if tank_rigid.global_position.distance_to(player_ref.global_position) > (max_chase_distance * 2):
+	if tank_rigid.global_position.distance_squared_to(player_ref.global_position) > (max_chase_distance * 2):
 		return false
 	
 	if is_omniscent:
@@ -593,7 +639,7 @@ func is_enemy_in_front() -> bool:
 	if not is_instance_valid(player_ref) or not player_ref.visible:
 		return false
 	
-	if tank_rigid.global_position.distance_to(player_ref.global_position) > (max_chase_distance * 2):
+	if tank_rigid.global_position.distance_squared_to(player_ref.global_position) > (max_chase_distance * 2):
 		return false
 	
 	if is_omniscent:
@@ -634,7 +680,7 @@ func alert_closest_ally() -> void:
 	for a in allies:
 		if not a is Basic_AI:
 			continue
-		var dist: float = tank_rigid.global_position.distance_to(a.tank_rigid.global_position)
+		var dist: float = tank_rigid.global_position.distance_squared_to(a.tank_rigid.global_position)
 		if a.tank_rigid.armor_points > 0 and (not a.alerted) and dist < min_distance:
 			closest = a
 			min_distance = dist
@@ -648,11 +694,12 @@ Engaging.",message_color))
 	report_on_battle_net()
 
 func report_on_battle_net() -> void:
+	
 	for a in ally_arrays:
 		
 		if not is_instance_valid(a) or not a.visible:
 			continue
-		if tank_rigid.global_position.distance_to(a.global_position) < a.max_vision_distance and not a.player_ref:
+		if tank_rigid.global_position.distance_squared_to(a.global_position) < a.max_vision_distance and not a.player_ref:
 			a.got_hit(player_ref,player_ref.global_position)
 			#Dialog_Manager.INSTANCE.add_dialog_to_buffer_low_prior(Dialog_data.new(tank_rigid.vehicle_pilot_name,"RETRANSMITTING",message_color))
 
@@ -683,6 +730,9 @@ func deactivate() -> void:
 
 
 func _process(delta: float) -> void:
+	
+	clear_thread_queue()
+	
 	scan_timer += delta
 	if scan_timer > 1.0:
 		scan_timer = 0.0
@@ -716,7 +766,7 @@ func get_closest_foe_old() -> void:
 			for e in get_tree().get_nodes_in_group("Player"):
 				if e != tank_rigid:
 				#if e is Tank_Rigid and e != tank_rigid:
-					var distance = tank_rigid.global_position.distance_to(e.global_position)
+					var distance = tank_rigid.global_position.distance_squared_to(e.global_position)
 					if distance < min_distance:
 						closest_foe = e
 						min_distance = distance
@@ -725,7 +775,7 @@ func get_closest_foe_old() -> void:
 			for e in get_tree().get_nodes_in_group("Enemy"):
 				if e != tank_rigid:
 				#if e is Tank_Rigid and e != tank_rigid:
-					var distance = tank_rigid.global_position.distance_to(e.global_position)
+					var distance = tank_rigid.global_position.distance_squared_to(e.global_position)
 					if distance < min_distance:
 						closest_foe = e
 						min_distance = distance

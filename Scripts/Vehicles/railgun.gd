@@ -66,7 +66,7 @@ func move(delta: float) -> void:
 	if direction == Vector3.ZERO:
 		return
 	
-	if origin_point.distance_to(global_position) > range:
+	if origin_point.distance_squared_to(global_position) > range:
 		direction = Vector3.ZERO
 		deactivate()
 		return

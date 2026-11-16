@@ -26,6 +26,7 @@ func _ready() -> void:
 	var grand_parent_col = parent_col.get_parent_node_3d()
 	
 	
+	max_vision_distance *= max_vision_distance
 	#current_team = randi_range(0,Team.size()-1)
 	
 	match current_team:
@@ -91,7 +92,7 @@ func alert_close_allies() -> void:
 		return
 	
 	for a in allies:
-		if global_position.distance_to(a.tank_rigid.global_position) < max_vision_distance:
+		if global_position.distance_squared_to(a.tank_rigid.global_position) < max_vision_distance:
 			if a.has_method("get_report") and a != self:
 				a.get_report(player_ref,player_ref.global_position)
 				#print(a)
@@ -105,7 +106,7 @@ func network_collapse() -> void:
 	#player_ref = player_ref_buffer
 	
 	for a in allies:
-		if global_position.distance_to(a.tank_rigid.global_position) < max_vision_distance:
+		if global_position.distance_squared_to(a.tank_rigid.global_position) < max_vision_distance:
 			if a.has_method("get_report") and a != self:
 				a.network_collapse(player_ref,player_ref.global_position)
 				#print(a)

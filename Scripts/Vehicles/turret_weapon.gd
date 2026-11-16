@@ -168,6 +168,9 @@ func _ready() -> void:
 		meshes.clear()
 		return
 	
+	for i in 30:
+		await get_tree().process_frame
+	
 	for c in get_children():
 		if c is MeshInstance3D:
 			meshes.append(c)

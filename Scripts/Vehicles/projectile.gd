@@ -71,6 +71,8 @@ signal body_entered
 
 var stencil_color : Color = Color.WHITE
 
+var tick: float = 0.01
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
@@ -176,6 +178,7 @@ func _set_originals() -> void:
 	original_recoil_force = recoil_force
 	original_heat = heat
 	original_status_effect = status_effect
+	range *= range
 	original_range = range
 	
 	if not is_instance_valid(proy):
@@ -212,6 +215,10 @@ func _additional_setup() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
+	tick += delta
+	if tick < 0.01:
+		return
+	tick = 0.0
 	move(delta)
 
 
@@ -278,6 +285,7 @@ func shoot(pos: Vector3, rot: Vector2, pot: bool = false, mult: float = 2.0) -> 
 
 func activate() -> void:
 	visible = true
+	tick = 0.0
 	set_deferred("process_mode", Node.PROCESS_MODE_INHERIT)
 	set_deferred("monitoring", true)
 	set_deferred("monitorable", true)
@@ -308,7 +316,7 @@ func move(delta: float) -> void:
 	if direction == Vector3.ZERO:
 		return
 	
-	if origin_point.distance_to(global_position) > range:
+	if origin_point.distance_squared_to(global_position) > range:
 		deactivate()
 		return
 	

@@ -89,6 +89,7 @@ func _on_body_entered(body):
 
 func activate() -> void:
 	visible = true
+	tick = 0.0
 	set_deferred("process_mode", Node.PROCESS_MODE_INHERIT)
 	set_deferred("monitoring", true)
 	set_deferred("monitorable", true)

@@ -8,8 +8,8 @@ var building_bounds: Vector2 = Vector2.ZERO
 
 var effects_manager: Effects_Manager = null
 
-var physics_tick_counter: int = 6
-@export var crush_update_frequency: int = 5
+var physics_tick_counter: float = 0.0
+@export var crush_update_frequency: float = 0.05
 
 var destroyed: bool = false
 
@@ -247,6 +247,7 @@ func init_grid() -> void:
 	
 	var radious = ((building_bounds.x+building_bounds.y)/2.0) * 3
 	max_shake_distance = radious * levels.size()
+	max_shake_distance *= max_shake_distance
 	#print("SAAAAAAAAAAAAA ",max_shake_distance)
 	
 	
@@ -465,7 +466,7 @@ func shake_player() -> void:
 	if not player_ref:
 		return
 	#print("OLA",damage_zone.global_position.distance_to(player_ref.global_position))
-	var distance = damage_zone.global_position.distance_to(player_ref.global_position)
+	var distance = damage_zone.global_position.distance_squared_to(player_ref.global_position)
 	if distance < max_shake_distance:
 		var factor: float = (max_shake_distance - distance) / max_shake_distance
 		#print("ADIO")
@@ -479,9 +480,9 @@ func _physics_process(delta: float) -> void:
 	
 	global_position -= global_basis.y * delta * 2
 	
-	physics_tick_counter += 1
+	physics_tick_counter += delta
 	if physics_tick_counter >= crush_update_frequency:
-		physics_tick_counter = 0
+		physics_tick_counter = 0.0
 		destruction()
 
 

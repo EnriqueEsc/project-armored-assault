@@ -195,7 +195,7 @@ func burn_tree(damage: int, pos: Vector2i) -> void:
 	var vehicles_affected: Array[Vehicle_Rigid] = []
 	for t in trees_affected:
 		for v in vehicles_within:
-			if not vehicles_affected.has(v) and t.distance_to(v.global_position) < 3.0:
+			if not vehicles_affected.has(v) and t.distance_squared_to(v.global_position) < 9.0:
 				vehicles_affected.append(v)
 		t.take_damage(damage,true)
 	

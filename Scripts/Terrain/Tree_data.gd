@@ -19,8 +19,8 @@ func _init(hp: int, id: int, position: Vector3, matrix_index: Vector2i) -> void:
 	self.matrix_index = matrix_index
 	#print(hp,id,position,matrix_index)
 
-func distance_to(pos: Vector3) -> float:
-	return position.distance_to(pos)
+func distance_squared_to(pos: Vector3) -> float:
+	return position.distance_squared_to(pos)
 
 func take_damage(damage: int, is_burning: bool) -> void:
 	hp -= damage
