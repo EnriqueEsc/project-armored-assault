@@ -22,17 +22,19 @@ uniform sampler2D screen_texture : hint_screen_texture, filter_linear_mipmap;
 
 varying float wave_height;
 
+global uniform float game_speed;
+
 void vertex() {
 	vec3 world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	
 	float surge = sin(TIME * surge_speed) * surge_strength;
 	vec2 surge_offset = normalize(surge_direction) * surge;
-	VERTEX.x += surge_offset.x;
-	VERTEX.z += surge_offset.y;
+	VERTEX.x += surge_offset.x * game_speed;
+	VERTEX.z += surge_offset.y * game_speed;
 	
 	float wave1 = sin(world_pos.x * wave_frequency + TIME * wave_speed);
 	float wave2 = cos(world_pos.z * wave_frequency * 0.8 + TIME * wave_speed * 1.2);
-	float final_wave = (wave1 + wave2) * wave_amplitude;
+	float final_wave = (wave1 + wave2) * wave_amplitude * game_speed;
 	
 	VERTEX.y += final_wave;
 	wave_height = (wave1 + wave2) * 0.5; 

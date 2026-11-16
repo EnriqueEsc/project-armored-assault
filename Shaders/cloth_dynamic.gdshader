@@ -12,6 +12,8 @@ uniform float wave_frequency = 5.0;
 
 uniform float speed_inertia = 0.0; 
 
+global uniform float game_speed;
+
 void vertex() {
 	float mask = 0.0;
 	float wave_axis = 0.0;
@@ -29,8 +31,8 @@ void vertex() {
 	float cross_axis = (attachment_type == 0) ? VERTEX.y : VERTEX.x;
 	float wave_noise = cos(cross_axis * (wave_frequency * 0.6) + TIME * (wind_speed * 0.7));
 	
-	VERTEX.y += (wave + wave_noise * 0.3) * wind_strength * mask;
-	VERTEX.y += speed_inertia * (mask * mask);
+	VERTEX.y += (wave + wave_noise * 0.3) * wind_strength * mask * game_speed;
+	VERTEX.y += speed_inertia * (mask * mask) * game_speed;
 }
 
 void fragment() {

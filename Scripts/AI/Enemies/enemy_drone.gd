@@ -13,7 +13,13 @@ func _init_rigid() -> void:
 
 
 
-func get_whisker_steering() -> float:
+func get_whisker_steering(delta: float) -> float:
+	
+	whisker_counter += delta
+	if whisker_counter < whisker_tick:
+		return 0.0
+	whisker_counter = 0.0
+	
 	var steering_offset: float = 0.0
 	
 	if left_whisker.is_colliding():
@@ -81,7 +87,7 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 	
 	var input_x: float = -clamp(angle, -1.0, 1.0)
 	
-	input_x += get_whisker_steering()
+	input_x += get_whisker_steering(delta)
 	input_x = clamp(input_x, -1.0, 1.0)
 	
 	if current_mode != AI_Mode.COMBAT:

@@ -116,12 +116,15 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 	var forward = tank_rigid.global_transform.basis.z.normalized()
 	var angle = forward.signed_angle_to(dir_to_path, tank_rigid.global_basis.y)
 	
-	if tank_rigid.global_position.distance_to(player_ref.global_position) < 5:
+	if not is_instance_valid(player_ref):
+		return
+	
+	if tank_rigid.global_position.distance_squared_to(player_ref.global_position) < 25:
 		angle = -(1/angle)
 		
 	var input_x: float = -clamp(angle, -1.0, 1.0)
 	
-	input_x += get_whisker_steering()
+	input_x += get_whisker_steering(delta)
 	input_x = clamp(input_x, -1.0, 1.0)
 	
 	

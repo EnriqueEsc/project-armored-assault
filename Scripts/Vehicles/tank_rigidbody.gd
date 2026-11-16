@@ -4,6 +4,10 @@ class_name  Tank_Rigid
 var tank_Data: Tank_Data = null
 @export var traction: float = 5.0
 
+enum TankModes{Normal, SiegeDeployed, MechBooster}
+var current_mode: TankModes = TankModes.Normal
+
+signal tank_mode_changed(mode: TankModes)
 
 func _physics_process(delta: float) -> void:
 	

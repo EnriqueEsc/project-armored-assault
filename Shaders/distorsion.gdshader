@@ -9,8 +9,10 @@ uniform float transparency : hint_range(0.0, 1.0) = 0.9;
 uniform float noise_scale = 8.0;
 uniform float noise_speed = 0.5;
 
+global uniform float game_speed;
+
 float noise(vec2 p) {
-	return sin(p.x * noise_scale + TIME * noise_speed) * cos(p.y * noise_scale + TIME * noise_speed);
+	return sin(p.x * noise_scale + TIME * noise_speed) * cos(p.y * noise_scale + TIME * noise_speed) * game_speed;
 }
 
 void fragment() {

@@ -94,7 +94,7 @@ func activate() -> void:
 	set_deferred("monitorable", true)
 	
 	if flame_effect:
-		flame_effect.process_mode = Node.PROCESS_MODE_ALWAYS
+		flame_effect.process_mode = Node.PROCESS_MODE_PAUSABLE
 		flame_effect.show()
 		flame_effect.restart()
 	

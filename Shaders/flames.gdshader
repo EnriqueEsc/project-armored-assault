@@ -20,6 +20,7 @@ uniform float wind_curve = 1.5;
 varying float height_mask;
 varying float flame_variation;
 
+global uniform float game_speed;
 
 float rand(vec3 point) {
 	return fract(sin(dot(point, vec3(99.12412, 4.2515, 412.2215))) * 42142.1242);
@@ -36,9 +37,9 @@ void vertex() {
 	float vertical_wave = sin(TIME * flicker_speed + VERTEX.x * 3.0 + random_offset * 5.0);
 	float vertical_motion = vertical_wave * vertical_strength * mask;
 	
-	VERTEX.x += wind + random_motion;
-	VERTEX.z += cos(TIME * wind_speed * 0.8 + VERTEX.y * 3.0) * wind_strength * 0.3 * mask;
-	VERTEX.y += vertical_motion;
+	VERTEX.x += (wind + random_motion) * game_speed;
+	VERTEX.z += (cos(TIME * wind_speed * 0.8 + VERTEX.y * 3.0) * wind_strength * 0.3 * mask) * game_speed;
+	VERTEX.y += (vertical_motion * game_speed);
 	
 	height_mask = height;
 	flame_variation = random_offset;

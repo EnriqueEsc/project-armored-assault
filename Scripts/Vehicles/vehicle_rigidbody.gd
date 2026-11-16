@@ -436,7 +436,7 @@ func show_move_effects(vel: float) -> void:
 	if not move_effect.emitting:
 		move_effect.emitting = true
 		move_effect.show()
-		move_effect.process_mode = Node.PROCESS_MODE_ALWAYS
+		move_effect.process_mode = Node.PROCESS_MODE_PAUSABLE
 	
 	if move_effect.one_shot:
 		move_effect.one_shot = false
@@ -550,7 +550,7 @@ func show_visual_damage(ap: float) -> void:
 		if not damage_effect.emitting:
 			damage_effect.emitting = true
 			damage_effect.show()
-			damage_effect.process_mode = Node.PROCESS_MODE_ALWAYS
+			damage_effect.process_mode = Node.PROCESS_MODE_PAUSABLE
 			damage_effect.set_process(false)
 		
 		var particles_ammount:float = remap(ap, 50.0, 10.0, 1.0, 10)

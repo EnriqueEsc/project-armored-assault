@@ -7,24 +7,6 @@
 [ext_resource type="Script" uid="uid://bjh2nh20l8im4" path="res://Scripts/Vehicles/turret_weapon.gd" id="5_vmj1g"]
 [ext_resource type="Script" uid="uid://ihmlg2cppvyn" path="res://Scripts/Vehicles/missile_barrage_atch.gd" id="6_mkhjs"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jaswq"]
-render_priority = 1
-transparency = 1
-shading_mode = 0
-albedo_color = Color(1, 0, 0, 1)
-grow = true
-grow_amount = 0.01
-stencil_mode = 3
-stencil_flags = 1
-stencil_compare = 5
-metadata/_stencil_owned = true
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yimcp"]
-next_pass = SubResource("StandardMaterial3D_jaswq")
-stencil_mode = 1
-stencil_flags = 2
-stencil_color = Color(1, 0, 0, 1)
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_31w8j"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_b27yt"]
@@ -149,8 +131,10 @@ size = Vector3(12, 2, 6)
 
 [node name="Enemy_drone6" type="CharacterBody3D" unique_id=391940438 node_paths=PackedStringArray("vehicle_turrets", "attachment", "model")]
 transform = Transform3D(3.059797e-07, 0, 1, 0, 1, 0, -1, 0, 3.059797e-07, 0, 0, 0)
+collision_mask = 0
 motion_mode = 1
 script = ExtResource("1_lr34c")
+is_invulnerable = true
 distance_to_ground = 4.25
 vehicle_pilot_name = "Grizzly X-25 (Lt. Francis)"
 max_speed = 500.0
@@ -159,11 +143,10 @@ turn_speed = 0.5
 turning_acceleration = 0.5
 current_speed = 30.0
 friction = 0.7
-vehicle_turrets = [NodePath("Heli2/Fighter2/Turret"), NodePath("Heli2/Fighter2/Turret2"), NodePath("Heli2/Fighter2/Turret3"), NodePath("Heli2/Fighter2/Turret4")]
+vehicle_turrets = [NodePath("Heli2/Fighter2/Turret"), NodePath("Heli2/Fighter2/Turret2"), NodePath("Heli2/Fighter2/Turret3"), NodePath("Heli2/Fighter2/Turret4"), NodePath("Heli2/Fighter2/Turret5"), NodePath("Heli2/Fighter2/Turret6"), NodePath("Heli2/Fighter2/Turret7"), NodePath("Heli2/Fighter2/Turret8")]
 max_armor_points = 400
 attachment = NodePath("Node3D")
 model = [NodePath("Heli2/Fighter2"), NodePath("Heli2/Fighter2/Turret/Gun/Gun"), NodePath("Heli2/Fighter2/Turret2/Gun/Gun"), NodePath("Heli2/Fighter2/Attachment"), NodePath("Heli2/Fighter2/Turret3/Gun/Gun"), NodePath("Heli2/Fighter2/Turret2/Gun/Gun")]
-material = SubResource("StandardMaterial3D_yimcp")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1117181724]
 avoidance_enabled = true
@@ -185,7 +168,7 @@ mesh = SubResource("ArrayMesh_b25ju")
 transform = Transform3D(0.5, 0, 0, 0, 0.4829629, -0.12940952, 0, 0.12940952, 0.4829629, -0.375, 0.16201448, 0.16563368)
 script = ExtResource("3_nqica")
 turret_barrel = [NodePath("Gun")]
-barrel_upper_limit = 0.0
+barrel_upper_limit = 50.0
 barrel_lower_limit = -5.0
 side_angle_limit = 90.0
 fire_mode = 1
@@ -197,7 +180,8 @@ visible = false
 [node name="Gun" type="Node3D" parent="Heli2/Fighter2/Turret" unique_id=1317202634]
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, -0.38298702, 0)
 script = ExtResource("5_vmj1g")
-barrel_upper_limit = 0.0
+barrel_upper_limit = 50.0
+side_angle_limit = 90.0
 projectile_type = 4
 muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.01
@@ -213,7 +197,7 @@ mesh = SubResource("ArrayMesh_q3ecf")
 transform = Transform3D(0.5, 0, 0, 0, 0.4829629, -0.12940952, 0, 0.12940952, 0.4829629, 0.375, 0.16201448, 0.16563368)
 script = ExtResource("3_nqica")
 turret_barrel = [NodePath("Gun")]
-barrel_upper_limit = 0.0
+barrel_upper_limit = 50.0
 barrel_lower_limit = -5.0
 side_angle_limit = 90.0
 fire_mode = 1
@@ -225,7 +209,8 @@ visible = false
 [node name="Gun" type="Node3D" parent="Heli2/Fighter2/Turret2" unique_id=1853660768]
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, -0.38298702, 0)
 script = ExtResource("5_vmj1g")
-barrel_upper_limit = 0.0
+barrel_upper_limit = 50.0
+side_angle_limit = 90.0
 projectile_type = 4
 muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.01
@@ -237,11 +222,127 @@ transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 1, 0, 0, 0)
 material_override = SubResource("StandardMaterial3D_f0gs1")
 mesh = SubResource("ArrayMesh_q3ecf")
 
+[node name="Turret5" type="Node3D" parent="Heli2/Fighter2" unique_id=1810012693 node_paths=PackedStringArray("turret_barrel")]
+transform = Transform3D(0.5, 0, 0, 0, 0.4829629, -0.12940952, 0, 0.12940952, 0.4829629, -0.37500018, 0.16201448, -0.33436632)
+script = ExtResource("3_nqica")
+turret_barrel = [NodePath("Gun")]
+barrel_upper_limit = 50.0
+barrel_lower_limit = -5.0
+side_angle_limit = 90.0
+fire_mode = 1
+
+[node name="turret_V3" parent="Heli2/Fighter2/Turret5" unique_id=1799322346 instance=ExtResource("4_x4ygy")]
+transform = Transform3D(1.6391772e-07, 0, 1.25, 0, 1.25, 0, -1.25, 0, 1.6391772e-07, 0, -0.29506743, 0)
+visible = false
+
+[node name="Gun" type="Node3D" parent="Heli2/Fighter2/Turret5" unique_id=167874401]
+transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, -0.38298702, 0)
+script = ExtResource("5_vmj1g")
+barrel_upper_limit = 50.0
+side_angle_limit = 90.0
+projectile_type = 4
+muzzle_pos = Vector3(0, 0, 0.8)
+fire_rate_prim = 0.01
+max_heat = 999.0
+cooling_factor = 999.0
+
+[node name="Gun" type="MeshInstance3D" parent="Heli2/Fighter2/Turret5/Gun" unique_id=1499918812]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 1, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_f0gs1")
+mesh = SubResource("ArrayMesh_q3ecf")
+
+[node name="Turret6" type="Node3D" parent="Heli2/Fighter2" unique_id=1068326794 node_paths=PackedStringArray("turret_barrel")]
+transform = Transform3D(0.5, 0, 0, 0, 0.4829629, -0.12940952, 0, 0.12940952, 0.4829629, 0.37499982, 0.16201448, -0.33436632)
+script = ExtResource("3_nqica")
+turret_barrel = [NodePath("Gun")]
+barrel_upper_limit = 50.0
+barrel_lower_limit = -5.0
+side_angle_limit = 90.0
+fire_mode = 1
+
+[node name="turret_V3" parent="Heli2/Fighter2/Turret6" unique_id=261525692 instance=ExtResource("4_x4ygy")]
+transform = Transform3D(1.6391772e-07, 0, 1.25, 0, 1.25, 0, -1.25, 0, 1.6391772e-07, 0, -0.29506743, 0)
+visible = false
+
+[node name="Gun" type="Node3D" parent="Heli2/Fighter2/Turret6" unique_id=1277805735]
+transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, -0.38298702, 0)
+script = ExtResource("5_vmj1g")
+barrel_upper_limit = 50.0
+side_angle_limit = 90.0
+projectile_type = 4
+muzzle_pos = Vector3(0, 0, 0.8)
+fire_rate_prim = 0.01
+max_heat = 999.0
+cooling_factor = 999.0
+
+[node name="Gun" type="MeshInstance3D" parent="Heli2/Fighter2/Turret6/Gun" unique_id=537678182]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 1, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_f0gs1")
+mesh = SubResource("ArrayMesh_q3ecf")
+
+[node name="Turret7" type="Node3D" parent="Heli2/Fighter2" unique_id=1732475483 node_paths=PackedStringArray("turret_barrel")]
+transform = Transform3D(0.5, 0, 0, 0, 0.4829629, -0.12940952, 0, 0.12940952, 0.4829629, -0.37500036, 0.16201448, -0.8343663)
+script = ExtResource("3_nqica")
+turret_barrel = [NodePath("Gun")]
+barrel_upper_limit = 50.0
+barrel_lower_limit = -5.0
+side_angle_limit = 90.0
+fire_mode = 1
+
+[node name="turret_V3" parent="Heli2/Fighter2/Turret7" unique_id=1118382890 instance=ExtResource("4_x4ygy")]
+transform = Transform3D(1.6391772e-07, 0, 1.25, 0, 1.25, 0, -1.25, 0, 1.6391772e-07, 0, -0.29506743, 0)
+visible = false
+
+[node name="Gun" type="Node3D" parent="Heli2/Fighter2/Turret7" unique_id=1302828939]
+transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, -0.38298702, 0)
+script = ExtResource("5_vmj1g")
+barrel_upper_limit = 50.0
+side_angle_limit = 90.0
+projectile_type = 4
+muzzle_pos = Vector3(0, 0, 0.8)
+fire_rate_prim = 0.01
+max_heat = 999.0
+cooling_factor = 999.0
+
+[node name="Gun" type="MeshInstance3D" parent="Heli2/Fighter2/Turret7/Gun" unique_id=2054312392]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 1, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_f0gs1")
+mesh = SubResource("ArrayMesh_q3ecf")
+
+[node name="Turret8" type="Node3D" parent="Heli2/Fighter2" unique_id=650182683 node_paths=PackedStringArray("turret_barrel")]
+transform = Transform3D(0.5, 0, 0, 0, 0.4829629, -0.12940952, 0, 0.12940952, 0.4829629, 0.37499964, 0.16201448, -0.8343663)
+script = ExtResource("3_nqica")
+turret_barrel = [NodePath("Gun")]
+barrel_upper_limit = 50.0
+barrel_lower_limit = -5.0
+side_angle_limit = 90.0
+fire_mode = 1
+
+[node name="turret_V3" parent="Heli2/Fighter2/Turret8" unique_id=1042609130 instance=ExtResource("4_x4ygy")]
+transform = Transform3D(1.6391772e-07, 0, 1.25, 0, 1.25, 0, -1.25, 0, 1.6391772e-07, 0, -0.29506743, 0)
+visible = false
+
+[node name="Gun" type="Node3D" parent="Heli2/Fighter2/Turret8" unique_id=1538669438]
+transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, -0.38298702, 0)
+script = ExtResource("5_vmj1g")
+barrel_upper_limit = 50.0
+side_angle_limit = 90.0
+projectile_type = 4
+muzzle_pos = Vector3(0, 0, 0.8)
+fire_rate_prim = 0.01
+max_heat = 999.0
+cooling_factor = 999.0
+
+[node name="Gun" type="MeshInstance3D" parent="Heli2/Fighter2/Turret8/Gun" unique_id=430263649]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 1, 0, 0, 0)
+material_override = SubResource("StandardMaterial3D_f0gs1")
+mesh = SubResource("ArrayMesh_q3ecf")
+
 [node name="Turret3" type="Node3D" parent="Heli2/Fighter2" unique_id=133584453 node_paths=PackedStringArray("turret_barrel")]
 transform = Transform3D(0.5, 0, 0, 0, 0.4829629, -0.12940952, 0, 0.12940952, 0.4829629, -1.162312, 0.1990366, -0.084365845)
 script = ExtResource("3_nqica")
 turret_barrel = [NodePath("Gun")]
-barrel_upper_limit = 0.0
+barrel_upper_limit = 50.0
 barrel_lower_limit = -5.0
 side_angle_limit = 90.0
 
@@ -252,7 +353,8 @@ visible = false
 [node name="Gun" type="Node3D" parent="Heli2/Fighter2/Turret3" unique_id=2030359533]
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, -0.38298702, 0)
 script = ExtResource("5_vmj1g")
-barrel_upper_limit = 0.0
+barrel_upper_limit = 50.0
+side_angle_limit = 90.0
 projectile_type = 0
 muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.01
@@ -267,7 +369,7 @@ mesh = SubResource("ArrayMesh_q3ecf")
 transform = Transform3D(0.5, 0, 0, 0, 0.4829629, -0.12940952, 0, 0.12940952, 0.4829629, 1.1624999, 0.19901466, -0.08436632)
 script = ExtResource("3_nqica")
 turret_barrel = [NodePath("Gun")]
-barrel_upper_limit = 0.0
+barrel_upper_limit = 50.0
 barrel_lower_limit = -5.0
 side_angle_limit = 90.0
 
@@ -278,7 +380,8 @@ visible = false
 [node name="Gun" type="Node3D" parent="Heli2/Fighter2/Turret4" unique_id=1814440108]
 transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, -0.38298702, 0)
 script = ExtResource("5_vmj1g")
-barrel_upper_limit = 0.0
+barrel_upper_limit = 50.0
+side_angle_limit = 90.0
 projectile_type = 0
 muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.01

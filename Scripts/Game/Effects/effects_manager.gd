@@ -252,7 +252,7 @@ func explosion_from_pool(position: Vector3, radius: float, wave_scale: int = -1)
 		to_global_active(explosion)
 		
 		explosion.lifetime = radius * 0.15
-		explosion.process_mode = Node.PROCESS_MODE_ALWAYS
+		explosion.process_mode = Node.PROCESS_MODE_PAUSABLE
 		explosion.global_position = position
 		explosion.show()
 		explosion.restart()
@@ -299,7 +299,7 @@ func explo_wave_from_pool(position: Vector3, radius: float, wave_scale: int = -1
 				mat.albedo_color.a = 0.06
 		
 		
-		explo_wave.process_mode = Node.PROCESS_MODE_ALWAYS
+		explo_wave.process_mode = Node.PROCESS_MODE_PAUSABLE
 		explo_wave.global_position = position
 		explo_wave.show()
 		explo_wave.restart()
@@ -350,7 +350,7 @@ func explosion_3d_from_pool(position: Vector3, scale: float = -1, color: Color =
 				mat.albedo_color = color
 				#mat.albedo_color.a = 0.06
 		
-		explosion_3d.process_mode = Node.PROCESS_MODE_ALWAYS
+		explosion_3d.process_mode = Node.PROCESS_MODE_PAUSABLE
 		explosion_3d.global_position = position
 		explosion_3d.show()
 		explosion_3d.restart()
@@ -398,7 +398,7 @@ func shoot_3d_from_pool(position: Vector3, rotation: Vector3 = Vector3.ZERO, sca
 				mat.albedo_color = color
 				#mat.albedo_color.a = 0.06
 		
-		shoot_3d.process_mode = Node.PROCESS_MODE_ALWAYS
+		shoot_3d.process_mode = Node.PROCESS_MODE_PAUSABLE
 		shoot_3d.global_position = position
 		shoot_3d.global_rotation = rotation
 		shoot_3d.rotate_object_local(Vector3.RIGHT,deg_to_rad(90))
@@ -437,7 +437,7 @@ func sparks_from_pool(position: Vector3) -> void:
 		to_global_active(sparks)
 		
 		
-		sparks.process_mode = Node.PROCESS_MODE_ALWAYS
+		sparks.process_mode = Node.PROCESS_MODE_PAUSABLE
 		sparks.global_position = position
 		sparks.show()
 		sparks.restart()
@@ -470,7 +470,7 @@ func failed_sparks_from_pool(position: Vector3) -> void:
 		to_global_active(failed_sparks)
 		
 		
-		failed_sparks.process_mode = Node.PROCESS_MODE_ALWAYS
+		failed_sparks.process_mode = Node.PROCESS_MODE_PAUSABLE
 		failed_sparks.global_position = position
 		failed_sparks.show()
 		failed_sparks.restart()
@@ -506,7 +506,7 @@ func debris_from_pool(position: Vector3) -> void:
 		to_global_active(debris)
 		
 		
-		debris.process_mode = Node.PROCESS_MODE_ALWAYS
+		debris.process_mode = Node.PROCESS_MODE_PAUSABLE
 		debris.global_position = position
 		debris.show()
 		debris.restart()
@@ -535,7 +535,7 @@ func collapse_from_pool(position: Vector3) -> void:
 		to_global_active(collapse)
 		
 		
-		collapse.process_mode = Node.PROCESS_MODE_ALWAYS
+		collapse.process_mode = Node.PROCESS_MODE_PAUSABLE
 		collapse.global_position = position
 		collapse.show()
 		collapse.restart()
@@ -560,7 +560,7 @@ func fire_from_pool(position: Vector3, size: Vector3 = Vector3.ONE) -> Fire_Effe
 		fire = fire_pool.pop_front()
 	if fire:
 		fire_active.push_back(fire)
-		fire.process_mode = Node.PROCESS_MODE_ALWAYS
+		fire.process_mode = Node.PROCESS_MODE_PAUSABLE
 		fire.global_position = position
 		fire.counter = 0.0
 		if fire.fake_light_effect:
@@ -588,7 +588,7 @@ func heat_from_pool(position: Vector3) -> GPUParticles3D:
 		heat = heat_pool.pop_front()
 	if heat:
 		heat_active.push_back(heat)
-		heat.process_mode = Node.PROCESS_MODE_ALWAYS
+		heat.process_mode = Node.PROCESS_MODE_PAUSABLE
 		heat.global_position = position
 		heat.finished.emit()
 		heat.one_shot = false

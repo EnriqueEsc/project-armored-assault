@@ -73,10 +73,12 @@ func back_to_main_menu() -> void:
 
 func resume_game() -> void:
 	get_tree().paused = false
+	ShaderData.set_game_speed(1.0)
 	visible = false
 	game_state.emit(true)
 
 func pause_game() -> void:
 	get_tree().paused = true
+	ShaderData.set_game_speed(0.0)
 	visible = true
 	game_state.emit(false)

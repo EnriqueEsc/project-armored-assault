@@ -10,14 +10,16 @@ uniform vec2 noise_speed = vec2(0.015, 0.025);
 uniform float noise_variation = 0.35;
 varying vec3 world_pos;
 
+global uniform float game_speed;
+
 void vertex() {
-	world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+	world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz * game_speed;
 }
 
 void fragment() {
 	vec2 world_uv = world_pos.xz * noise_scale;
-	vec2 uv_a = world_uv - TIME * noise_speed;
-	vec2 uv_b = world_uv * 1.7 - TIME * noise_speed.yx * 0.7;
+	vec2 uv_a = world_uv - (TIME * noise_speed * game_speed);
+	vec2 uv_b = world_uv * 1.7 - (TIME * noise_speed.yx * 0.7 * game_speed);
 	
 	float noise_a = texture(rain_noise, uv_a).r;
 	float noise_b = texture(rain_noise, uv_b).r;

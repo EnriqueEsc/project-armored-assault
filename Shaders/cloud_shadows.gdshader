@@ -10,8 +10,10 @@ uniform float cloud_softness = 0.15;
 
 uniform vec2 cloud_speed = vec2(0.02, 0.01);
 
+global uniform float game_speed;
+
 void fragment() {
-	vec2 animated_uv = UV + (TIME * cloud_speed);
+	vec2 animated_uv = UV + (TIME * cloud_speed * game_speed);
 	
 	float noise = texture(cloud_noise_tex, animated_uv).r;
 	float clouds = smoothstep(cloud_threshold - cloud_softness, cloud_threshold + cloud_softness, noise);

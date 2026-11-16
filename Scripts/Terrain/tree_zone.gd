@@ -1,4 +1,4 @@
-extends Area3D
+extends Node3D
 class_name Tree_Zone
 
 @export var tree_mesh: Mesh
@@ -32,10 +32,10 @@ func _ready() -> void:
 	#multimesh_instance.call_deferred("set_global_position",collision.global_position)
 	#multimesh_instance.call_deferred("set_global_rotation",collision.global_rotation)
 	
-	body_entered.connect(_on_body_entered)
-	body_exited.connect(_on_body_exit)
-	area_entered.connect(_on_area_entered)
-	area_exited.connect(_on_area_exit)
+	#body_entered.connect(_on_body_entered)
+	#body_exited.connect(_on_body_exit)
+	#area_entered.connect(_on_area_entered)
+	#area_exited.connect(_on_area_exit)
 	init_grid()
 
 

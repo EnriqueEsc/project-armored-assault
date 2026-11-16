@@ -71,7 +71,8 @@ func create_HUD_Icon() -> void:
 	var col = null
 	if parent_node is Vehicle_Rigid:
 		#col = parent_node.collision_shape.size
-		pass
+		col = Vector3.ONE * parent_node.collision_shape.size.length() * 0.5
+		#pass
 	if parent_node is Emplacement:
 		var aux = parent_node.collision_size
 		if aux != Vector3.ZERO:

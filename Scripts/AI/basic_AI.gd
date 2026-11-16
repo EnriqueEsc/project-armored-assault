@@ -67,6 +67,9 @@ var occlusion_node: AIDistanceOccluder = AIDistanceOccluder.new(self)
 var thinking_counter: float = 0.0
 var thinking_tick: float = 0.01
 
+var whisker_tick: float = 0.5
+var whisker_counter: float = 0.0
+
 func _init_rigid() -> void:
 	
 	tank_rigid = get_parent() as Vehicle_Rigid
@@ -236,10 +239,15 @@ func init_whiskers() -> void:
 	center_whisker.collide_with_areas = false
 	
 
-func get_whisker_steering() -> float:
+func get_whisker_steering(delta: float) -> float:
 	if not is_instance_valid(center_whisker) or not is_instance_valid(left_whisker) or not is_instance_valid(right_whisker):
 		#print("PUTA MADRE")
 		return 0.0
+	
+	whisker_counter += delta
+	if whisker_counter < whisker_tick:
+		return 0.0
+	whisker_counter = 0.0
 	
 	#print(left_whisker.get_collider()," ",center_whisker.get_collider()," ",right_whisker.get_collider())
 	
@@ -326,12 +334,13 @@ func destroyed_dialog() -> void:
 	pass
 
 func _physics_process(delta: float) -> void:
-	'''
+	
 	thinking_counter += delta
 	if thinking_counter < thinking_tick:
+		navigate_to_position(next_node,delta)
 		return
 	thinking_counter = 0.0
-	'''
+	
 	
 	var static_model: bool = false
 	if is_instance_valid(tank_rigid) and tank_rigid is Vehicle_Rigid:
@@ -499,7 +508,7 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 		
 	var input_x: float = -clamp(angle, -1.0, 1.0)
 	
-	input_x += get_whisker_steering()
+	input_x += get_whisker_steering(delta)
 	input_x = clamp(input_x, -1.0, 1.0)
 	
 	
@@ -675,7 +684,8 @@ func deactivate() -> void:
 
 func _process(delta: float) -> void:
 	scan_timer += delta
-	if scan_timer > 1:
+	if scan_timer > 1.0:
+		scan_timer = 0.0
 		get_closest_foe()
 		if current_state == AI_State.ENGAGED and is_on_sight_range():
 			report_on_battle_net()

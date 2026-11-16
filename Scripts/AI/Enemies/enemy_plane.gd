@@ -14,19 +14,42 @@ var active: bool = false
 func _init_rigid() -> void:
 	if is_instance_valid(occlusion_node):
 		#occlusion_node.queue_free()
-		occlusion_node.max_process_distance = 9999
+		occlusion_node.max_process_distance = 999999
+		#occlusion_node.max_render_distance = 999999
 	tank_rigid = get_parent() as Plane_Rigid
 	#current_team = randi_range(1,Team.size()-1)
 	#tank_rigid.is_kamikaze = is_kamikaze
-	plan_attack_route(Vector3.ZERO)
+	#plan_attack_route(Vector3.ZERO)
 
 func plan_attack_route(attack_pos: Vector3) -> void:
 	counter = 0
-	start_point = Vector3(-50,10,randf_range(-50,50))
-	tank_rigid.global_position = start_point
+	
+	var random_angle: float = randf_range(0.0, TAU)
+	var offset_2d = Vector3(cos(random_angle), 0.0, sin(random_angle)) * 50.0
+	
+	start_point = attack_pos + offset_2d
+	start_point.y = attack_pos.y + 50.0
+	#start_point = Vector3(attack_pos.x - 50,attack_pos.y + 50,randf_range(-50,50))
+	
+	
+	var dir: Vector3 = (attack_pos - start_point)
+	dir.y = 0.0
+	dir = dir.normalized()
 #	start_point = tank_rigid.global_position
-	end_point = (-tank_rigid.global_position * 1.2)
+	#end_point = (-tank_rigid.global_position * 1.2)
+	#end_point.y = start_point.y
+	end_point = attack_pos + (dir * 120.0)
 	end_point.y = start_point.y
+	var pos = start_point - (dir * 20.0)
+	pos.y = start_point.y
+	
+	
+	tank_rigid.global_position = pos
+	tank_rigid.velocity = Vector3.ZERO
+	tank_rigid.turning_velocity = 0.0
+	tank_rigid.look_at(start_point, Vector3.UP)
+
+	
 	path_array.clear()
 	path_array.append(start_point)
 	var iterations: int = 1
@@ -34,11 +57,11 @@ func plan_attack_route(attack_pos: Vector3) -> void:
 	#while iterations > 0:
 	var aux: Array[Vector3]
 	var caux: Vector3 = start_point.lerp(attack_pos,0.5)
-	caux.y = 20
+	caux.y = attack_pos.y + (start_point.y / 5.0)
 	aux.append(caux)
 	aux.append(attack_pos)
 	caux = end_point.lerp(attack_pos, 0.5)
-	caux.y = 20
+	caux.y = attack_pos.y + (start_point.y / 5.0)
 	aux.append(caux)
 	iterations -= 1
 	path_array.append_array(aux)
@@ -50,7 +73,9 @@ func plan_attack_route(attack_pos: Vector3) -> void:
 	
 	#if not path_array.size() % 2 == 0:
 	#	middle_point += 1
+
 	
+	print("Starts at ",pos," Current_position ",tank_rigid.global_position," PLAN ",path_array)
 	print(path_array.size()," ",middle_point)
 	next_path = path_array.pop_front()
 	
@@ -59,8 +84,16 @@ func plan_attack_route(attack_pos: Vector3) -> void:
 	
 	#path_array.push_back(next_path)
 
-func get_whisker_steering() -> float:
+func get_whisker_steering(delta: float) -> float:
+	
+	whisker_counter += delta
+	if whisker_counter < whisker_tick:
+		return 0.0
+	whisker_counter = 0.0
+	
 	var steering_offset: float = 0.0
+	return steering_offset
+	
 	
 	if left_whisker.is_colliding():
 		steering_offset += 1.0 # Empuja a la derecha
@@ -78,7 +111,6 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 	target_position = target_pos
 	
 	var dir_to_path = target_position - tank_rigid.global_position
-	
 	#print(tank_rigid.global_position.y - target_pos.y," ",tank_rigid.distance_to_ground," ",dir_to_path.length_squared())
 	if dir_to_path.length_squared() < 2.0:
 		match current_mode:
@@ -127,7 +159,7 @@ func navigate_to_position(target_pos: Vector3, delta: float) -> void:
 	
 	var input_x: float = -clamp(angle, -1.0, 1.0)
 	
-	input_x += get_whisker_steering()
+	#input_x += get_whisker_steering()
 	input_x = clamp(input_x, -1.0, 1.0)
 	input_x = 0.0
 	
@@ -191,18 +223,20 @@ func _physics_process(delta: float) -> void:
 	
 	tank_rigid.move(Vector2(0.0,1.0),delta,0.0,next_path)
 	
-	aim_to.emit(next_path + Vector3(randf_range(-50.0,50.0),0.0,randf_range(-50.0,50.0)))
-	if tank_rigid.global_position.distance_to(next_path) < 50.0 and counter == middle_point:
+	#aim_to.emit(next_path + Vector3(randf_range(-50.0,50.0),0.0,randf_range(-50.0,50.0)))
+	aim_to.emit(next_path)
+	if tank_rigid.global_position.distance_to(next_path) > 10.0 and counter == middle_point:
 		tank_rigid.use_attachment(next_path)
 		tank_rigid.shoot()
 	
 	
-	if tank_rigid.global_position.distance_to(next_path) < 10.0:
+	if tank_rigid.global_position.distance_to(next_path) < 20.0:
 		if path_array.is_empty():
 			#plan_attack_route(Vector3.ZERO)
 			deactivate()
 			return
 		next_path = path_array.pop_front()
+		print(next_path)
 		counter += 1
 		#path_array.push_back(next_path)
 

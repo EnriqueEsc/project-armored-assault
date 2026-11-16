@@ -150,3 +150,7 @@ player_aim_dir={
 "type": "vec3",
 "value": Vector3(0, 0, 0)
 }
+game_speed={
+"type": "float",
+"value": 1.0
+}

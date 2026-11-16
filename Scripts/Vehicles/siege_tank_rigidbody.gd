@@ -1,12 +1,18 @@
 extends Tank_Rigid
 class_name Siege_Rigid
 
-var emplaced: bool = false
 @export var legs_retracted: MeshInstance3D = null
 @export var legs_extended: MeshInstance3D = null
 
 func special_action() -> bool:
-	emplaced = not emplaced
+	match current_mode:
+		TankModes.Normal:
+			current_mode = TankModes.SiegeDeployed
+			tank_mode_changed.emit(current_mode)
+		TankModes.SiegeDeployed:
+			current_mode = TankModes.Normal
+			tank_mode_changed.emit(current_mode)
+	var emplaced = current_mode == TankModes.SiegeDeployed
 	velocity = Vector3.ZERO
 	
 	if is_instance_valid(legs_retracted):
@@ -34,7 +40,8 @@ func _physics_process(delta: float) -> void:
 	
 	allign_with_floor(delta)
 	
-	if emplaced:
+	if current_mode == TankModes.SiegeDeployed:
+	#if emplaced:
 		return
 	
 	if direction:
@@ -113,7 +120,8 @@ func _physics_process(delta: float) -> void:
 
 func recoil(dir: Vector3, force: float = 1.0,rot: bool = false) -> void:
 	
-	if emplaced:
+	if current_mode == TankModes.SiegeDeployed:
+	#if emplaced:
 		return
 	
 	if rot:
@@ -146,7 +154,8 @@ func move(move: Vector2, delta: float, lateral_move: float = 0.0, plane_move: Ve
 		return
 	
 	
-	if emplaced:
+	if current_mode == TankModes.SiegeDeployed:
+	#if emplaced:
 		return
 	
 	turning_velocity = lerpf(turning_velocity, -move.x * turn_speed, turning_acceleration * delta)

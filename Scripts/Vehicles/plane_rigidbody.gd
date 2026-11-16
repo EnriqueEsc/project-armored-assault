@@ -1,7 +1,7 @@
 extends Drone_Rigid
 class_name Plane_Rigid
 
-
+@export var is_invulnerable: bool = false
 
 func _physics_process(delta: float) -> void:
 	
@@ -119,6 +119,9 @@ func allign_with_floor(delta: float) -> void:
 	var new_basis = current_transform.basis.slerp(target_basis, allign_speed * delta)
 	global_transform.basis = new_basis.orthonormalized()
 
+func recoil(dir: Vector3, force: float = 1.0,rot: bool = false) -> void:
+	return
+
 func move(move: Vector2, delta: float, lateral_move: float = 0.0, plane_move: Vector3 = Vector3.ZERO) -> void:
 	#rotate_y(-move.x * turn_speed * delta)
 	if staggered:
@@ -152,3 +155,35 @@ func move(move: Vector2, delta: float, lateral_move: float = 0.0, plane_move: Ve
 	
 	#var current_pos_2d: Vector2 = (Vector2(0,move.y).rotated(-rotation.y))
 	#position += Vector3(current_pos_2d.x,0,current_pos_2d.y) * current_speed
+
+
+func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3, status_effect: StatusEffects = StatusEffects.None) -> void:
+	if is_invulnerable:
+		return
+	
+	if armor_points < 1:
+		return
+	armor_points -= damage
+	armor_points = clamp(armor_points,0,max_armor_points)
+	
+	#print("Salud ",armor_points)
+	
+	ap_percent.emit(float(armor_points)/float(max_armor_points) * 100.0)
+	hp_changed.emit(armor_points)
+	
+	if status_effect != StatusEffects.None:
+		status_buildup(damage * 10,status_effect)
+	
+	if armor_points <= 0:
+		if source:
+			source.get_score(max_armor_points * 4)
+			
+		#if is_player:
+			#self.get_parent().get_parent().death_screen.visible = true
+		deactivate() 
+		return
+	
+	
+	
+	embraces_damage.emit(damage)
+	got_hit.emit(source, impact_point)

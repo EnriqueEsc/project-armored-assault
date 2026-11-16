@@ -1,6 +1,13 @@
 extends Node
 
 var player: Vehicle_Rigid = null
+var game_speed: float = 1.0
+
+func set_game_speed(speed: float) -> void:
+	if is_equal_approx(game_speed, speed):
+		return
+	game_speed = speed
+	RenderingServer.global_shader_parameter_set("game_speed", game_speed)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

@@ -22,9 +22,10 @@ uniform float push_curve = 1.5;
 
 varying float vertex_height;
 
+global uniform float game_speed;
 
 float get_wind(vec3 world_pos, float time) {
-	float wave_1 = sin(world_pos.x * wind_frequency + time * wind_speed);	
+	float wave_1 = sin(world_pos.x * wind_frequency + time * wind_speed);
 	float wave_2 = cos(world_pos.z * wind_frequency * 0.7 + time * wind_speed * 0.8);
 	
 	return wave_1 * wave_2;
@@ -51,7 +52,7 @@ void vertex() {
 		push_offset = normalize(direction) * influence * push_strength * height_mask;
 	}
 	
-	VERTEX += wind_offset + push_offset;
+	VERTEX += (wind_offset + push_offset) * game_speed;
 }
 
 

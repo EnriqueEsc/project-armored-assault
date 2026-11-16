@@ -28,6 +28,8 @@ uniform sampler2D screen_texture : hint_screen_texture, filter_linear_mipmap;
 varying float wave_height;
 varying vec3 vec_world_pos;
 
+global uniform float game_speed;
+
 void vertex() {
 	vec_world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	float surge = sin(TIME * surge_speed) * surge_strength;
@@ -35,9 +37,10 @@ void vertex() {
 	VERTEX.x += surge_offset.x;
 	VERTEX.z += surge_offset.y;
 	
-	float wave1 = sin(vec_world_pos.x * wave_frequency + TIME * wave_speed);
-	float wave2 = cos(vec_world_pos.z * wave_frequency * 0.8 + TIME * wave_speed * 1.2);
-	float final_wave = (wave1 + wave2) * wave_amplitude;
+	
+	float wave1 = sin(vec_world_pos.x * wave_frequency + TIME * wave_speed) * game_speed;
+	float wave2 = cos(vec_world_pos.z * wave_frequency * 0.8 + TIME * wave_speed * 1.2 * game_speed);
+	float final_wave = (wave1 + wave2) * wave_amplitude * game_speed;
 	
 	VERTEX.y += final_wave;
 	
@@ -46,7 +49,7 @@ void vertex() {
 
 void fragment() {
 	
-	vec2 refraction_offset = vec2(wave_height) * refraction_strength;
+	vec2 refraction_offset = vec2(wave_height) * refraction_strength * game_speed;
 	vec2 distorted_screen_uv = SCREEN_UV + refraction_offset;
 	
 	float depth = textureLod(depth_texture, distorted_screen_uv, 0.0).r;
@@ -61,7 +64,7 @@ void fragment() {
 	vec2 foam_scroll = vec2(TIME * wave_speed * 0.05);
 	float noise_r = texture(foam_noise_tex, foam_uv + foam_scroll).r;
 	float noise_g = texture(foam_noise_tex, foam_uv * 1.5 - foam_scroll * 0.8).g;
-	float combined_noise = (noise_r + noise_g) * 0.5;
+	float combined_noise = (noise_r + noise_g) * 0.5 * game_speed;
 	
 	float crest_area = smoothstep(crest_foam_threshold, 1.0, wave_height);
 	float crest_foam = step(foam_cutoff, crest_area * combined_noise);

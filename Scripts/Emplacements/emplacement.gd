@@ -111,7 +111,7 @@ func show_visual_damage(ap: float) -> void:
 		if not damage_effect.emitting:
 			damage_effect.emitting = true
 			damage_effect.show()
-			damage_effect.process_mode = Node.PROCESS_MODE_ALWAYS
+			damage_effect.process_mode = Node.PROCESS_MODE_PAUSABLE
 		
 		var particles_ammount:float = remap(ap, 50.0, 10.0, 1.0, 10)
 		var final_particles: int = clampi(roundi(particles_ammount),1,10)

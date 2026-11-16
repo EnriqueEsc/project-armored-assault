@@ -58,7 +58,7 @@ func update_steps(move_input: Vector2, delta: float) -> float:
 			move_effect.emitting = true
 			move_effect.lifetime = original_effect_time
 			move_effect.show()
-			move_effect.process_mode = Node.PROCESS_MODE_ALWAYS
+			move_effect.process_mode = Node.PROCESS_MODE_PAUSABLE
 	return 0.5 + 0.5 * cos(step_phase)
 
 
@@ -70,9 +70,13 @@ func show_move_effects(vel: float) -> void:
 func special_action() -> bool:
 	match move_type:
 		Move_Type.Walking:
+			current_mode = TankModes.MechBooster
 			move_type = Move_Type.Skating
+			tank_mode_changed.emit(current_mode)
 		Move_Type.Skating:
+			current_mode = TankModes.Normal
 			move_type = Move_Type.Walking
+			tank_mode_changed.emit(current_mode)
 	return true
 
 func recoil(dir: Vector3, force: float = 1.0,rot: bool = false) -> void:

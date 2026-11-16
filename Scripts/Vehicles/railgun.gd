@@ -56,7 +56,7 @@ func _additional_activate_process() -> void:
 	
 	if not trail:
 		return
-	trail.process_mode = Node.PROCESS_MODE_ALWAYS
+	trail.process_mode = Node.PROCESS_MODE_PAUSABLE
 	trail.show()
 	trail.restart()
 	#trail.emitting = true

@@ -143,6 +143,7 @@ func _ready() -> void:
 	tank_rigid.add_to_group("Player")
 	self.add_to_group("Player")
 	
+	
 	tank_rigid.hp_changed.connect(update_AP)
 	tank_rigid.score_changed.connect(update_Score)
 	tank_rigid.velocimeter.connect(update_Velocimeter)
@@ -206,6 +207,10 @@ func _ready() -> void:
 	HUD_Aim_box.hit_marker_time = hit_marker_time
 	if Tank_camera.INSTANCE:
 		Tank_camera.INSTANCE.hud_aim_box = HUD_Aim_box
+	
+	#tank_rigid.tank_mode_changed.connect(update_tank_mode)
+	if HUD_Aim_box:
+		tank_rigid.tank_mode_changed.connect(HUD_Aim_box.update_tank_mode)
 	
 	if not mouse_visible:
 		Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
@@ -349,6 +354,7 @@ func _ready() -> void:
 			tank_rigid.attachment.shakes.connect(tank_rigid.shakes.emit)
 		
 	tank_rigid.update_stencil_color(Color.GREEN)
+	tank_rigid.tank_mode_changed.emit(tank_rigid.current_mode)
 
 func color_HUD() -> void:
 		#HUD_aim.modulate = color
@@ -1033,3 +1039,13 @@ func untarget_enemy(e: NodeInGameData) -> void:
 		lock_on = false
 		enemy_locked = null
 		HUD_Lock_on.visible = lock_on
+
+
+func update_tank_mode(mode: Tank_Rigid.TankModes) -> void:
+	var text: String = ""
+	match mode:
+		Tank_Rigid.TankModes.MechBooster:
+			text = "Skating"
+		Tank_Rigid.TankModes.SiegeDeployed:
+			text = "Deployed"
+	#print("MODE ",mode," ",text)

@@ -42,6 +42,9 @@ var buffer_height: int = 0
 var vertex_map: Dictionary = {}
 @export var vertex_map_accuracy: float = 0.001
 
+var spatial_grid: Dictionary = {}
+@export var spatial_grid_cell_size: float = 1.0
+
 func visual_process(delta: float) -> void:
 	
 	if not update_visual_next_tick:
@@ -76,10 +79,19 @@ func _ready() -> void:
 func generate() -> void:
 	get_visuals_from_existing_mesh()
 	generate_visuals()
+	generate_spatial_grid()
 	generate_vertex_map()
 	generate_collisions()
 	generate_navmesh()
 
+func generate_spatial_grid() -> void:
+	spatial_grid.clear()
+	
+	for i in range(vertices.size()):
+		var aux = get_cell_coords(vertices[i])
+		if not spatial_grid.has(aux):
+			spatial_grid[aux] = PackedInt32Array()
+		spatial_grid[aux].append(i)
 
 func generate_vertex_map() -> void:
 	vertex_map.clear()
@@ -234,6 +246,8 @@ func generate_visuals() -> void:
 	mesh_instance.mesh = new_mesh
 	var material
 	
+	use_shader = deformation_mode != DeformationMode.None
+	
 	if use_shader:
 		material = ShaderMaterial.new()
 		var shader = load("res://Shaders/deformation_test.gdshader")
@@ -341,6 +355,10 @@ func generate_collisions() -> void:
 
 
 func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3, status_effect: Vehicle_Rigid.StatusEffects = Vehicle_Rigid.StatusEffects.None) -> void:
+	
+	if deformation_mode == DeformationMode.None:
+		return
+	
 	if damage <= deformation_treshold:
 		return
 	
@@ -349,52 +367,31 @@ func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3, stat
 
 
 func take_explosion(damage: int,source: Vehicle_Rigid,impact_point: Vector3,radius: float) -> void:
+	
+	if deformation_mode == DeformationMode.None:
+		return
+	
 	if damage <= deformation_treshold:
 		return
 	
 	var local_point = to_local(impact_point)
 	var radius_squared = radius * radius
+	var rad: Vector3 = Vector3.ONE * radius
+	var min_cell: Vector3i = get_cell_coords(local_point - rad)
+	var max_cell: Vector3i = get_cell_coords(local_point + rad)
 	
-	for i in range(vertices.size()):
-		if vertices[i].distance_squared_to(local_point) <= radius_squared:
-			deform_terrain_by_index(i,damage)
-	
-	return
-	
-	var vertex_spacing_x = (float(size.x) / subdivisions.x)
-	var vertex_spacing_z = (float(size.y) / subdivisions.y)
-	
-	var center_x = roundi((local_point.x + size.x * 0.5) / vertex_spacing_x)
-	var center_z = roundi((local_point.z + size.y * 0.5) / vertex_spacing_z)
-	
-	var range_x = ceili(radius / vertex_spacing_x)
-	var range_z = ceili(radius / vertex_spacing_z)
-	
-	var min_x = maxi(0, center_x - range_x)
-	var max_x = mini(subdivisions.x, center_x + range_x)
-	
-	var min_z = maxi(0, center_z - range_z)
-	var max_z = mini(subdivisions.y, center_z + range_z)
-	
-	var row_size = subdivisions.x + 1
-	
-	for z in range(min_z, max_z + 1):
-		for x in range(min_x, max_x + 1):
-			
-			var index = x + z * row_size
-			var vertex = vertices[index]
-			var dist_x = vertex.x - local_point.x
-			var dist_z = vertex.z - local_point.z
-			var distance_squared = (dist_x * dist_x) + (dist_z * dist_z)
-			
-			if distance_squared > radius_squared:
-				continue
+	for x in range(min_cell.x, max_cell.x + 1):
+		for y in range(min_cell.y, max_cell.y + 1):
+			for z in range(min_cell.z, max_cell.z + 1):
+				var cell: Vector3i = Vector3i(x,y,z)
 				
-			var distance = sqrt(distance_squared)
-			var fallout = 1.0 - (distance / radius)
-			
-			deform_terrain_by_index(index,damage)
-			#deform_terrain_by_index(index,damage * fallout)
+				if not spatial_grid.has(cell):
+					continue
+				
+				var cell_indexes: PackedInt32Array = spatial_grid[cell]
+				for index in cell_indexes:
+					if vertices[index].distance_squared_to(local_point) <= radius_squared:
+						deform_terrain_by_index(index,damage)
 
 
 func deform_terrain_by_index(index: int, damage: float = 1) -> void:
@@ -406,11 +403,15 @@ func deform_terrain_by_index(index: int, damage: float = 1) -> void:
 	var target = vertices[index]
 	
 	var new_height: float = vertices[index].y
+	
+	
 	var factor = - 1.0
 	factor *= (float(damage) * randf_range(0.6,1.4))
 	
 	new_height += factor
 	
+	if is_equal_approx(new_height, vertices[index].y):
+		return
 	#print("NEW ", new_height < vertices[index].y," ",vertices[index].y," ",new_height)
 	
 	new_height = clampf(new_height,min_max_height[index].x,min_max_height[index].y)
@@ -436,17 +437,36 @@ func deform_terrain_by_index(index: int, damage: float = 1) -> void:
 	#update()
 
 func find_closest_vertex_to_point(point: Vector3) -> int:
+	var local_point: Vector3 = to_local(point)
+	var center: Vector3i = get_cell_coords(local_point)
 	var closest_index: int = -1
 	var min_dist: float = INF
-	var local_point: Vector3 = to_local(point)
 	#var closest_vertex: Vector3 = Vector3.ZERO
+	var search_radius: int = 1
 	
+	
+	for x in range(center.x - search_radius,center.x + search_radius + 1):
+		for y in range(center.y - search_radius,center.y + search_radius + 1):
+			for z in range(center.z - search_radius,center.z + search_radius + 1):
+				var cell: Vector3i = Vector3i(x,y,z)
+				
+				if not spatial_grid.has(cell):
+					continue
+				
+				var cell_indexes: PackedInt32Array = spatial_grid[cell]
+				for index in cell_indexes:
+					var dist: float = vertices[index].distance_squared_to(local_point)
+					if dist < min_dist:
+						min_dist = dist
+						closest_index = index
+	
+	'''
 	for v in vertices.size():
 		var dist: float = vertices[v].distance_squared_to(local_point)
 		if dist < min_dist:
 			min_dist = dist
 			closest_index = v
-	
+	'''
 	#res = vertices.find(closest_vertex)
 	
 	return closest_index
@@ -466,3 +486,7 @@ func create_vertex_buffer() -> void:
 		var vertex = vertices[i]
 		image_buffer.set_pixel(x,y,Color(vertex.x, vertex.y, vertex.z, 1.0))
 	texture_buffer = ImageTexture.create_from_image(image_buffer)
+
+
+func get_cell_coords(pos: Vector3) -> Vector3i:
+	return Vector3i(floori(pos.x / spatial_grid_cell_size),floori(pos.y / spatial_grid_cell_size),floori(pos.z / spatial_grid_cell_size))

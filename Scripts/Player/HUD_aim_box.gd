@@ -12,6 +12,7 @@ var primary_weapon_indicators: Array[ProgressBar] = []
 var primary_reload_label: RichTextLabel = null
 
 var upper_container: VBoxContainer = null
+var lower_container: HBoxContainer = null
 
 var enemy_health_bar: ProgressBar = null
 var enemy_name: RichTextLabel = null
@@ -24,16 +25,35 @@ var cursor: Sprite2D = null
 
 var aim_assist_type: Settings_Manager.Aim_Assist_Type = Settings_Manager.Aim_Assist_Type.None
 
+var tank_mode_label: RichTextLabel = null
+
 func _ready() -> void:
 	
 	call_deferred("set_position",Vector2(1000,1000))
+	
+	lower_container = HBoxContainer.new()
+	lower_container.size = Vector2(300.0,40.0)
+	#lower_container.alignment = BoxContainer.ALIGNMENT_END
+	
+	call_deferred("add_child",lower_container)
+	
+	tank_mode_label = RichTextLabel.new()
+	tank_mode_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	tank_mode_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	tank_mode_label.custom_minimum_size = Vector2(100.0, 30.0)
+	tank_mode_label.size = tank_mode_label.custom_minimum_size
+	tank_mode_label.scroll_active = false
+	lower_container.call_deferred("add_child",tank_mode_label)
+	tank_mode_label.text = ""
+	tank_mode_label.visible = true
+	
 	
 	hitmarker = RichTextLabel.new()
 	hitmarker.scroll_active = false
 	hitmarker.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hitmarker.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	hitmarker.size = Vector2(160,40)
-	hitmarker.custom_minimum_size = Vector2(160,40)
+	hitmarker.custom_minimum_size = Vector2(100,40)
+	hitmarker.size = hitmarker.custom_minimum_size
 	hitmarker.pivot_offset = hitmarker.size / 2.0
 	hitmarker.fit_content = true
 	hitmarker.text = "HIT"
@@ -41,9 +61,9 @@ func _ready() -> void:
 	hitmarker.add_theme_constant_override("outline_size", 5)
 	hitmarker.add_theme_color_override("outline_color", Color.BLACK)
 	hitmarker.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	call_deferred("add_child",hitmarker)
+	lower_container.call_deferred("add_child",hitmarker)
 	
-	hitmarker.visible = false
+	#hitmarker.visible = false
 	last_time_hit_shown = hit_marker_time
 	
 	
@@ -55,8 +75,9 @@ func _ready() -> void:
 	call_deferred("add_child",cursor)
 	
 	if aim_assist_type != Settings_Manager.Aim_Assist_Type.Box:
-		var centered_hitmarker_pos = Vector2(0,30) - hitmarker.pivot_offset
-		hitmarker.call_deferred("set_position",centered_hitmarker_pos)
+		var aux = lower_container.size.x / 2.0
+		var centered_hitmarker_pos = lower_container.pivot_offset - Vector2(aux,-15.0)
+		lower_container.call_deferred("set_position",centered_hitmarker_pos)
 		return
 	
 	var texture = load("res://Sprites/Test/lock_on.png")
@@ -119,8 +140,9 @@ func _ready() -> void:
 	var upper_aux = points[3] - Vector2(0,15) - Vector2(0.0, upper_height)
 	upper_container.call_deferred("set_position", upper_aux)
 	
-	var centered_hitmarker_pos = Vector2(0,-points[2].y * 1.2) - hitmarker.pivot_offset
-	hitmarker.call_deferred("set_position",centered_hitmarker_pos)
+	var lower_width = lower_container.size.x / 6.0
+	var centered_hitmarker_pos = points[0] - Vector2(lower_width, 0.0)
+	lower_container.call_deferred("set_position",centered_hitmarker_pos)
 	
 
 func draw_line_to_points(array: Array[NodeInGameData]) -> void:
@@ -369,3 +391,17 @@ func _process(delta: float) -> void:
 		last_time_hit_shown += delta
 		if last_time_hit_shown >= hit_marker_time:
 			hitmarker.visible = false
+
+func update_tank_mode(mode: Tank_Rigid.TankModes) -> void:
+	if aim_assist_type != Settings_Manager.Aim_Assist_Type.Box:
+		return
+	if not tank_mode_label:
+		return
+	var text: String = ""
+	match mode:
+		Tank_Rigid.TankModes.MechBooster:
+			text = "Skating"
+		Tank_Rigid.TankModes.SiegeDeployed:
+			text = "Deployed"
+	if tank_mode_label.text != text:
+		tank_mode_label.text = text

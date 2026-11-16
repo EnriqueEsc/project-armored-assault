@@ -177,6 +177,14 @@ func _set_originals() -> void:
 	original_heat = heat
 	original_status_effect = status_effect
 	original_range = range
+	
+	if not is_instance_valid(proy):
+		return
+	var mat = proy.material_override as StandardMaterial3D
+	if not is_instance_valid(mat):
+		return
+	original_color = mat.albedo_color
+	change_material_color(original_color)
 
 
 func modify_parameters(spd: float = 1.0, dmg: float = 1.0, rang: float = 1.0, sts: Vehicle_Rigid.StatusEffects = original_status_effect, exp: bool = orginal_is_explosive, blst_dmg: float = 1.0, blst_rd: float = 1.0, ht: float = 1.0, rec: float = 1.0) -> void:
@@ -197,6 +205,7 @@ func modify_parameters(spd: float = 1.0, dmg: float = 1.0, rang: float = 1.0, st
 	if not is_instance_valid(mat):
 		return
 	original_color = mat.albedo_color
+	change_material_color(original_color)
 
 func _additional_setup() -> void:
 	pass

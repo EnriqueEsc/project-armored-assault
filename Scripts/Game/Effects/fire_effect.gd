@@ -48,7 +48,7 @@ func light_scale(delta: float) -> void:
 func show_fire(size: Vector3 = Vector3.ONE) -> void:
 	show()
 	if fire_3d:
-		fire_3d.process_mode = Node.PROCESS_MODE_ALWAYS
+		fire_3d.process_mode = Node.PROCESS_MODE_PAUSABLE
 		fire_3d.show()
 		size.y = 0.0
 		size /= 2.0
