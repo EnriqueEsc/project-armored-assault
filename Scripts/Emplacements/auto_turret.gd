@@ -35,6 +35,8 @@ var thinking_tick: float = 0.1
 
 
 func _start() -> void:
+	max_vision_distance *= max_vision_distance
+	
 	turret.barrel_lower_limit = barrel_lower_limit
 	turret.barrel_upper_limit = barrel_upper_limit
 	turret.turret_turning_speed = 0.05
@@ -92,6 +94,8 @@ func _start() -> void:
 		mission.add_entity(self)
 
 func _start_turret() -> void:
+	max_vision_distance *= max_vision_distance
+	
 	turret.barrel_lower_limit = barrel_lower_limit
 	turret.barrel_upper_limit = barrel_upper_limit
 	turret.turret_turning_speed = 0.05

@@ -19,7 +19,8 @@ func _additional_setup() -> void:
 	original_fake_light_size = fake_light.mesh.size.x
 	life_timer = lifetime
 	
-	
+	range = sqrt(range)
+	original_range = range
 	
 	if is_instance_valid(self):
 		pass

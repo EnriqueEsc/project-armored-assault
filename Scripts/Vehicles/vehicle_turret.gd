@@ -67,6 +67,10 @@ var current_correction: float = 0.0
 var mean_bullet_speed: float = 1.0
 var mean_fire_rate: float = 1.0
 
+var last_aim_point: Vector3 = Vector3.ZERO
+
+var excluded: Array[RID] = []
+	
 func spawn() -> void:
 	
 	if static_model:
@@ -176,6 +180,7 @@ func _ready() -> void:
 	
 	calculate_mean_bullet_speed()
 	
+	
 	max_compensation = 1.0 - turret_turning_speed
 	
 	if turret_barrel.size() > 1:
@@ -188,6 +193,16 @@ func _ready() -> void:
 		bullets_per_burst = 0
 	
 	#muzzle_pos = global_position + muzzle_pos
+	for i in 30:
+		await get_tree().process_frame
+	
+	for i in ignore:
+		if not is_instance_valid(i):
+			continue
+		excluded.append(i)
+	if is_instance_valid(origin):
+		excluded.append(origin.get_rid())
+	
 	pass
 
 
@@ -238,8 +253,15 @@ func rotate_turret_to_point(point: Vector2) -> void:
 func rotate_turret_to_point_3d(point: Vector3,node_info: NodeInGameData = null, compensation: float = 0.0) -> void:
 	if node_info:
 		point = node_info.get_pre_position(calculate_travel_time_to_point(node_info.parent_node.global_position))
-	if global_position.is_equal_approx(point):
+	
+	if last_aim_point.is_equal_approx(point):
 		return
+	
+	#if global_position.is_equal_approx(point):
+	#	return
+	
+	
+	#last_aim_point = point
 	
 	var parent_up = get_parent_node_3d().global_transform.basis.y
 	var target_global_transform = global_transform.looking_at(point, parent_up)
@@ -298,14 +320,6 @@ func get_aim_point_3d(distance: float) -> Vector3:
 	query.collide_with_areas = false
 	#query.exclude = [self, get_parent_node_3d(), projectile]
 	
-	var excluded: Array[RID] = []
-	
-	for i in ignore:
-		if not is_instance_valid(i):
-			continue
-		excluded.append(i)
-	if is_instance_valid(origin):
-		excluded.append(origin.get_rid())
 	
 	query.exclude = excluded
 	
@@ -322,7 +336,6 @@ func get_aim_point_3d(distance: float) -> Vector3:
 		res = from + forward * distance
 		aim_point_normal = -global_basis.z
 		target.emit(null)
-	
 	
 	aim_point.emit(res)
 	return res

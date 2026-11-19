@@ -569,6 +569,10 @@ func handle_turret_and_shooting(aim_pos: Vector3, can_shoot: bool, can_see_playe
 	var data: NodeInGameData = null
 	if player_ref and "ingame_data" in player_ref:
 		data = player_ref.ingame_data
+		
+	if is_enemy_in_front():
+		return
+	
 	var correction: float = 0.0
 	aim_to.emit(aim_pos, data, correction)
 	if not can_shoot:
@@ -581,7 +585,7 @@ func handle_turret_and_shooting(aim_pos: Vector3, can_shoot: bool, can_see_playe
 
 		shoot_angle = turret_forward.angle_to(shoot_dir)
 		if abs(shoot_angle) < max_shoot_angle:
-			if can_see_player and not is_enemy_in_front(): 
+			if can_see_player: 
 				#tank_rigid.shoot()
 				t.shoot()
 				

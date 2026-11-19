@@ -94,6 +94,8 @@ var status_effect_max_tick: int = 5
 
 var collision_lenght: float = 0.0
 
+var consumable: Consumable = null
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	
@@ -332,6 +334,14 @@ func allign_with_floor(delta: float) -> void:
 	var target_basis = Basis(right,normal,forward)
 	var new_basis = current_transform.basis.slerp(target_basis, allign_speed * delta)
 	global_transform.basis = new_basis.orthonormalized()
+	
+	if is_on_floor():
+		var angle_to_floor = rad_to_deg(acos(clampf(normal.dot(Vector3.UP),-1.0,1.0)))
+		if angle_to_floor > 40.0:
+			var factor = clampf(angle_to_floor / 40.0, 0.0, 1.0) * 5
+			var aux = abs(velocity)
+			velocity += get_gravity() * delta * factor * aux
+			#print("INCLINACIÓN ",angle_to_floor)
 
 func _physics_process(delta: float) -> void:
 	
@@ -719,3 +729,8 @@ func exec_status_effect() -> void:
 				status_effect_max_tick = 999.0
 		_:
 			return
+
+func use_consumable() -> void:
+	if not consumable:
+		return
+	consumable.use_consumable()

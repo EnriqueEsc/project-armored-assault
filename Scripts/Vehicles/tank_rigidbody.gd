@@ -73,7 +73,9 @@ func _physics_process(delta: float) -> void:
 				collider.calculate_impact_chunk(impact_damage, self, global_position)
 				if Effects_Manager.INSTANCE:
 					Effects_Manager.INSTANCE.sparks_from_pool(global_position)
-			
+			elif (not collider is Deformable_Terrain):
+				if Effects_Manager.INSTANCE:
+					Effects_Manager.INSTANCE.sparks_from_pool(global_position)
 			elif (not collider is Deformable_Terrain) and collider.has_method("take_damage"):
 				var impact_damage = (5.0) * impact
 				collider.take_damage(impact_damage, self, global_position)

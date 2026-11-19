@@ -3,7 +3,7 @@ class_name Deformable_Terrain
 
 
 var mesh_instance: MeshInstance3D = null
-var collision_shape: CollisionShape3D = null
+var collision_shapes: CollisionShape3D = null
 var navigation: NavRegion = null
 
 @export var terrain_texture: Texture2D
@@ -104,6 +104,8 @@ func generate() -> void:
 	generate_vertex_map()
 	generate_collisions()
 	generate_navmesh()
+	print("COSO COSO", vertex_map.size(), " ",spatial_grid.size()," ",vertex_faces.size())
+	
 
 func generate_spatial_grid() -> void:
 	spatial_grid.clear()
@@ -317,12 +319,12 @@ func update_visuals() -> void:
 	update_collision_next_tick = true
 
 func apply_collision(shape: ConcavePolygonShape3D) -> void:
-	collision_shape.shape = shape
+	collision_shapes.shape = shape
 
 func async_update_collisions(modified_indexes: Array[int], faces: PackedVector3Array) -> void:
 	#var shape = mesh_instance.mesh.create_trimesh_shape()
 	var shape = ConcavePolygonShape3D.new()
-	#var faces: PackedVector3Array = collision_shape.shape.get_faces().duplicate()
+	#var faces: PackedVector3Array = collision_shapes.shape.get_faces().duplicate()
 	
 	#faces.resize(indexes.size())
 	var aux: int = 0
@@ -339,7 +341,7 @@ func async_update_collisions(modified_indexes: Array[int], faces: PackedVector3A
 
 func update_collisions() -> void:
 	var mod: Array[int] = modified_indexes.duplicate()
-	var faces: PackedVector3Array = collision_shape.shape.get_faces().duplicate()
+	var faces: PackedVector3Array = collision_shapes.shape.get_faces().duplicate()
 	modified_indexes.clear()
 	var id = WorkerThreadPool.add_task(async_update_collisions.bind(mod,faces))
 	thread_queue.append(id)
@@ -357,8 +359,8 @@ func update_collisions() -> void:
 	
 	#var shape = collision_mesh.create_trimesh_shape()
 	
-	#if collision_shape.shape != shape:
-	#	collision_shape.shape = shape
+	#if collision_shapes.shape != shape:
+	#	collision_shapes.shape = shape
 
 func generate_collisions() -> void:
 	
@@ -379,22 +381,22 @@ func generate_collisions() -> void:
 		
 	shape.set_faces(faces)
 	
-	collision_shape = CollisionShape3D.new()
+	collision_shapes = CollisionShape3D.new()
 	collision_layer = 3
-	collision_shape.shape = shape
+	collision_shapes.shape = shape
 	
-	call_deferred("add_child", collision_shape)
+	call_deferred("add_child", collision_shapes)
 	
 	return
 	
 	var data = mesh_instance.mesh.create_trimesh_shape()
 	
-	collision_shape = CollisionShape3D.new()
+	collision_shapes = CollisionShape3D.new()
 	collision_layer = 3
 	
-	collision_shape.shape = data
+	collision_shapes.shape = data
 	
-	call_deferred("add_child", collision_shape)
+	call_deferred("add_child", collision_shapes)
 
 
 

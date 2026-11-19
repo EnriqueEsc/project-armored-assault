@@ -18,6 +18,7 @@ var HUD_height_line: Array[Line2D] = []
 @onready var HUD_Score: RichTextLabel = $HUD/HUD_Player/HUD_Score
 @onready var HUD_Velocimeter: RichTextLabel = $HUD/HUD_Player/HUD_Velocimeter
 @onready var HUD_Objectives: RichTextLabel = $HUD/HUD_Player/HUD_Objectives
+@onready var HUD_Consumables: RichTextLabel = $HUD/HUD_Player/HUD_Consumables
 
 @onready var HUD_AP_Bar: ProgressBar = $HUD/HUD_Player/HUD_AP_Bar
 
@@ -331,6 +332,11 @@ func _ready() -> void:
 
 	tank_rigid.hits_enemy.connect(hits_enemy)
 	
+	var consumable = RepairKit.new(tank_rigid) as Consumable
+	if consumable:
+		tank_rigid.consumable = consumable
+		consumable.consumed.connect(update_consumables_label)
+		consumable.consumed.emit(consumable.remaining_uses)
 	
 	await get_tree().process_frame
 	HUD_dialog.add_to_buffer(Dialog_data.new("Main Systems","Activating combat mode.",color,"main_systems"))
@@ -363,6 +369,7 @@ func color_HUD() -> void:
 		HUD_AP.modulate = color
 		HUD_Velocimeter.modulate = color
 		HUD_Objectives.modulate = color
+		HUD_Consumables.modulate = color
 		HUD_AP_Bar.modulate = color
 		#HUD_Hitmarker.modulate = color
 		HUD_Boss_info.color_boss_info(color)
@@ -553,6 +560,10 @@ func _process(delta: float) -> void:
 	
 	if Input.is_action_just_pressed("Reload"):
 		get_tree().reload_current_scene()
+		return
+	
+	if Input.is_action_just_pressed("Use_Consumable"):
+		tank_rigid.use_consumable()
 		return
 	
 	var node = tank_camera.last_enemy_inside_box
@@ -897,6 +908,7 @@ func show_HUD(state: bool) -> void:
 	HUD_AP.visible = state
 	HUD_Velocimeter.visible = state
 	HUD_Objectives.visible = state
+	HUD_Consumables.visible = state
 	HUD_AP_Bar.visible = state
 	HUD_Boss_info.show_boss_info()
 	#HUD_height_line.visible = state
@@ -1063,3 +1075,11 @@ func update_tank_mode(mode: Tank_Rigid.TankModes) -> void:
 		Tank_Rigid.TankModes.SiegeDeployed:
 			text = "Deployed"
 	#print("MODE ",mode," ",text)
+
+func update_consumables_label(uses: int) -> void:
+	var text: String = ""
+	text = "x"+str(uses)+" Repair kits"
+	if HUD_Consumables.text == text:
+		return
+	HUD_Consumables.text = text
+	

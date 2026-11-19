@@ -132,6 +132,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/normal_font_size = 40
 text = "30 AP"
+scroll_active = false
 
 [node name="HUD_AP_Bar" type="ProgressBar" parent="HUD/HUD_Player" unique_id=1383129582]
 layout_mode = 1
@@ -156,6 +157,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/normal_font_size = 20
 text = "Score: 2000000"
+scroll_active = false
 horizontal_alignment = 1
 
 [node name="HUD_Velocimeter" type="RichTextLabel" parent="HUD/HUD_Player" unique_id=1921696932]
@@ -168,7 +170,23 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/normal_font_size = 20
 text = "Score: 2000000"
+scroll_active = false
 horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HUD_Consumables" type="RichTextLabel" parent="HUD/HUD_Player" unique_id=1656179823]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 478.0
+offset_right = 175.0
+offset_bottom = 515.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_font_sizes/normal_font_size = 20
+text = "x1 Repairs"
+scroll_active = false
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Map" type="TextureRect" parent="HUD/HUD_Player" unique_id=661682572]
 visible = false
@@ -209,6 +227,7 @@ text = "[font_size=15]Objectives:[/font_size]
 		> Destroy tanks [{ctk}/{mtk}]
 		> Destroy emplacements [{cek}/{mek}]
 		> Spread chaos [{cd}/{md}]"
+scroll_active = false
 
 [node name="HUD_Score" type="RichTextLabel" parent="HUD/HUD_Player/HUD_Objectives" unique_id=1365303483]
 layout_mode = 0
@@ -220,6 +239,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
 theme_override_font_sizes/normal_font_size = 20
 text = "Score: 2000000"
+scroll_active = false
 horizontal_alignment = 1
 
 [node name="Black_screen" type="Control" parent="HUD/HUD_Player" unique_id=255230971]
@@ -565,6 +585,7 @@ text = "[font_size=38]Controls[/font_size]
 [Mouse] - It shows the point that turret will rotate to aim to
 [Shift/Space] - Dash
 [R] - Use Attachment
-[C] - Special action (If aviable)"
+[C] - Special action (If aviable)
+[X] - Use Repair Kit (+100 AP)"
 scroll_active = false
 horizontal_alignment = 1
