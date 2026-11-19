@@ -16,6 +16,8 @@ var vertex_faces: Dictionary = {}
 var thread_result: Array[PackedVector3Array] = [PackedVector3Array()]
 var thread_id: int = -1
 
+var deformation_mode: Deformable_Terrain.DeformationMode = Deformable_Terrain.DeformationMode.All
+
 func generate_collisions() -> void:
 	
 	var shape = ConcavePolygonShape3D.new()
@@ -39,10 +41,16 @@ func generate_collisions() -> void:
 	
 
 func apply_collision(shape: ConcavePolygonShape3D) -> void:
+	if deformation_mode != Deformable_Terrain.DeformationMode.All:
+		return
+	
 	self.shape = shape
 	thread_id = -1
 
 func call_update_collision(vertices: PackedVector3Array) -> void:
+	if deformation_mode != Deformable_Terrain.DeformationMode.All:
+		return
+	
 	last_vertices = vertices.duplicate()
 	if thread_id != -1 or modified_indexes.is_empty():
 		return
@@ -74,6 +82,9 @@ static func async_update_collision(vertices: PackedVector3Array, modified_indexe
 
 
 func update_collision(vertices: PackedVector3Array) -> void:
+	if deformation_mode != Deformable_Terrain.DeformationMode.All:
+		return
+	
 	if modified_indexes.is_empty():
 		return
 	var faces: PackedVector3Array = self.shape.get_faces()
@@ -101,6 +112,9 @@ func modify_vertex(index: int) -> void:
 
 
 func _process(delta: float) -> void:
+	if deformation_mode != Deformable_Terrain.DeformationMode.All:
+		return
+	
 	if thread_id == -1:
 		return
 	

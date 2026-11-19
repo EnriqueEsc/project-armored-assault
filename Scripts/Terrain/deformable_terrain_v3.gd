@@ -10,6 +10,22 @@ var visual_chunks: Array[MeshInstance3D] = []
 
 @export var chunk_size: Vector2 = Vector2.ONE * 20
 
+enum TextureMode {Classic, MeshSurface, XZ, TextureSplatting}
+@export var texture_mode: TextureMode = TextureMode.MeshSurface
+
+
+
+@export var softness_map: Texture2D = null
+var softness_values: PackedFloat32Array = PackedFloat32Array()
+
+@export var scale_xz_uv: Vector2 = Vector2.ONE * 0.2
+
+@export_group("Texture Splatting")
+@export var textures: Array[Texture2D] = []
+@export var splat_map: Texture2D = null
+var mask_uv_min: Vector2 = Vector2.ZERO
+var mask_uv_size: Vector2 = Vector2.ONE
+
 func visual_process(delta: float) -> void:
 	
 	if not update_visual_next_tick:
@@ -43,14 +59,58 @@ func _ready() -> void:
 
 func generate() -> void:
 	get_visuals_from_existing_mesh()
-	generate_visuals()
+	
+	var chunk_data: Dictionary = split_mesh_to_chunks()
+	
+	chunk_data = generate_visuals_new(chunk_data)
 	generate_spatial_grid()
 	generate_vertex_map()
-	generate_collisions()
+	generate_collisions_new(chunk_data)
+	
 	
 	generate_navmesh()
-	print("COSO COSO", vertex_map.size(), " ",spatial_grid.size()," ",vertex_faces.size())
 	
+	generate_softness_values()
+	#print("COSO COSO", vertex_map.size(), " ",spatial_grid.size()," ",vertex_faces.size())
+
+func generate_softness_values() -> void:
+	for i in 15:
+		await get_tree().process_frame
+	var image: Image = null
+	if not softness_map:
+		image = Image.create_empty(1024,1024,false,Image.FORMAT_RGBA8)
+		image.fill(Color.BLACK)
+		softness_map = ImageTexture.create_from_image(image)
+		var ns = NoiseTexture2D.new()
+		ns.seamless = true
+		ns.noise = FastNoiseLite.new()
+		softness_map = ns
+	else:
+		image = softness_map.get_image()
+	
+	if not image:
+		#print("AAAH NO IMAGE")
+		clear_generation_data()
+		return
+		
+	softness_values.clear()
+	softness_values.resize(vertices.size())
+	
+	var width = image.get_width()
+	var height = image.get_height()
+	
+	for i in range(vertices.size()):
+		var uv = (uvs[i] - mask_uv_min) / mask_uv_size
+		var x = clampi(roundi(uv.x * (width-1)),0,width-1)
+		var y = clampi(roundi(uv.y * (height-1)),0,height-1)
+		
+		softness_values[i] = image.get_pixel(x,y).b
+	clear_generation_data()
+
+func clear_generation_data() -> void:
+	uvs.clear()
+	normals.clear()
+	indexes.clear()
 
 func generate_spatial_grid() -> void:
 	spatial_grid.clear()
@@ -94,6 +154,13 @@ func generate_navmesh() -> void:
 	call_deferred("request_nav_bake")
 	
 
+func generate_XZ_uvs() -> void:
+	uvs.resize(vertices.size())
+	
+	for i in range(vertices.size()):
+		var vertex = vertices[i]
+		
+		uvs[i] = Vector2(vertex.x * scale_xz_uv.x, vertex.z * scale_xz_uv.y)
 
 func get_visuals_from_existing_mesh() -> void:
 	for c in get_children():
@@ -113,18 +180,24 @@ func get_visuals_from_existing_mesh() -> void:
 	min_max_height.clear()
 	
 	var mesh_array = mesh_instance.mesh as ArrayMesh
-	
 	if not mesh_array:
 		mesh_instance = null
 		return
+	
 	
 	var aux = mesh_array.surface_get_arrays(0)
 	
 	vertices = aux[Mesh.ARRAY_VERTEX]
 	indexes = aux[Mesh.ARRAY_INDEX]
 	uvs = aux[Mesh.ARRAY_TEX_UV] 
-	normals = aux[Mesh.ARRAY_NORMAL]
 	
+	if texture_mode == TextureMode.XZ or texture_mode == TextureMode.TextureSplatting:
+		generate_XZ_uvs()
+	elif uvs.is_empty():
+		generate_XZ_uvs()
+	
+	calculate_mask_uv_bounds()
+	normals = aux[Mesh.ARRAY_NORMAL]
 	
 	var original_transform = mesh_instance.transform
 	
@@ -135,6 +208,10 @@ func get_visuals_from_existing_mesh() -> void:
 		
 		for i in range(normals.size()):
 			normals[i] = (original_transform.basis * normals[i]).normalized()
+	
+	
+	if texture_mode == TextureMode.MeshSurface:
+		terrain_texture = mesh_instance.get_active_material(0).albedo_texture
 	
 	mesh_instance.scale = Vector3.ONE
 	
@@ -150,24 +227,56 @@ func get_visuals_from_existing_mesh() -> void:
 		min_max_height.append(Vector2(v.y-max_deformation_in_runtime,0.0))
 	
 
+func set_splat_material(material: ShaderMaterial) -> void:
 	
+	material.set_shader_parameter("texture_1",textures[0])
+	material.set_shader_parameter("texture_2",textures[1])
+	material.set_shader_parameter("texture_3",textures[2])
+	material.set_shader_parameter("splat_map",splat_map)
+	
+	material.set_shader_parameter("mask_uv_min",mask_uv_min)
+	material.set_shader_parameter("mask_uv_size",mask_uv_size)
 
+func calculate_mask_uv_bounds() -> void:
+	if uvs.is_empty():
+		return
+	
+	var uv_min: Vector2 = Vector2(INF,INF)
+	var uv_max: Vector2 = Vector2(-INF,-INF)
+	
+	for uv in uvs:
+		uv_min.x = minf(uv_min.x, uv.x)
+		uv_min.y = minf(uv_min.y, uv.y)
+		
+		uv_max.x = maxf(uv_max.x, uv.x)
+		uv_max.y = maxf(uv_max.y, uv.y)
+	mask_uv_min = uv_min
+	mask_uv_size = uv_max - uv_min
+	
+	mask_uv_size.x = maxf(mask_uv_size.x, 0.001)
+	mask_uv_size.y = maxf(mask_uv_size.y, 0.001)
 
-func generate_visuals() -> void:
+func generate_visuals_new(chunk_data: Dictionary) -> Dictionary:
 	
 	if mesh_instance:
 		create_vertex_buffer()
 		var material = ShaderMaterial.new()
-		material.shader = load("res://Shaders/deformation_v2.gdshader")
+		if texture_mode == TextureMode.TextureSplatting:
+			material.shader = load("res://Shaders/deformation_v3.gdshader")
+			material.set_shader_parameter("use_deformation",deformation_mode != DeformationMode.None)
+			set_splat_material(material)
+		else:
+			material.shader = load("res://Shaders/deformation_v2.gdshader")
 		material.set_shader_parameter("buffer", texture_buffer)
 		material.set_shader_parameter("terrain_texture", terrain_texture)
 		material.set_shader_parameter("buffer_width",buffer_width)
 		
-		var chunk_data = split_mesh_to_chunks()
+		
+		#var chunk_data = split_mesh_to_chunks()
 		generate_visual_chunks(chunk_data,material)
 		mesh_instance.queue_free()
 		mesh_instance = null
-		return
+		return chunk_data
 	
 	vertices.clear()
 	indexes.clear()
@@ -185,7 +294,14 @@ func generate_visuals() -> void:
 			#min_max_height.append(Vector2(pos.y-max_deformation_in_runtime,pos.y+max_deformation_in_runtime))
 			min_max_height.append(Vector2(pos.y-max_deformation_in_runtime,0.0))
 			vertices.append(pos)
-			uvs.append(Vector2(x_ratio, z_ratio))
+			#uvs.append(Vector2(x_ratio, z_ratio))
+			#uvs.append(Vector2(x_ratio * size.x * scale_xz_uv.x,z_ratio * size.y * scale_xz_uv.y))
+			
+			if texture_mode == TextureMode.XZ or texture_mode == TextureMode.TextureSplatting:
+				uvs.append(Vector2(x_ratio * size.x * scale_xz_uv.x, z_ratio * size.y * scale_xz_uv.y))
+			else:
+				uvs.append(Vector2(x_ratio, z_ratio))
+			
 			normals.append(Vector3.UP)
 	
 	
@@ -214,15 +330,20 @@ func generate_visuals() -> void:
 	mesh_array[Mesh.ARRAY_TEX_UV] = uvs
 	mesh_array[Mesh.ARRAY_NORMAL] = normals
 	
-
 	var material
 	
 	
-	use_shader = deformation_mode != DeformationMode.None
+	use_shader = deformation_mode != DeformationMode.None or texture_mode == TextureMode.TextureSplatting
 	
 	if use_shader:
 		material = ShaderMaterial.new()
-		var shader = load("res://Shaders/deformation_v2.gdshader")
+		var shader: Shader = null
+		
+		if texture_mode == TextureMode.TextureSplatting:
+			calculate_mask_uv_bounds()
+			shader = load("res://Shaders/deformation_v3.gdshader")
+		else:
+			shader = load("res://Shaders/deformation_v2.gdshader")
 		material.shader = shader
 		#material.albedo_texture = terrain_texture
 		
@@ -232,11 +353,20 @@ func generate_visuals() -> void:
 		material.set_shader_parameter("buffer",texture_buffer)
 		material.set_shader_parameter("terrain_texture", terrain_texture)
 		material.set_shader_parameter("buffer_width",buffer_width)
+		
+		if texture_mode == TextureMode.TextureSplatting:
+			material.set_shader_parameter("use_deformation",deformation_mode != DeformationMode.None)
+			set_splat_material(material)
 	else:
 		material = StandardMaterial3D.new()
 		material.albedo_texture = terrain_texture
-	var chunk_data = split_mesh_to_chunks()
+	#var chunk_data = split_mesh_to_chunks()
+	
+	chunk_data = split_mesh_to_chunks()
+	
+	
 	generate_visual_chunks(chunk_data,material)
+	return chunk_data
 
 
 func update() -> void:
@@ -300,12 +430,14 @@ func generate_visual_chunks(chunk_data: Dictionary, material: Material) -> void:
 		var aabb: AABB = instance.mesh.get_aabb()
 		#var center_local: Vector3 = Vector3(aabb.get_center().x,0,aabb.get_center().z)
 		var center_local: Vector3 = aabb.get_center()
+		center_local.y = 0.0
 		var center_global: Vector3 = global_transform * center_local
 		
 		occluder.geometric_center = center_global
 		var factor = sqrt(chunk_size.length() / Vector2(5, 5).length())
 		occluder.max_render_distance = 1500 * factor
 		occluder.max_process_distance = occluder.max_render_distance * 2
+		occluder.occlusion_tick = 0.1
 		
 		#print("COSO ",occluder.geometric_center)
 
@@ -325,13 +457,13 @@ func update_collisions() -> void:
 	
 
 
-func generate_collisions() -> void:
+func generate_collisions_new(chunk_data: Dictionary) -> void:
 	chunks.clear()
 	vertex_chunks.clear()
 	
 	collision_layer = 3
 	
-	var chunk_data: Dictionary = split_mesh_to_chunks()
+	#var chunk_data: Dictionary = split_mesh_to_chunks()
 	
 	for coords in chunk_data:
 		var data: Dictionary = chunk_data[coords]
@@ -351,6 +483,7 @@ func generate_collisions() -> void:
 		
 		#chunk.collision_layer = 2
 		call_deferred("add_child",chunk)
+		chunk.deformation_mode = deformation_mode
 	
 		var occluder: TerrainChunkOccluder = TerrainChunkOccluder.new(chunk)
 		call_deferred("add_child",occluder)
@@ -457,7 +590,8 @@ func deform_terrain_by_index(index: int, damage: float = 1) -> void:
 	
 	
 	var factor = - 1.0
-	factor *= (float(damage) * randf_range(0.6,1.4))
+	#print("SOFT ",softness_values[index])
+	factor *= (float(damage) * randf_range(0.6,1.4)) * softness_values[index]
 	
 	new_height += factor
 	
