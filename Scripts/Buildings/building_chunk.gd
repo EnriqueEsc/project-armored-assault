@@ -346,8 +346,8 @@ func take_explosion(damage: int, source: Vehicle_Rigid, impact_point: Vector3, r
 		a.call_deferred("take_damage",damage, source, impact_point)
 
 func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3, status_effect: Vehicle_Rigid.StatusEffects = Vehicle_Rigid.StatusEffects.None) -> void:
-	armor_points -= damage
-	armor_points = clamp(armor_points,0,max_armor_points)
+	#armor_points -= damage
+	#armor_points = clamp(armor_points,0,max_armor_points)
 	
 	calculate_closest_block(damage,source, impact_point)
 	return

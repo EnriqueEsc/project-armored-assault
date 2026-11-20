@@ -104,7 +104,10 @@ func generate_softness_values() -> void:
 		var x = clampi(roundi(uv.x * (width-1)),0,width-1)
 		var y = clampi(roundi(uv.y * (height-1)),0,height-1)
 		
-		softness_values[i] = image.get_pixel(x,y).b
+		var value = image.get_pixel(x,y).b
+		if value < 0.25:
+			value = 0.0
+		softness_values[i] = value
 	clear_generation_data()
 
 func clear_generation_data() -> void:
@@ -583,7 +586,10 @@ func deform_terrain_by_index(index: int, damage: float = 1) -> void:
 		return
 	if index < 0 or index >= vertices.size():
 		return
-		
+	
+	if softness_values[index] < 0.25:
+		return
+	
 	var target = vertices[index]
 	
 	var new_height: float = vertices[index].y

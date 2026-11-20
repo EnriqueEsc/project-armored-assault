@@ -77,6 +77,11 @@ var occlusion_node: DistanceOccluder = DistanceOccluder.new(self)
 
 var color = Color(randf_range(170,240)/255.0, randf_range(170,240)/255.0, randf_range(170,240)/255.0)
 
+var building_base: Building_Base = null
+
+
+var building_radius: float = 0.0
+	
 func _ready() -> void:
 	
 	if occlusion_node:
@@ -220,6 +225,7 @@ func _ready() -> void:
 	material = Settings_Manager.INSTANCE.Building_Shader_Material
 	
 	init_grid()
+	create_building_base()
 
 
 func init_grid() -> void:
@@ -286,11 +292,11 @@ func init_grid() -> void:
 	var roof_corner_counter = 0
 	var roof_side_counter = 0
 	
-	
 	for c in levels:
 		c.damage_zone = damage_zone
 		c.building_half_extents = damage_zone.shape.size / 2.0
 		c.building_max_radius = c.building_half_extents.length()
+		building_radius = c.building_max_radius
 		for b in c.blocks:
 			var pos = Vector3(b.position.x,b.global_position.y - global_position.y,b.position.z)
 
@@ -362,6 +368,30 @@ func init_grid() -> void:
 		#print("adio")
 		pass
 
+func create_building_base() -> void:
+	var shape = BoxShape3D.new()
+	var size = Vector3(col_size_x,5,col_size_z)
+	shape.size = size
+	var collider = Building_Base.new()
+	var col = Building_Block_V2.new()
+	#collider.blocks.clear()
+	col.shape = shape
+	call_deferred("add_child",collider)
+	collider.call_deferred("set_global_position",Vector3(global_position.x,-2.5,global_position.z))
+	collider.call_deferred("add_child",col)
+	collider.collision = col
+	
+	shape = BoxMesh.new()
+	shape.size = size
+	var mesh = MeshInstance3D.new()
+	mesh.mesh = shape
+	collider.mesh = mesh
+	
+	collider.call_deferred("add_child",mesh)
+	collider.got_destroyed.connect(destroy_basement)
+	building_base = collider
+	#mesh.call_deferred("set_global_position",Vector3(global_position.x,-2.5,global_position.z))
+	
 
 func apply_shader_to_prefab(target_mesh: Mesh) -> void:
 	if not target_mesh:
@@ -461,6 +491,9 @@ func crush_below() -> void:
 				ignore_player_shake = collider == player_ref
 				collider.gets_crushed.emit()
 				collider.shakes.emit(1.0,1.0)
+			if collider is Deformable_Terrain_V3:
+				collider.take_explosion(1,null,global_position,building_radius)
+				
 
 func shake_player() -> void:
 	if not player_ref:
@@ -545,6 +578,9 @@ func destroy_chunk(chunk: Building_Chunk) -> void:
 func destroy_basement() -> void:
 	for l in levels:
 		l.deactivate_collisions()
+	if building_base:
+		building_base.deactivate_collisions()
+		building_base.deactivate_visuals()
 	destroyed = true
 	shake_player()
 	set_physics_process(true)
