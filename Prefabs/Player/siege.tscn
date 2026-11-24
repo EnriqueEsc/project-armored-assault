@@ -576,7 +576,7 @@ fire_rate_prim = 0.1
 cooling_factor = 20.0
 
 [node name="Gattling" type="MeshInstance3D" parent="Turret/Gun2" unique_id=905063896]
-transform = Transform3D(-1.9999996, -1.7484551e-07, 6.8189746e-07, 1.7484554e-07, -1.9999998, -9.935554e-15, 5.2453663e-07, 3.82137e-14, 2.5999997, 0, 0.31149194, 0.178)
+transform = Transform3D(-1.9999996, -3.0199158e-07, 6.818977e-07, 3.0199155e-07, -1.9999998, -9.935566e-15, 5.2453663e-07, 7.1560095e-14, 2.5999997, 0, 0.31149194, 0.178)
 mesh = SubResource("ArrayMesh_janqa")
 
 [node name="GattlingBullets" type="MeshInstance3D" parent="Turret/Gun2/Gattling" unique_id=1886573953]

@@ -8,12 +8,15 @@ var vertex_chunks: Dictionary = {}
 var chunks: Array[DeformableChunk] = []
 var visual_chunks: Array[MeshInstance3D] = []
 
+var folliage_chunks: Array[Tree_Zone_V2] = []
+
 @export var chunk_size: Vector2 = Vector2.ONE * 20
 
 enum TextureMode {Classic, MeshSurface, XZ, TextureSplatting}
 @export var texture_mode: TextureMode = TextureMode.MeshSurface
 
 
+@export var folliage_map: Texture2D = null
 
 @export var softness_map: Texture2D = null
 var softness_values: PackedFloat32Array = PackedFloat32Array()
@@ -67,6 +70,7 @@ func generate() -> void:
 	generate_vertex_map()
 	generate_collisions_new(chunk_data)
 	
+	generate_folliage(chunk_data)
 	
 	generate_navmesh()
 	
@@ -446,17 +450,21 @@ func generate_visual_chunks(chunk_data: Dictionary, material: Material) -> void:
 
 func update_collisions() -> void:
 	var affected_chunks: Dictionary = {}
+	var modified_indexes_local = modified_indexes.duplicate()
+	modified_indexes.clear()
 	
-	for i in modified_indexes:
+	for i in modified_indexes_local:
 		if not vertex_chunks.has(i):
 			continue
 		for chunk in vertex_chunks[i]:
 			chunk.modify_vertex(i)
 			affected_chunks[chunk] = true
-	modified_indexes.clear()
 	
 	for c in affected_chunks:
 		c.call_update_collision(vertices)
+	
+	for f in folliage_chunks:
+		f.modify_points(modified_indexes_local)
 	
 
 
@@ -540,6 +548,54 @@ func generate_collisions_new(chunk_data: Dictionary) -> void:
 	
 	
 
+func generate_folliage(chunk_data: Dictionary) -> void:
+	folliage_chunks.clear()
+	
+	#var chunk_data: Dictionary = split_mesh_to_chunks()
+	
+	var model = load("res://Meshes/Grass.tres")
+	model = model as ArrayMesh
+	for coords in chunk_data:
+		var data: Dictionary = chunk_data[coords]
+		var chunk = Tree_Zone_V2.new()
+		chunk.name = "Folliage_%d_%d" % [coords.x, coords.y]
+		var faces = (data["faces"])
+		chunk.tree_points = data["vertices"]
+		chunk.tree_mesh = model
+		chunk.tree_indexes = data["global_indexes"]
+		folliage_chunks.append(chunk)
+		
+		#for global_index in chunk.vertex_faces:
+		#	if not vertex_chunks.has(global_index):
+		#		vertex_chunks[global_index] = []
+		#	vertex_chunks[global_index].append(chunk)
+		
+		#chunk.collision_layer = 2
+		call_deferred("add_child",chunk)
+		#chunk.call_deferred("set_global_position",center_global)
+	
+		var occluder: TerrainChunkOccluder = TerrainChunkOccluder.new(chunk)
+		#return
+		call_deferred("add_child",occluder)
+		
+		var aabb: AABB = AABB()
+		
+		if not faces.is_empty():
+			aabb = AABB(faces[0],Vector3.ZERO)
+			
+			for vertex in faces:
+				aabb = aabb.expand(vertex)
+		
+		var center_local: Vector3 = aabb.get_center()
+		#center_local.y = 0.0
+		var center_global: Vector3 = global_transform * center_local
+		
+		occluder.geometric_center = center_global
+		var factor = sqrt(chunk_size.length() / Vector2(5, 5).length())
+		occluder.max_render_distance = 1500 * factor
+		occluder.max_process_distance = occluder.max_render_distance
+		chunk.occlusion_node = occluder
+		chunk.geometrical_position = center_global
 
 func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3, status_effect: Vehicle_Rigid.StatusEffects = Vehicle_Rigid.StatusEffects.None) -> void:
 	
@@ -554,6 +610,8 @@ func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3, stat
 
 
 func take_explosion(damage: int,source: Vehicle_Rigid,impact_point: Vector3,radius: float) -> void:
+	
+	take_fire(damage,impact_point,radius)
 	
 	if deformation_mode == DeformationMode.None:
 		return
@@ -623,7 +681,6 @@ func deform_terrain_by_index(index: int, damage: float = 1) -> void:
 				var x = i % buffer_width
 				var y = int(i / buffer_width)
 				image_buffer.set_pixel(x, y, Color(vertices[i].x, vertices[i].y, vertices[i].z, 1.0))
-	
 	
 	if not update_visual_next_tick:
 		update_visual_next_tick = true
@@ -766,3 +823,33 @@ func _on_nav_bake_finished() -> void:
 	if nav_bake_in_queue:
 		nav_bake_in_queue = false
 		call_deferred("request_nav_bake")
+
+
+
+func take_fire(damage: int, impact_point: Vector3, radius: float = 1.0) -> void:
+	if folliage_chunks.is_empty():
+		return
+	var closest_zone: Tree_Zone_V2 = null
+	var closest_tree: Tree_data = null
+	var min_distance: float = (radius * radius)
+	min_distance += (min_distance * 0.2)
+	
+	#min_distance = INF
+	
+	for zone in folliage_chunks:
+		#if zone.geometrical_position.distance_squared_to(impact_point) > 2000:
+		if not zone.occlusion_node.is_on_render_range(impact_point):
+			continue
+		for tree in zone.tree_list:
+			if tree.is_destroyed:
+				continue
+			
+			var distance: float = tree.position.distance_squared_to(impact_point)
+			
+			if distance < min_distance:
+				min_distance = distance
+				closest_tree = tree
+				closest_zone = zone
+				
+	if closest_tree and closest_zone:
+		closest_tree.take_damage(damage,true)

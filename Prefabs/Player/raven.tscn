@@ -6,11 +6,6 @@
 [ext_resource type="PackedScene" uid="uid://caqoxtxta5muo" path="res://Models/Test/Tank_Test/turret_V3.fbx" id="4_ingu5"]
 [ext_resource type="Script" uid="uid://bjh2nh20l8im4" path="res://Scripts/Vehicles/turret_weapon.gd" id="5_rg08m"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bwv6e"]
-stencil_flags = 2
-stencil_reference = 2
-stencil_color = Color(1, 0, 0, 1)
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dw7m3"]
 resource_name = "Material.002"
 vertex_color_use_as_albedo = true
@@ -259,7 +254,6 @@ boost_cooldown = 0.5
 vehicle_turrets = [NodePath("Minor/Torso/Turret"), NodePath("Minor/Torso/Turret2")]
 max_armor_points = 80
 model = [NodePath("Minor/Minor"), NodePath("Minor/Torso/Cube_010"), NodePath("Minor/Torso/Cube_010/Cube_011"), NodePath("Minor/Torso/Cube_010/Cube_018"), NodePath("Minor/Torso/Turret/Gun/Gun"), NodePath("Minor/Torso/Turret/Cube_017"), NodePath("Minor/Torso/Turret2/Gun2/Gun"), NodePath("Minor/Torso/Turret2/Gun3/Gun"), NodePath("Minor/Torso/Turret2/Cube_016")]
-material = SubResource("StandardMaterial3D_bwv6e")
 
 [node name="tanque_V3" parent="." unique_id=1683942184 instance=ExtResource("2_xc76b")]
 transform = Transform3D(1.002, 0, 0, 0, 1.3, 0, 0, 0, 1.002, 0, -0.28692198, 0)
@@ -304,6 +298,7 @@ script = ExtResource("5_rg08m")
 projectile_type = 6
 muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.2
+visual_recoil_limit = 0.5
 
 [node name="Gun" type="MeshInstance3D" parent="Minor/Torso/Turret/Gun" unique_id=1346115680]
 mesh = SubResource("ArrayMesh_bdpwl")

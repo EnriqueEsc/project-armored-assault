@@ -274,6 +274,8 @@ transform = Transform3D(1, 0, -1.7484558e-07, 0, 1, 0, 1.7484558e-07, 0, 1, 0, 0
 script = ExtResource("8_6k30k")
 projectile_type = 0
 muzzle_pos = Vector3(0, 0, 0.8)
+visual_recoil_limit = 0.02
+visual_recoil_factor = 0.02
 
 [node name="Barrel" type="MeshInstance3D" parent="Turret/Gun" unique_id=2074808330]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 8.0209446e-08, 0, 0.36699557)

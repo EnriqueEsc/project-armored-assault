@@ -7,7 +7,7 @@ var id: int = 0
 var position: Vector3 = Vector3.ZERO
 var matrix_index: Vector2i = Vector2i.ZERO
 var is_burning: bool = false
-
+var is_destroyed: bool = false
 signal got_destroyed(id: int)
 signal got_burnt(damage:int, matrix_index: Vector2i)
 
@@ -23,10 +23,11 @@ func distance_squared_to(pos: Vector3) -> float:
 	return position.distance_squared_to(pos)
 
 func take_damage(damage: int, is_burning: bool) -> void:
+	if is_destroyed:
+		return
 	hp -= damage
 	
 	#damage *= (hp/max_hp)
-	
 	damage /= 2
 	
 	if hp > 0:

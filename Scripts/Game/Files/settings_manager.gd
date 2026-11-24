@@ -41,11 +41,14 @@ var use_vibration: bool = false
 enum Aim_Assist_Type {None, ToCenter, Box}
 var aim_assist_type: Aim_Assist_Type = Aim_Assist_Type.None
 
+var vsync_enabled: bool = true
+
 var current_save: String = "user://test.json"
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	singleton()
+	vsync_enabled = DisplayServer.window_get_vsync_mode(0) == DisplayServer.VSYNC_ENABLED
 	Settings_Manager.INSTANCE.load_settings()
 	
 	initialize_materials()
@@ -132,6 +135,7 @@ func save_settings() -> void:
 	settings_file.set_value("Game","aim_assist_type",aim_assist_type)
 	settings_file.set_value("Game","destruction_effects_mode",destruction_effects_mode)
 	settings_file.set_value("Controls","use_vibration",use_vibration)
+	settings_file.set_value("Video","vsync_enabled",vsync_enabled)
 	settings_file.save(SETTINGS_PATH)
 	print("SETTINGS GUARDADOS")
 	print(settings_file,settings_file.get_value("Video","fullscreen",fullscreen))
@@ -164,6 +168,9 @@ func load_settings() -> void:
 		controller_aim = settings_file.get_value("Controls","controller_aim",controller_aim)
 		move_type = settings_file.get_value("Controls","move_type",move_type)
 		use_vibration = settings_file.get_value("Controls","use_vibration",use_vibration)
+		
+		vsync_enabled = settings_file.get_value("Video","vsync_enabled",vsync_enabled)
+		
 		apply_settings()
 	else:
 		print("no existe")
@@ -175,3 +182,8 @@ func apply_settings() -> void:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	
+	if vsync_enabled:
+		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED)
+	else:
+		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)

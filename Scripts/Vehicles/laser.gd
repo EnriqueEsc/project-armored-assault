@@ -10,13 +10,15 @@ var end_point: Vector3 = Vector3.ZERO
 var middle_point: Vector3 = Vector3.ZERO
 
 var original_proy_size: float = 0.0
-var original_fake_light_size: float = 0.0
+var original_fake_light_size: float = 0.8
 
 var aux_ignore: Array[RID] = []
 
 func _additional_setup() -> void:
 	original_proy_size = proy.scale.z
-	original_fake_light_size = fake_light.mesh.size.x
+	
+	# vvv Esto se arregla poniendo el fake light como recurso local a su escena
+	#original_fake_light_size = fake_light.mesh.size.y
 	life_timer = lifetime
 	
 	range = sqrt(range)
@@ -178,7 +180,7 @@ func stretch() -> void:
 	caster.shape.size.z = dist
 	#collision.shape.size.z = dist
 	proy.scale.z = original_proy_size * dist
-	fake_light.mesh.size.x = original_fake_light_size * dist
+	fake_light.mesh.size.y = original_fake_light_size * dist
 
 func _on_body_entered(body):
 	#print(body.collider.get_parent.name)

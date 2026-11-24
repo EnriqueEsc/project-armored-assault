@@ -41,3 +41,6 @@ func occlude() -> void:
 		if parent_node.process_mode != ProcessMode.PROCESS_MODE_INHERIT:
 			parent_node.process_mode = Node.PROCESS_MODE_INHERIT
 		return
+
+func is_on_render_range(pos: Vector3) -> bool:
+	return geometric_center.distance_squared_to(pos) < max_render_distance

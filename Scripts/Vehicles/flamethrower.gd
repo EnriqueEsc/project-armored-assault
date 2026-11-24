@@ -65,7 +65,9 @@ func _on_body_entered(body):
 		hits_enemy.emit()
 	
 	
-	if body.has_method("take_damage"):
+	if body.has_method("take_fire"):
+		body.take_fire(damage * power_multiplier * 10, global_position, blast_rad * 4)
+	elif body.has_method("take_damage"):
 		direction = Vector3.ZERO
 		#origin.projectile_to_pool(self)
 		body.take_damage(damage * power_multiplier, origin, global_position, status_effect)

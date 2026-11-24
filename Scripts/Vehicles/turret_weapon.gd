@@ -80,6 +80,16 @@ var meshes: Array[MeshInstance3D] = []
 var override: StandardMaterial3D = null
 var stencil_color: Color = Color.WHITE
 
+var meshes_original_pos: PackedVector3Array = PackedVector3Array()
+var meshes_max_pos: PackedVector3Array = PackedVector3Array()
+
+
+enum RecoilTypes {None, Backwards, Rotation}
+@export var recoil_type: RecoilTypes = RecoilTypes.Backwards
+@export var recover_recoil_time: float = 1.0
+@export var visual_recoil_limit: float = 0.05
+@export var visual_recoil_factor: float = 0.05
+
 var use_emmisions: bool = false
 signal overheat_signal
 
@@ -164,16 +174,27 @@ func _ready() -> void:
 	
 	use_emmisions = Settings_Manager.INSTANCE.enable_emmisions
 	
+	if recoil_type != RecoilTypes.None:
+		recoil.connect(instant_recoil)
+	
 	if not use_emmisions:
 		meshes.clear()
+		meshes_original_pos.clear()
+		meshes_max_pos.clear()
 		return
 	
 	for i in 30:
 		await get_tree().process_frame
 	
+	var proj = projectile_prefab.instantiate() as Projectile
 	for c in get_children():
 		if c is MeshInstance3D:
 			meshes.append(c)
+			meshes_original_pos.append(c.position)
+			var aux =  visual_recoil_limit
+			if is_instance_valid(proj):
+				aux *= proj.recoil_force
+			meshes_max_pos.append(c.basis.z * aux)
 			if not override:
 				if not c.get_active_material(0):
 					continue
@@ -333,8 +354,6 @@ func shoot(shake_mult: float = 1.0) -> void:
 	
 	var forward = global_basis * Vector3.FORWARD * 10
 	
-	
-	
 	var case: Case
 	if case_pool.size() <= 0:
 		case = case_active.pop_front()
@@ -380,7 +399,31 @@ func case_to_pool(current_case: Case) -> void:
 func _process(delta: float) -> void:
 	cooling(delta)
 	calculate_charge(delta)
+	recoil_process(delta)
 	#print("HEAT ",current_heat," ",overheat)
+
+func instant_recoil(dir: Vector3, force: float) -> void:
+	var aux = visual_recoil_factor * force
+	for i in range(meshes.size()):
+		if recoil_type == RecoilTypes.Backwards:
+			if meshes[i].position.is_equal_approx(abs(meshes_max_pos[i])):
+				continue
+			var pos = meshes[i].position - (meshes[i].basis.z * aux)
+			meshes[i].position = clamp(meshes[i].position,meshes_max_pos[i],-meshes_max_pos[i])
+		if recoil_type == RecoilTypes.Rotation:
+			var pos = meshes[i].rotation_degrees.z + 10.0
+			meshes[i].rotation_degrees.z = pos
+
+func recoil_process(delta: float) -> void:
+	if recoil_type != RecoilTypes.Backwards:
+		return
+	for i in range(meshes.size()):
+		var pos = meshes[i].position
+		var target = meshes_original_pos[i]
+		if pos.is_equal_approx(target):
+			continue
+		var aux = lerp(pos,target, recover_recoil_time * delta)
+		meshes[i].position = aux
 
 func cooling(delta: float) -> void:
 	if current_heat <= 0:

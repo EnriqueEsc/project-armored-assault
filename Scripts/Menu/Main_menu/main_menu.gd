@@ -56,6 +56,8 @@ extends Menu
 @onready var move_type_text: RichTextLabel = $Settings_Menu/Buttons/Move_type_text
 @onready var move_type_option: OptionButton = $Settings_Menu/Buttons/Move_type_option
 
+@onready var enable_vsync_button: CheckButton = $Settings_Menu/Buttons/Enable_Vsync
+
 @onready var save_settings_button: Button = $Settings_Menu/Buttons/Save
 @onready var settings_back: Button = $Settings_Menu/Buttons/Back
 
@@ -95,6 +97,8 @@ func _set_buttons() -> void:
 	start_mission_button.button_down.connect(load_scene)
 	
 	update_settings_window()
+	
+	
 	
 	#fullscreen_button.button_down.connect(set_fullscreen)
 	max_effects_bar.value_changed.connect(update_max_effects_text)
@@ -176,6 +180,8 @@ func update_settings_window() -> void:
 	use_controller.button_pressed = Settings_Manager.INSTANCE.controller_aim
 	move_type_option.selected = Settings_Manager.INSTANCE.move_type
 	use_controller_vibration.button_pressed = Settings_Manager.INSTANCE.use_vibration 
+	
+	enable_vsync_button.button_pressed = Settings_Manager.INSTANCE.vsync_enabled
 
 func check_mission_can_start() -> void:
 	start_mission_button.visible = selected_mission != null and selected_tank
@@ -365,5 +371,7 @@ func save_settings() -> void:
 	Settings_Manager.INSTANCE.controller_aim = use_controller.button_pressed
 	Settings_Manager.INSTANCE.move_type = move_type_option.selected
 	Settings_Manager.INSTANCE.use_vibration = use_controller_vibration.button_pressed
+	
+	Settings_Manager.INSTANCE.vsync_enabled = enable_vsync_button.button_pressed
 	
 	Settings_Manager.INSTANCE.save_settings()

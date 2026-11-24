@@ -276,6 +276,8 @@ projectile_type = 4
 muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.2
 cooling_factor = 5.0
+recover_recoil_time = 2.0
+visual_recoil_limit = 0.5
 
 [node name="Gun" type="MeshInstance3D" parent="Turret/Gun" unique_id=1346115680]
 transform = Transform3D(0.3, 0, 0, 0, 0.39999998, 0, 0, 0, 1.0000001, 0, 0, 0)
@@ -288,6 +290,8 @@ projectile_type = 4
 muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.2
 cooling_factor = 5.0
+recover_recoil_time = 2.0
+visual_recoil_limit = 0.5
 
 [node name="Gun" type="MeshInstance3D" parent="Turret/Gun2" unique_id=1460588150]
 transform = Transform3D(0.3, 0, 0, 0, 0.39999998, 0, 0, 0, 1.0000001, 0, 0, 0)
@@ -300,6 +304,8 @@ projectile_type = 4
 muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.2
 cooling_factor = 5.0
+recover_recoil_time = 2.0
+visual_recoil_limit = 0.5
 
 [node name="Gun" type="MeshInstance3D" parent="Turret/Gun3" unique_id=1076089126]
 transform = Transform3D(0.3, 0, 0, 0, 0.39999998, 0, 0, 0, 1.0000001, 0, 0, 0)
@@ -312,6 +318,8 @@ projectile_type = 4
 muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.2
 cooling_factor = 5.0
+recover_recoil_time = 2.0
+visual_recoil_limit = 0.5
 
 [node name="Gun" type="MeshInstance3D" parent="Turret/Gun4" unique_id=2105652170]
 transform = Transform3D(0.3, 0, 0, 0, 0.39999998, 0, 0, 0, 1.0000001, 0, 0, 0)
