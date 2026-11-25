@@ -63,6 +63,9 @@ func _exit_tree() -> void:
 func _process(delta: float) -> void:
 	clear_thread_queue()
 	
+	if destroyed:
+		return
+		
 	if not destroy_blocks:
 		return
 		
@@ -219,6 +222,8 @@ func calculate_closest_block(damage:int, source: Vehicle_Rigid, impact_point: Ve
 	
 
 func calculate_impact_chunk(damage: int, source: Vehicle_Rigid, impact_point: Vector3) -> void:
+	if destroyed:
+		return
 	if not source:
 		return
 	
@@ -267,6 +272,9 @@ func calculate_impact_chunk(damage: int, source: Vehicle_Rigid, impact_point: Ve
 
 func block_destroyed(block: Building_Block_V2, type: Building_Block_V2.Block_Types) -> void:
 	#print("Antes -> ",blocks.size())
+	if destroyed:
+		return
+		
 	blocks.erase(block)
 	if key_blocks.has(block):
 		key_blocks.erase(block)
@@ -291,6 +299,9 @@ func block_destroyed(block: Building_Block_V2, type: Building_Block_V2.Block_Typ
 		deactivate()
 
 func async_take_explosion(glob_pos: Vector3, blocks: Array[Building_Block_V2], damage: int, source: Vehicle_Rigid, impact_point: Vector3, radius: float,block_global_pos: Dictionary) -> void:
+	if destroyed:
+		return
+	
 	if impact_point.distance_to(glob_pos) + building_max_radius <= radius:
 		for b in blocks:
 			b.destroy_now.call_deferred()
@@ -348,7 +359,8 @@ func take_explosion(damage: int, source: Vehicle_Rigid, impact_point: Vector3, r
 func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3, status_effect: Vehicle_Rigid.StatusEffects = Vehicle_Rigid.StatusEffects.None) -> void:
 	#armor_points -= damage
 	#armor_points = clamp(armor_points,0,max_armor_points)
-	
+	if destroyed:
+		return
 	calculate_closest_block(damage,source, impact_point)
 	return
 	
@@ -371,7 +383,11 @@ func activate() -> void:
 	
 
 func deactivate() -> void:
+	if destroyed:
+		return
+	destroyed = true
 	got_destroyed.emit()
+	#print("DESTRUIO")
 	#print("siuuuuuuu V2")
 	#damage_zone	.queue_free()
 	queue_free()

@@ -44,7 +44,7 @@ size = Vector3(0.2, 0.2, 0.5)
 script = ExtResource("1_k3eec")
 damage = 1
 blast_rad = 20.0
-blast_damage = 100.0
+blast_damage = 1.0
 blast_det_max_entities = 32000
 
 [node name="Proy" type="MeshInstance3D" parent="." unique_id=197739711]

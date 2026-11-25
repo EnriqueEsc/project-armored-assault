@@ -17,6 +17,8 @@ enum TextureMode {Classic, MeshSurface, XZ, TextureSplatting}
 
 
 @export var folliage_map: Texture2D = null
+var folliage_image: Image = null
+@export_range(0.0,1.0) var folliage_density: float = 1.0
 
 @export var softness_map: Texture2D = null
 var softness_values: PackedFloat32Array = PackedFloat32Array()
@@ -69,6 +71,9 @@ func generate() -> void:
 	generate_spatial_grid()
 	generate_vertex_map()
 	generate_collisions_new(chunk_data)
+	
+	
+	generate_folliage_mask()
 	
 	generate_folliage(chunk_data)
 	
@@ -464,6 +469,8 @@ func update_collisions() -> void:
 		c.call_update_collision(vertices)
 	
 	for f in folliage_chunks:
+		if not is_instance_valid(f):
+			continue
 		f.modify_points(modified_indexes_local)
 	
 
@@ -548,7 +555,38 @@ func generate_collisions_new(chunk_data: Dictionary) -> void:
 	
 	
 
+
+func generate_folliage_mask() -> void:
+	for i in 15:
+		await get_tree().process_frame
+	
+	if not folliage_map:
+		folliage_image = null
+		return
+	
+	folliage_image = folliage_map.get_image()
+	
+	if not folliage_image:
+		return
+
+func get_folliage_values(uv: Vector2) -> float:
+	if not folliage_image:
+		return 0.0
+	
+	var mask_uv: Vector2 = (uv - mask_uv_min) / mask_uv_size
+	
+	var x: int = clampi(roundi(mask_uv.x * (folliage_image.get_width() - 1)),0,folliage_image.get_width() - 1)
+	var y: int = clampi(roundi(mask_uv.y * (folliage_image.get_height() - 1)),0,folliage_image.get_height() - 1)
+	var res = 1.0 - folliage_image.get_pixel(x,y).get_luminance()
+	if res < 0.5:
+		res = 0.0
+	elif res >= 0.5:
+		res = 1.0
+	return res
+
 func generate_folliage(chunk_data: Dictionary) -> void:
+	for i in 15:
+		await get_tree().process_frame
 	folliage_chunks.clear()
 	
 	#var chunk_data: Dictionary = split_mesh_to_chunks()
@@ -560,9 +598,30 @@ func generate_folliage(chunk_data: Dictionary) -> void:
 		var chunk = Tree_Zone_V2.new()
 		chunk.name = "Folliage_%d_%d" % [coords.x, coords.y]
 		var faces = (data["faces"])
-		chunk.tree_points = data["vertices"]
+		#chunk.tree_points = data["vertices"]
 		chunk.tree_mesh = model
-		chunk.tree_indexes = data["global_indexes"]
+		#chunk.tree_indexes = data["global_indexes"]
+		
+		
+		var points: PackedVector3Array = data["vertices"]
+		var indexes: Array = data["global_indexes"]
+		var chunk_uvs: PackedVector2Array = data["uvs"]
+		
+		var aux_points: PackedVector3Array = PackedVector3Array()
+		var aux_indexes: Array = []
+		
+		for i in range(points.size()):
+			var value: float = get_folliage_values(chunk_uvs[i])
+			
+			if value >= 0.5:
+				aux_points.append(points[i])
+				aux_indexes.append(indexes[i])
+		
+		
+		chunk.tree_points = aux_points
+		chunk.tree_indexes = aux_indexes
+		chunk.density = folliage_density
+		
 		folliage_chunks.append(chunk)
 		
 		#for global_index in chunk.vertex_faces:
@@ -825,7 +884,36 @@ func _on_nav_bake_finished() -> void:
 		call_deferred("request_nav_bake")
 
 
+func take_fire(damage: int, impact_point: Vector3, radius: float = 1.0) -> void:
+	if folliage_chunks.is_empty():
+		return
+	var radius_squared: float = radius * radius
+	
+	for c in folliage_chunks:
+		if not is_instance_valid(c):
+			continue
+		if not c.occlusion_node.is_on_render_range(impact_point):
+			continue
+		var center_cell: Vector2i = c.get_tree_cell(impact_point)
+		var neighbor_radius: float = c.neighbor_radius if c.neighbor_radius > 0.0 else 1.0
+		var cell_radius: int = ceili(radius / neighbor_radius)
+		
+		for x in range(-cell_radius,cell_radius+1):
+			for z in range(-cell_radius,cell_radius+1):
+				var cell: Vector2i = center_cell + Vector2i(x,z)
+				
+				if not c.tree_spatial_grid.has(cell):
+					continue
+				
+				for t in c.tree_spatial_grid[cell]:
+					if t.is_destroyed:
+						continue
+					if t.position.distance_squared_to(impact_point) > radius_squared:
+						continue
+					t.take_damage(damage,true)
 
+
+'''
 func take_fire(damage: int, impact_point: Vector3, radius: float = 1.0) -> void:
 	if folliage_chunks.is_empty():
 		return
@@ -853,3 +941,4 @@ func take_fire(damage: int, impact_point: Vector3, radius: float = 1.0) -> void:
 				
 	if closest_tree and closest_zone:
 		closest_tree.take_damage(damage,true)
+'''

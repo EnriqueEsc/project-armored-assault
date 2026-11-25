@@ -16,24 +16,6 @@ var effects_manager: Effects_Manager = null
 signal got_destroyed
 
 
-var thread_queue: Array[int] = []
-
-func clear_thread_queue() -> void:
-	for i in range(thread_queue.size() -1, -1,-1):
-		var id = thread_queue[i]
-		if WorkerThreadPool.is_task_completed(id):
-			WorkerThreadPool.wait_for_task_completion(id)
-			thread_queue.remove_at(i)
-
-func _exit_tree() -> void:
-	for id in thread_queue:
-		WorkerThreadPool.wait_for_task_completion(id)
-	thread_queue.clear()
-		
-
-func _process(delta: float) -> void:
-	clear_thread_queue()
-	
 
 func _ready() -> void:
 	
@@ -57,7 +39,9 @@ func take_explosion(damage: int, source: Vehicle_Rigid, impact_point: Vector3, r
 func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3, status_effect: Vehicle_Rigid.StatusEffects = Vehicle_Rigid.StatusEffects.None) -> void:
 	if destroyed:
 		return
-		
+	
+	#print("AY")
+	
 	armor_points -= damage
 	armor_points = clamp(armor_points,0,max_armor_points)
 	
@@ -83,6 +67,7 @@ func activate() -> void:
 
 func deactivate() -> void:
 	got_destroyed.emit()
+	deactivate_collisions()
 	#print("siuuuuuuu V2")
 	#damage_zone	.queue_free()
 	queue_free()
@@ -91,6 +76,8 @@ func deactivate() -> void:
 	set_deferred("disabled",true)
 	#set_deferred("monitoring", false)
 	#set_deferred("monitorable", false)
+	
+	return
 	
 	for c in get_children():
 		if c.has_method("deactivate"):

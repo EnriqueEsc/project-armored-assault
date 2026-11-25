@@ -492,7 +492,8 @@ func crush_below() -> void:
 				collider.gets_crushed.emit()
 				collider.shakes.emit(1.0,1.0)
 			if collider is Deformable_Terrain_V3:
-				collider.take_explosion(1,null,global_position,building_radius)
+				#print("UY")
+				collider.take_explosion(10,null,global_position,building_radius)
 				
 
 func shake_player() -> void:
@@ -559,7 +560,7 @@ func activate() -> void:
 	#set_deferred("monitorable", true)
 
 func destroy_chunk(chunk: Building_Chunk) -> void:
-	
+	#print("EY")
 	var aux_levels = levels.duplicate()
 	
 	levels.erase(chunk)
