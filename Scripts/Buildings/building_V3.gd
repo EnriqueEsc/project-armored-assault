@@ -493,7 +493,7 @@ func crush_below() -> void:
 				collider.shakes.emit(1.0,1.0)
 			if collider is Deformable_Terrain_V3:
 				#print("UY")
-				collider.take_explosion(10,null,global_position,building_radius)
+				collider.take_explosion(10,null,global_position,building_radius,false)
 				
 
 func shake_player() -> void:

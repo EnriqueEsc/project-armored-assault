@@ -152,21 +152,24 @@ func shoot_laser() -> void:
 		#origin.projectile_to_pool(self)
 		body.take_damage(damage * power_multiplier, origin, global_position, status_effect)
 		if effects_manager:
-			effects_manager.sparks_from_pool(global_position)
+			#effects_manager.sparks_from_pool(global_position)
+			effects_manager.sparks_from_pool(end_point)
 		#origin.get_score(damage)
 		if is_explosive:
 			detonate()
 	elif body.has_method("detonate"):
 		direction = Vector3.ZERO
 		if effects_manager:
-			effects_manager.sparks_from_pool(global_position)
+			#effects_manager.sparks_from_pool(global_position)
+			effects_manager.sparks_from_pool(end_point)
 		body.detonate()
 		if is_explosive:
 			detonate()
 	else:
 		direction = Vector3.ZERO
 		if effects_manager:
-			effects_manager.failed_sparks_from_pool(global_position)
+			#effects_manager.failed_sparks_from_pool(global_position)
+			effects_manager.failed_sparks_from_pool(end_point)
 		if is_explosive:
 			detonate()
 

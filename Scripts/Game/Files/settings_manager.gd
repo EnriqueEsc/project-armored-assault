@@ -45,6 +45,11 @@ var vsync_enabled: bool = true
 
 var current_save: String = "user://test.json"
 
+enum FlamableModes {Disabled, Invisible, OnDirectFire, All}
+var flamable_mode: FlamableModes = FlamableModes.All
+
+var folliage_density: float = 1.0
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	singleton()

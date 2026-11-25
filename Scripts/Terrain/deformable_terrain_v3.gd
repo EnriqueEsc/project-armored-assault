@@ -8,7 +8,7 @@ var vertex_chunks: Dictionary = {}
 var chunks: Array[DeformableChunk] = []
 var visual_chunks: Array[MeshInstance3D] = []
 
-var folliage_chunks: Array[Tree_Zone_V2] = []
+var folliage_chunks: Array[Tree_Zone_V3] = []
 
 @export var chunk_size: Vector2 = Vector2.ONE * 20
 
@@ -18,7 +18,7 @@ enum TextureMode {Classic, MeshSurface, XZ, TextureSplatting}
 
 @export var folliage_map: Texture2D = null
 var folliage_image: Image = null
-@export_range(0.0,1.0) var folliage_density: float = 1.0
+#@export_range(0.0,1.0) var folliage_density: float = 1.0
 
 @export var softness_map: Texture2D = null
 var softness_values: PackedFloat32Array = PackedFloat32Array()
@@ -30,6 +30,9 @@ var softness_values: PackedFloat32Array = PackedFloat32Array()
 @export var splat_map: Texture2D = null
 var mask_uv_min: Vector2 = Vector2.ZERO
 var mask_uv_size: Vector2 = Vector2.ONE
+
+var flamable_mode: SettingsManager.FlamableModes = SettingsManager.FlamableModes.OnDirectFire
+
 
 func visual_process(delta: float) -> void:
 	
@@ -61,6 +64,8 @@ func _ready() -> void:
 	generate()
 	recalculate_visual_timer = recalculate_visual_tick
 	recalculate_collision_timer = recalculate_collision_tick
+	
+	flamable_mode = Settings_Manager.INSTANCE.flamable_mode
 
 func generate() -> void:
 	get_visuals_from_existing_mesh()
@@ -569,20 +574,34 @@ func generate_folliage_mask() -> void:
 	if not folliage_image:
 		return
 
-func get_folliage_values(uv: Vector2) -> float:
+func get_folliage_values(uv: Vector2) -> Vector2:
 	if not folliage_image:
-		return 0.0
+		return Vector2.ZERO
 	
 	var mask_uv: Vector2 = (uv - mask_uv_min) / mask_uv_size
 	
 	var x: int = clampi(roundi(mask_uv.x * (folliage_image.get_width() - 1)),0,folliage_image.get_width() - 1)
 	var y: int = clampi(roundi(mask_uv.y * (folliage_image.get_height() - 1)),0,folliage_image.get_height() - 1)
-	var res = 1.0 - folliage_image.get_pixel(x,y).get_luminance()
+	
+	var aux: Vector2 = Vector2.ZERO
+	
+	var pixel: Color = folliage_image.get_pixel(x,y)
+	var channels: Array[float] = [pixel.r,pixel.g,pixel.b]
+	var channel: int = 0
+	
+	for i in range(channels.size()):
+		if channels[i] > channels[channel]:
+			channel = i
+	
+	#var res = 1.0 - folliage_image.get_pixel(x,y).get_luminance()
+	var res: float = channels[channel]
+	
 	if res < 0.5:
 		res = 0.0
 	elif res >= 0.5:
 		res = 1.0
-	return res
+	aux = Vector2(res,channel)
+	return aux
 
 func generate_folliage(chunk_data: Dictionary) -> void:
 	for i in 15:
@@ -591,15 +610,15 @@ func generate_folliage(chunk_data: Dictionary) -> void:
 	
 	#var chunk_data: Dictionary = split_mesh_to_chunks()
 	
-	var model = load("res://Meshes/Grass.tres")
-	model = model as ArrayMesh
+	#var model = load("res://Meshes/Grass.tres")
+	#model = model as ArrayMesh
 	for coords in chunk_data:
 		var data: Dictionary = chunk_data[coords]
-		var chunk = Tree_Zone_V2.new()
+		var chunk = Tree_Zone_V3.new()
 		chunk.name = "Folliage_%d_%d" % [coords.x, coords.y]
 		var faces = (data["faces"])
 		#chunk.tree_points = data["vertices"]
-		chunk.tree_mesh = model
+		#chunk.tree_mesh = model
 		#chunk.tree_indexes = data["global_indexes"]
 		
 		
@@ -609,18 +628,29 @@ func generate_folliage(chunk_data: Dictionary) -> void:
 		
 		var aux_points: PackedVector3Array = PackedVector3Array()
 		var aux_indexes: Array = []
+		var aux_types: PackedByteArray = PackedByteArray()
 		
 		for i in range(points.size()):
-			var value: float = get_folliage_values(chunk_uvs[i])
+			var aux_vec: Vector2 = get_folliage_values(chunk_uvs[i])
+			var value: float = aux_vec.x
+			var type: int = int(aux_vec.y)
 			
 			if value >= 0.5:
 				aux_points.append(points[i])
 				aux_indexes.append(indexes[i])
+				aux_types.append(type)
+				
 		
 		
 		chunk.tree_points = aux_points
 		chunk.tree_indexes = aux_indexes
-		chunk.density = folliage_density
+		var f_type: PackedByteArray = PackedByteArray()
+		f_type.resize(aux_points.size())
+		for i in range(f_type.size()):
+			f_type[i] = randi_range(0,1)
+		f_type.fill(1)
+		chunk.folliage_type = aux_types
+		#chunk.density = folliage_density
 		
 		folliage_chunks.append(chunk)
 		
@@ -668,9 +698,11 @@ func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3, stat
 	deform_terrain_by_index(closest_index)
 
 
-func take_explosion(damage: int,source: Vehicle_Rigid,impact_point: Vector3,radius: float) -> void:
+func take_explosion(damage: int,source: Vehicle_Rigid,impact_point: Vector3,radius: float, apply_fire: bool = true) -> void:
 	
-	take_fire(damage,impact_point,radius)
+	
+	if flamable_mode == Settings_Manager.FlamableModes.All and apply_fire:
+		take_fire(damage,impact_point,radius)
 	
 	if deformation_mode == DeformationMode.None:
 		return
@@ -910,14 +942,18 @@ func take_fire(damage: int, impact_point: Vector3, radius: float = 1.0) -> void:
 						continue
 					if t.position.distance_squared_to(impact_point) > radius_squared:
 						continue
-					t.take_damage(damage,true)
+					var fire = flamable_mode != Settings_Manager.FlamableModes.Disabled
+					var aux = fire and flamable_mode != Settings_Manager.FlamableModes.Invisible
+					if fire:
+						#print("sexo ",aux)
+						t.take_damage(damage,aux)
 
 
 '''
 func take_fire(damage: int, impact_point: Vector3, radius: float = 1.0) -> void:
 	if folliage_chunks.is_empty():
 		return
-	var closest_zone: Tree_Zone_V2 = null
+	var closest_zone: Tree_Zone_V3 = null
 	var closest_tree: Tree_data = null
 	var min_distance: float = (radius * radius)
 	min_distance += (min_distance * 0.2)

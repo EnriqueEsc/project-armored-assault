@@ -3,7 +3,7 @@ class_name Flamethrower
 
 @export var fall_turn_speed: float = 0
 var flame_effect: GPUParticles3D = null
-var flame_prefab = preload("res://Prefabs/Effects/fire.tscn")
+var flame_prefab = preload("res://Prefabs/Effects/flamethrower.tscn")
 
 func _additional_setup() -> void:
 	var flame = flame_prefab.instantiate() as GPUParticles3D

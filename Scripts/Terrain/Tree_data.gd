@@ -8,6 +8,7 @@ var position: Vector3 = Vector3.ZERO
 var matrix_index: Vector2i = Vector2i.ZERO
 var is_burning: bool = false
 var is_destroyed: bool = false
+var discarded: bool = false
 signal got_destroyed(id: int)
 signal got_burnt(damage:int, matrix_index: Vector2i)
 

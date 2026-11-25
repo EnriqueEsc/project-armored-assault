@@ -1,0 +1,33 @@
+[gd_resource type="ArrayMesh" format=4 uid="uid://ddvoxstv1uqrb"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_atn8o"]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_atn8o"]
+_surfaces = [{
+"aabb": AABB(-0.07499999, -0.375, -0.07499999, 0.14999998, 0.75, 0.14999998),
+"format": 34359742465,
+"index_count": 24,
+"index_data": PackedByteArray("AAABAAIAAgABAAMAAQAAAAQABAADAAEAAAACAAUAAAAFAAQAAgADAAUABQADAAQA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 6,
+"vertex_data": PackedByteArray("AAAAAAAAwL4AAACAAAAAAAAAAACYmZk9mJmZPQAAAAAAAACAAAAAAAAAwD4AAACAmJmZvQAAAAAAAACAAAAAAAAAAACYmZm9")
+}]
+blend_shape_mode = 0
+
+[resource]
+resource_name = "Effects_Cube_007"
+_surfaces = [{
+"aabb": AABB(-0.07499999, -0.375, -0.07499999, 0.14999998, 0.75, 0.14999998),
+"attribute_data": PackedByteArray("AAAAAAAAgD8AAAAAAACAPwAAAAAAAIA/AAAAAAAAgD8AAAAAAACAPwAAAAAAAIA/AAAAAAAAgD8AAAAAAACAPwAAAAAAAIA/AAAAAAAAgD8AAAAAAACAPwAAAAAAAIA/AAAAAAAAgD8AAAAAAACAPwAAAAAAAIA/AAAAAAAAgD8AAAAAAACAPwAAAAAAAIA/AAAAAAAAgD8AAAAAAACAPwAAAAAAAIA/AAAAAAAAgD8AAAAAAACAPwAAAAAAAIA/"),
+"format": 34359742487,
+"index_count": 24,
+"index_data": PackedByteArray("AAABAAIAAwAEAAUABgAHAAgACQAKAAsADAANAA4ADwAQABEAEgATABQAFQAWABcA"),
+"material": SubResource("StandardMaterial3D_atn8o"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 24,
+"vertex_data": PackedByteArray("AAAAAAAAwL4AAACAAAAAAAAAAACYmZk9mJmZPQAAAAAAAACAAAAAAAAAwL4AAACAAAAAAAAAAACYmZm9mJmZvQAAAAAAAACAAAAAAAAAAACYmZm9AAAAAAAAwD4AAACAmJmZvQAAAAAAAACAmJmZPQAAAAAAAACAAAAAAAAAAACYmZk9AAAAAAAAwD4AAACAmJmZPQAAAAAAAACAAAAAAAAAwD4AAACAAAAAAAAAAACYmZm9AAAAAAAAwL4AAACAmJmZPQAAAAAAAACAAAAAAAAAAACYmZm9AAAAAAAAAACYmZk9AAAAAAAAwL4AAACAmJmZvQAAAAAAAACAmJmZvQAAAAAAAACAAAAAAAAAwD4AAACAAAAAAAAAAACYmZk9LrpddP///z8uul10////Py66XXT///8/ogsuOv///7+iCy46////v6ILLjr///+/ogvQxf///7+iC9DF////v6IL0MX///+/Lrqhi////z8uuqGL////Py66oYv///8/XPTQxf///79c9NDF////v1z00MX///+/XPQuOv///79c9C46////v1z0Ljr///+/0EVddP///z/QRV10////P9BFXXT///8/0EWhi////z/QRaGL////P9BFoYv///8/")
+}]
+blend_shape_mode = 0
+shadow_mesh = SubResource("ArrayMesh_atn8o")

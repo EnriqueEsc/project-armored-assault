@@ -15,10 +15,6 @@ var tree_state: PackedByteArray = PackedByteArray()
 var tree_list: Array[Tree_data] = []
 var multimesh: MultiMesh
 
-var col_size_x: int = 0
-var col_size_z: int = 0
-
-var vehicles_within: Array[Vehicle_Rigid] = []
 
 var active_count: int = 0
 
@@ -36,11 +32,24 @@ var burn_state: PackedByteArray = PackedByteArray()
 
 var geometrical_position: Vector3 = Vector3.ZERO
 
+var flamable_mode: SettingsManager.FlamableModes = SettingsManager.FlamableModes.OnDirectFire
+
 var occlusion_node: TerrainChunkOccluder = TerrainChunkOccluder.new(self)
+
+var texture: Texture2D = null
 
 var zones: Array = []
 func _ready() -> void:
+	var model = load("res://Meshes/Grass.tres")
+	model = model as ArrayMesh
 	
+	tree_mesh = model
+	
+	texture = load("res://Models/Test/Grass_Grass.png")
+	texture = texture as Texture2D
+	
+	flamable_mode = Settings_Manager.INSTANCE.flamable_mode
+	density = Settings_Manager.INSTANCE.folliage_density
 	#if occlusion_node:
 	#	get_tree().current_scene.call_deferred("add_child",occlusion_node)
 	add_to_group("tree_zones")
@@ -94,6 +103,8 @@ func init_grid() -> void:
 	else:
 		multimesh.mesh = tree_mesh.duplicate()
 		if material:
+			if texture:
+				material.set_shader_parameter("albedo_texture", texture)
 			multimesh.mesh.surface_set_material(0,material)
 	#multimesh.instance_count = tree_points.size()
 	
@@ -167,6 +178,7 @@ func modify_points(indexes: PackedInt32Array) -> void:
 		tree_state[local_index] = 0
 		tree_list[local_index].hp = 0
 		tree_list[local_index].is_destroyed = true
+		tree_list[local_index].discarded = true
 		#print("Destroy1 ",local_index)
 		destroy_tree(local_index)
 
@@ -183,7 +195,8 @@ func take_explosion(pos: Vector3, blast_rad: float, blast_damage: float) -> void
 		if closest_tree.is_destroyed:
 			return
 		blast_damage = 10
-		closest_tree.take_damage(int(blast_damage),true)
+		var fire: bool = flamable_mode == Settings_Manager.FlamableModes.All
+		closest_tree.take_damage(int(blast_damage),fire)
 
 func destroy_tree(id: int) -> void:
 	var mm: MultiMesh = multimesh_instance.multimesh
@@ -198,6 +211,9 @@ func destroy_tree(id: int) -> void:
 		queue_free()
 
 func burn_tree(damage: int, pos: Vector2i) -> void:
+	if flamable_mode == Settings_Manager.FlamableModes.Disabled:
+		return
+	
 	if damage <= 0:
 		return
 	
@@ -207,6 +223,8 @@ func burn_tree(damage: int, pos: Vector2i) -> void:
 	
 	if burn_state[local_index] == 1:
 		return
+	
+	#print("SEXOOOOOO ",local_index)
 	
 	burn_state[local_index] = 1
 	
@@ -244,6 +262,7 @@ func burn_tree(damage: int, pos: Vector2i) -> void:
 						continue
 					if tree.position.distance_squared_to(source.position) > radius_squared:
 						continue
+					tree.discarded = true
 					affected_trees.append(tree)
 					if affected_trees.size() >= max_burnt_neighbors:
 						break
