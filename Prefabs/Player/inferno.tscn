@@ -289,6 +289,9 @@ script = ExtResource("8_niw7e")
 projectile_type = 5
 muzzle_pos = Vector3(0, 0, 0.85)
 fire_rate_prim = 0.2
+recover_recoil_time = 1.5
+visual_recoil_limit = 0.2
+visual_recoil_factor = 0.1
 
 [node name="Gun" type="MeshInstance3D" parent="Turret/Gun" unique_id=1346115680]
 material_override = SubResource("StandardMaterial3D_vwfjx")
@@ -318,6 +321,9 @@ script = ExtResource("8_niw7e")
 projectile_type = 5
 muzzle_pos = Vector3(0, 0, 0.85)
 fire_rate_prim = 0.2
+recover_recoil_time = 1.5
+visual_recoil_limit = 0.2
+visual_recoil_factor = 0.1
 
 [node name="Gun" type="MeshInstance3D" parent="Turret2/Gun" unique_id=637877119]
 material_override = SubResource("StandardMaterial3D_vwfjx")

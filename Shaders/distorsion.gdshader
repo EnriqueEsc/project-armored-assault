@@ -10,15 +10,18 @@ uniform float noise_scale = 8.0;
 uniform float noise_speed = 0.5;
 
 global uniform float game_speed;
+global uniform bool animated_shaders;
 
 float noise(vec2 p) {
 	return sin(p.x * noise_scale + TIME * noise_speed) * cos(p.y * noise_scale + TIME * noise_speed) * game_speed;
 }
 
 void fragment() {
-	vec2 screen_uv = SCREEN_UV;
-	vec2 distortion = vec2(noise(UV + vec2(0.0, 0.0)), noise(UV + vec2(4.2, 2.7)));
-	vec3 background = texture(screen_texture,screen_uv + distortion * distortion_strength).rgb;
-	ALBEDO = background;
+	if (animated_shaders){
+		vec2 screen_uv = SCREEN_UV;
+		vec2 distortion = vec2(noise(UV + vec2(0.0, 0.0)), noise(UV + vec2(4.2, 2.7)));
+		vec3 background = texture(screen_texture,screen_uv + distortion * distortion_strength).rgb;
+		ALBEDO = background;
+	}
 	ALPHA = transparency;
 }

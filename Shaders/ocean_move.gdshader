@@ -29,22 +29,25 @@ varying float wave_height;
 varying vec3 vec_world_pos;
 
 global uniform float game_speed;
+global uniform bool animated_shaders;
 
 void vertex() {
-	vec_world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
-	float surge = sin(TIME * surge_speed) * surge_strength;
-	vec2 surge_offset = normalize(surge_direction) * surge;
-	VERTEX.x += surge_offset.x;
-	VERTEX.z += surge_offset.y;
-	
-	
-	float wave1 = sin(vec_world_pos.x * wave_frequency + TIME * wave_speed) * game_speed;
-	float wave2 = cos(vec_world_pos.z * wave_frequency * 0.8 + TIME * wave_speed * 1.2 * game_speed);
-	float final_wave = (wave1 + wave2) * wave_amplitude * game_speed;
-	
-	VERTEX.y += final_wave;
-	
-	wave_height = ((wave1 + wave2) * 0.5) * 0.5 + 0.5; 
+	if (animated_shaders){
+		vec_world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+		float surge = sin(TIME * surge_speed) * surge_strength;
+		vec2 surge_offset = normalize(surge_direction) * surge;
+		VERTEX.x += surge_offset.x;
+		VERTEX.z += surge_offset.y;
+		
+		
+		float wave1 = sin(vec_world_pos.x * wave_frequency + TIME * wave_speed) * game_speed;
+		float wave2 = cos(vec_world_pos.z * wave_frequency * 0.8 + TIME * wave_speed * 1.2 * game_speed);
+		float final_wave = (wave1 + wave2) * wave_amplitude * game_speed;
+		
+		VERTEX.y += final_wave;
+		
+		wave_height = ((wave1 + wave2) * 0.5) * 0.5 + 0.5; 
+	}
 }
 
 void fragment() {

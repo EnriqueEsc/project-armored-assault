@@ -18,7 +18,7 @@ signal recoil(dir: Vector3, force: float)
 var ignore = []
 
 
-enum Projectile_Type {HE, AP, MachineGun, Nuke, Flak, Flamethrower, Slug, Laser, Railgun, Grenade}
+enum Projectile_Type {HE, AP, MachineGun, Nuke, Flak, Incinerator, Slug, Laser, Railgun, Grenade}
 enum Fire_Mode {Semi, Auto, Burst}
 
 
@@ -139,8 +139,8 @@ func _ready() -> void:
 		Projectile_Type.Flak:
 			projectile_prefab = load("res://Prefabs/Test/flak_bullet.tscn")
 			#case_prefab = load("res://Prefabs/Test/machine_gun_case.tscn")
-		Projectile_Type.Flamethrower:
-			projectile_prefab = load("res://Prefabs/Test/flamethrower.tscn")
+		Projectile_Type.Incinerator:
+			projectile_prefab = load("res://Prefabs/Test/incinerator.tscn")
 		Projectile_Type.Slug:
 			projectile_prefab = load("res://Prefabs/Test/slug.tscn")
 		Projectile_Type.Laser:
@@ -321,7 +321,7 @@ func create_projectiles(team: Basic_AI.Team) -> void:
 		Basic_AI.Team.ALLY:
 			stencil_color = Color.GREEN
 	
-	if projectile_type == Projectile_Type.Flamethrower:
+	if projectile_type == Projectile_Type.Incinerator:
 		return
 	
 	if case_prefab == null:
@@ -366,7 +366,7 @@ func shoot(shake_mult: float = 1.0) -> void:
 	#rotation.y = lerp_angle(rotation.y,rotation.y+randf_range(deg_to_rad(-10),deg_to_rad(10)),1)
 	
 	last_shoot_prim = time_controller.running_time if is_instance_valid(time_controller) else 0.0
-	if effects_manager and projectile_type != Projectile_Type.Flamethrower and projectile_type != Projectile_Type.Railgun:
+	if effects_manager and projectile_type != Projectile_Type.Incinerator and projectile_type != Projectile_Type.Railgun:
 		#effects_manager.shoot_from_pool(to_global(muzzle_pos), global_rotation, projectile.muzzle_flash_scale)
 		effects_manager.shoot_3d_from_pool(to_global(muzzle_pos), global_rotation,projectile.muzzle_flash_scale)
 	

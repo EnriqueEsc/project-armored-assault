@@ -1,9 +1,9 @@
 [gd_scene format=4 uid="uid://be4v7gqq014hk"]
 
-[ext_resource type="Script" uid="uid://bynxx60atnrsn" path="res://Scripts/Game/Effects/fire_effect.gd" id="1_1fos8"]
-[ext_resource type="Shader" uid="uid://r0dpspjp6381" path="res://Shaders/fake_light.gdshader" id="2_57va8"]
-[ext_resource type="Script" uid="uid://pk4lo6kji8hu" path="res://Scripts/Game/Effects/meshinstance3d_as_effect.gd" id="3_ifdf5"]
-[ext_resource type="Shader" uid="uid://ddocuixqi2653" path="res://Shaders/flames.gdshader" id="4_vmv0e"]
+[ext_resource type="Script" uid="uid://bynxx60atnrsn" path="res://Scripts/Game/Effects/fire_effect.gd" id="1_1mnkq"]
+[ext_resource type="Shader" uid="uid://r0dpspjp6381" path="res://Shaders/fake_light.gdshader" id="2_2okr8"]
+[ext_resource type="Script" uid="uid://pk4lo6kji8hu" path="res://Scripts/Game/Effects/meshinstance3d_as_effect.gd" id="3_dn8qm"]
+[ext_resource type="Shader" uid="uid://ddocuixqi2653" path="res://Shaders/flames.gdshader" id="4_ahn5o"]
 
 [sub_resource type="Gradient" id="Gradient_2mh7v"]
 colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 0.69803923)
@@ -51,7 +51,7 @@ size = Vector2(0.3, 0.3)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_riqys"]
 render_priority = 0
-shader = ExtResource("2_57va8")
+shader = ExtResource("2_2okr8")
 shader_parameter/intensity = 1.0
 shader_parameter/softness = 2.5
 
@@ -85,7 +85,7 @@ turbulence_enabled = true
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gg0mq"]
 render_priority = 0
-shader = ExtResource("4_vmv0e")
+shader = ExtResource("4_ahn5o")
 shader_parameter/base_color = Color(3.194369, 0.57337433, 0.12073104, 0.007843138)
 shader_parameter/tip_color = Color(1.8826746, 1.4217094, 0.13964978, 0.25882354)
 shader_parameter/max_height = 0.0
@@ -134,13 +134,13 @@ randomness = 0.7
 collision_base_size = 1.0
 process_material = SubResource("ParticleProcessMaterial_w5yva")
 draw_pass_1 = SubResource("QuadMesh_kuf18")
-script = ExtResource("1_1fos8")
+script = ExtResource("1_1mnkq")
 
 [node name="Fake_Light" type="MeshInstance3D" parent="." unique_id=1690803610]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0.7597447, 0)
 material_override = SubResource("ShaderMaterial_riqys")
 mesh = SubResource("QuadMesh_bhunq")
-script = ExtResource("3_ifdf5")
+script = ExtResource("3_dn8qm")
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=57538460]
 lifetime = 0.5

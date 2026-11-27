@@ -43,12 +43,17 @@ var aim_assist_type: Aim_Assist_Type = Aim_Assist_Type.None
 
 var vsync_enabled: bool = true
 
+var use_animated_shaders: bool = true
+
 var current_save: String = "user://test.json"
 
 enum FlamableModes {Disabled, Invisible, OnDirectFire, All}
 var flamable_mode: FlamableModes = FlamableModes.All
 
-var folliage_density: float = 1.0
+var folliage_density: int = 100
+var max_active_fire: int = 1
+
+var odds_start_fire_on_explosion: int = 100
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -141,6 +146,13 @@ func save_settings() -> void:
 	settings_file.set_value("Game","destruction_effects_mode",destruction_effects_mode)
 	settings_file.set_value("Controls","use_vibration",use_vibration)
 	settings_file.set_value("Video","vsync_enabled",vsync_enabled)
+	
+	settings_file.set_value("Game","flamable_mode",flamable_mode)
+	settings_file.set_value("Video","folliage_density",folliage_density)
+	settings_file.set_value("Video","use_animated_shaders",use_animated_shaders)
+	settings_file.set_value("Game","max_active_fire",max_active_fire)
+	settings_file.set_value("Game","odds_start_fire_on_explosion",odds_start_fire_on_explosion)
+	
 	settings_file.save(SETTINGS_PATH)
 	print("SETTINGS GUARDADOS")
 	print(settings_file,settings_file.get_value("Video","fullscreen",fullscreen))
@@ -176,6 +188,13 @@ func load_settings() -> void:
 		
 		vsync_enabled = settings_file.get_value("Video","vsync_enabled",vsync_enabled)
 		
+	
+		flamable_mode = settings_file.get_value("Game","flamable_mode",flamable_mode)
+		folliage_density = settings_file.get_value("Video","folliage_density",folliage_density)
+		use_animated_shaders = settings_file.get_value("Video","use_animated_shaders",use_animated_shaders)
+		max_active_fire = settings_file.get_value("Game","max_active_fire",max_active_fire)
+		
+		odds_start_fire_on_explosion = settings_file.get_value("Game","odds_start_fire_on_explosion",odds_start_fire_on_explosion)
 		apply_settings()
 	else:
 		print("no existe")
@@ -192,3 +211,5 @@ func apply_settings() -> void:
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED)
 	else:
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+	
+	RenderingServer.global_shader_parameter_set("animated_shaders", use_animated_shaders)

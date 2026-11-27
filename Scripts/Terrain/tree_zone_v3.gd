@@ -229,6 +229,7 @@ func destroy_tree(id: int) -> void:
 		queue_free()
 
 func burn_tree(damage: int, pos: Vector2i) -> void:
+	
 	if flamable_mode == Settings_Manager.FlamableModes.Disabled:
 		return
 	
@@ -315,7 +316,7 @@ func create_multimesh_instance(type: int) -> void:
 		
 		model = load("res://Meshes/Grass.tres")
 		model = model as ArrayMesh
-		
+		#model = QuadMesh.new()
 		tree_mesh = model
 		
 		texture = load("res://Models/Test/Grass_Grass.png")

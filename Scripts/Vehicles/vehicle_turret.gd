@@ -480,7 +480,7 @@ func set_fire_mode(mode: Turret_Weapon.Fire_Mode) -> void:
 			fire_mode = w.fire_mode
 		'''
 		w.fire_mode = mode
-		if w.projectile_type == w.Projectile_Type.Flamethrower:
+		if w.projectile_type == w.Projectile_Type.Incinerator:
 			projectile_type = w.projectile_type
 	
 	return

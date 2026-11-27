@@ -8,7 +8,7 @@ var vertex_chunks: Dictionary = {}
 var chunks: Array[DeformableChunk] = []
 var visual_chunks: Array[MeshInstance3D] = []
 
-var folliage_chunks: Array[Tree_Zone_V3] = []
+var folliage_chunks: Array[Tree_Zone_V4] = []
 
 @export var chunk_size: Vector2 = Vector2.ONE * 20
 
@@ -33,6 +33,11 @@ var mask_uv_size: Vector2 = Vector2.ONE
 
 var flamable_mode: SettingsManager.FlamableModes = SettingsManager.FlamableModes.OnDirectFire
 
+var fire_tick: float = 1.0
+var fire_counter: float = 0.0
+var can_take_fire: bool = true
+
+var odds_start_fire_on_explosion: int = 100
 
 func visual_process(delta: float) -> void:
 	
@@ -59,6 +64,16 @@ func collision_process(delta: float) -> void:
 func _process(delta: float) -> void:
 	visual_process(delta)
 	collision_process(delta)
+	fire_tick_process(delta)
+
+func fire_tick_process(delta: float) -> void:
+	if can_take_fire:
+		return
+	fire_counter += delta
+	if fire_counter > fire_tick:
+		can_take_fire = true
+		return
+
 
 func _ready() -> void:
 	generate()
@@ -66,6 +81,8 @@ func _ready() -> void:
 	recalculate_collision_timer = recalculate_collision_tick
 	
 	flamable_mode = Settings_Manager.INSTANCE.flamable_mode
+	
+	odds_start_fire_on_explosion = Settings_Manager.INSTANCE.odds_start_fire_on_explosion
 
 func generate() -> void:
 	get_visuals_from_existing_mesh()
@@ -604,6 +621,9 @@ func get_folliage_values(uv: Vector2) -> Vector2:
 	return aux
 
 func generate_folliage(chunk_data: Dictionary) -> void:
+	if Settings_Manager.INSTANCE.folliage_density <= 0:
+		#print("SEXOOOOOOOO MUERTO")
+		return
 	for i in 15:
 		await get_tree().process_frame
 	folliage_chunks.clear()
@@ -614,7 +634,7 @@ func generate_folliage(chunk_data: Dictionary) -> void:
 	#model = model as ArrayMesh
 	for coords in chunk_data:
 		var data: Dictionary = chunk_data[coords]
-		var chunk = Tree_Zone_V3.new()
+		var chunk = Tree_Zone_V4.new()
 		chunk.name = "Folliage_%d_%d" % [coords.x, coords.y]
 		var faces = (data["faces"])
 		#chunk.tree_points = data["vertices"]
@@ -641,6 +661,8 @@ func generate_folliage(chunk_data: Dictionary) -> void:
 				aux_types.append(type)
 				
 		
+		if aux_points.size() < 1:
+			continue
 		
 		chunk.tree_points = aux_points
 		chunk.tree_indexes = aux_indexes
@@ -651,7 +673,6 @@ func generate_folliage(chunk_data: Dictionary) -> void:
 		f_type.fill(1)
 		chunk.folliage_type = aux_types
 		#chunk.density = folliage_density
-		
 		folliage_chunks.append(chunk)
 		
 		#for global_index in chunk.vertex_faces:
@@ -702,7 +723,9 @@ func take_explosion(damage: int,source: Vehicle_Rigid,impact_point: Vector3,radi
 	
 	
 	if flamable_mode == Settings_Manager.FlamableModes.All and apply_fire:
-		take_fire(damage,impact_point,radius)
+		var odds: int = randi_range(0,100)
+		if odds < odds_start_fire_on_explosion:
+			take_fire(damage,impact_point,radius)
 	
 	if deformation_mode == DeformationMode.None:
 		return
@@ -917,18 +940,26 @@ func _on_nav_bake_finished() -> void:
 
 
 func take_fire(damage: int, impact_point: Vector3, radius: float = 1.0) -> void:
+	if not can_take_fire:
+		return
 	if folliage_chunks.is_empty():
 		return
+	if flamable_mode == Settings_Manager.FlamableModes.Disabled:
+		return
+	
+	#print("SEXOOO FUEGO")
+	
+	can_take_fire = false
+	fire_counter = 0.0
+	
 	var radius_squared: float = radius * radius
+	var fire: bool = flamable_mode != Settings_Manager.FlamableModes.Invisible
 	
 	for c in folliage_chunks:
 		if not is_instance_valid(c):
 			continue
-		if not c.occlusion_node.is_on_render_range(impact_point):
-			continue
 		var center_cell: Vector2i = c.get_tree_cell(impact_point)
-		var neighbor_radius: float = c.neighbor_radius if c.neighbor_radius > 0.0 else 1.0
-		var cell_radius: int = ceili(radius / neighbor_radius)
+		var cell_radius: int = ceili(radius / c.neighbor_radius)
 		
 		for x in range(-cell_radius,cell_radius+1):
 			for z in range(-cell_radius,cell_radius+1):
@@ -936,24 +967,19 @@ func take_fire(damage: int, impact_point: Vector3, radius: float = 1.0) -> void:
 				
 				if not c.tree_spatial_grid.has(cell):
 					continue
-				
-				for t in c.tree_spatial_grid[cell]:
-					if t.is_destroyed:
+				for tree in c.tree_spatial_grid[cell]:
+					if tree["is_destroyed"]:
 						continue
-					if t.position.distance_squared_to(impact_point) > radius_squared:
+					if tree["position"].distance_squared_to(impact_point) > radius_squared:
 						continue
-					var fire = flamable_mode != Settings_Manager.FlamableModes.Disabled
-					var aux = fire and flamable_mode != Settings_Manager.FlamableModes.Invisible
-					if fire:
-						#print("sexo ",aux)
-						t.take_damage(damage,aux)
+					c.burn_tree(damage, tree["id"])
 
 
 '''
 func take_fire(damage: int, impact_point: Vector3, radius: float = 1.0) -> void:
 	if folliage_chunks.is_empty():
 		return
-	var closest_zone: Tree_Zone_V3 = null
+	var closest_zone: Tree_Zone_V4 = null
 	var closest_tree: Tree_data = null
 	var min_distance: float = (radius * radius)
 	min_distance += (min_distance * 0.2)

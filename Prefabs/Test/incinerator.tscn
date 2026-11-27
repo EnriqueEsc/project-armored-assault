@@ -1,12 +1,12 @@
 [gd_scene format=3 uid="uid://creacnju5tfdx"]
 
-[ext_resource type="Script" uid="uid://dnc5kw8t4gr6p" path="res://Scripts/Vehicles/flamethrower.gd" id="1_mlnxn"]
-[ext_resource type="PackedScene" uid="uid://dk2ejhum7dj0e" path="res://Models/Test/Projectile.fbx" id="2_c5k73"]
-[ext_resource type="PackedScene" uid="uid://koxj0b8ls2xa" path="res://Models/Test/Gun.fbx" id="3_gxfw7"]
-[ext_resource type="Shader" uid="uid://r0dpspjp6381" path="res://Shaders/fake_light.gdshader" id="4_gxfw7"]
-[ext_resource type="Script" uid="uid://pk4lo6kji8hu" path="res://Scripts/Game/Effects/meshinstance3d_as_effect.gd" id="5_r4i38"]
-[ext_resource type="Shader" uid="uid://ddocuixqi2653" path="res://Shaders/flames.gdshader" id="6_1185n"]
-[ext_resource type="ArrayMesh" uid="uid://d0m8fmct5fklb" path="res://Meshes/Explosion.tres" id="7_6eeun"]
+[ext_resource type="Script" uid="uid://dnc5kw8t4gr6p" path="res://Scripts/Vehicles/incinerator.gd" id="1_qpgkp"]
+[ext_resource type="PackedScene" uid="uid://dk2ejhum7dj0e" path="res://Models/Test/Projectile.fbx" id="2_r56sy"]
+[ext_resource type="PackedScene" uid="uid://koxj0b8ls2xa" path="res://Models/Test/Gun.fbx" id="3_hwd8j"]
+[ext_resource type="Shader" uid="uid://r0dpspjp6381" path="res://Shaders/fake_light.gdshader" id="4_dvtp0"]
+[ext_resource type="Script" uid="uid://pk4lo6kji8hu" path="res://Scripts/Game/Effects/meshinstance3d_as_effect.gd" id="5_2qu57"]
+[ext_resource type="Shader" uid="uid://ddocuixqi2653" path="res://Shaders/flames.gdshader" id="6_1sq4v"]
+[ext_resource type="ArrayMesh" uid="uid://b5g1skuead6bg" path="res://Meshes/Explosion.tres" id="7_rsaqd"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oxg01"]
 albedo_color = Color(1, 0.69803923, 0, 1)
@@ -20,7 +20,7 @@ height = 0.5
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_1185n"]
 render_priority = 0
-shader = ExtResource("4_gxfw7")
+shader = ExtResource("4_dvtp0")
 shader_parameter/intensity = 1.0
 shader_parameter/softness = 2.5
 
@@ -32,7 +32,7 @@ size = Vector3(0.5, 0.5, 0.5)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lejfw"]
 render_priority = 0
-shader = ExtResource("6_1185n")
+shader = ExtResource("6_1sq4v")
 shader_parameter/base_color = Color(3.194369, 0.57337433, 0.12073104, 1)
 shader_parameter/tip_color = Color(1.8826746, 1.4217094, 0.13964978, 1)
 shader_parameter/max_height = 0.0
@@ -45,17 +45,16 @@ shader_parameter/flicker_speed = 10.0
 shader_parameter/wind_curve = 50.0
 
 [node name="Projectile" type="Node3D" unique_id=1845193271]
-script = ExtResource("1_mlnxn")
+script = ExtResource("1_qpgkp")
 damage = 3
 blast_damage = 0.0
-recoil_force = 0.01
 status_effect = 1
 
-[node name="Projectile" parent="." unique_id=379440040 instance=ExtResource("2_c5k73")]
+[node name="Projectile" parent="." unique_id=379440040 instance=ExtResource("2_r56sy")]
 transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0)
 visible = false
 
-[node name="Gun" parent="." unique_id=51241174 instance=ExtResource("3_gxfw7")]
+[node name="Gun" parent="." unique_id=51241174 instance=ExtResource("3_hwd8j")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 0.23016813, 0, 0)
 visible = false
 
@@ -68,7 +67,7 @@ mesh = SubResource("SphereMesh_bhunq")
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0)
 material_override = SubResource("ShaderMaterial_1185n")
 mesh = SubResource("QuadMesh_6eeun")
-script = ExtResource("5_r4i38")
+script = ExtResource("5_2qu57")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1897963084]
 shape = SubResource("BoxShape3D_sn0t7")
@@ -77,4 +76,4 @@ debug_color = Color(0, 0.6485492, 0.20114565, 0.41960785)
 [node name="Proy" type="MeshInstance3D" parent="." unique_id=2133887607]
 transform = Transform3D(0.29999998, 0, 0, 0, -1.3113416e-08, 0.29999998, 0, -0.29999998, -1.3113416e-08, 0, 0, 0)
 material_override = SubResource("ShaderMaterial_lejfw")
-mesh = ExtResource("7_6eeun")
+mesh = ExtResource("7_rsaqd")

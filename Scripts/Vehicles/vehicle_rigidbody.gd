@@ -96,6 +96,9 @@ var collision_lenght: float = 0.0
 
 var consumable: Consumable = null
 
+var allign_tick: float = 0.1
+var allign_counter: float = 0.0
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	
@@ -323,6 +326,11 @@ func quick_boost() -> void:
 		Effects_Manager.INSTANCE.shoot_from_pool(global_position, global_rotation - Vector3(0,deg_to_rad(180),0), velocity.length() * 0.02)
 
 func allign_with_floor(delta: float) -> void:
+	allign_counter += delta
+	if allign_counter < allign_tick:
+		return
+	allign_counter = 0.0
+	
 	var normal: Vector3 = Vector3.UP
 	
 	if is_on_floor():

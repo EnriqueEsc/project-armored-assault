@@ -16,34 +16,37 @@ uniform float noise_strength = 0.4;
 uniform float noise_scale = 1.0;
 
 global uniform float game_speed;
+global uniform bool animated_shaders;
 
 void vertex() {
-	float mask = 0.0;
-	float wave_axis = 0.0;
-	
-	if (attachment_type == 0) {
-		mask = smoothstep(0.0, 0.2, UV.x);
-		wave_axis = VERTEX.x;
-    } else {
-		mask = smoothstep(0.0, 0.2, UV.y);
-		wave_axis = VERTEX.y;
-	}
-	
-	vec2 noise_uv = VERTEX.xy * 0.2 * noise_scale;
-	vec2 noise_scroll = vec2(TIME * (wind_speed * 0.1), TIME * (wind_speed * 0.05));
-	float noise_value = texture(wind_noise_tex, noise_uv - noise_scroll).r;
-	
-	float wave = sin(wave_axis * wave_frequency - TIME * wind_speed);
-	
-	float cross_axis = (attachment_type == 0) ? VERTEX.y : VERTEX.x;
-	float wave_noise = cos(cross_axis * (wave_frequency * 0.6) + TIME * (wind_speed * 0.7));
-	
-	float final_movement = (wave + wave_noise * 0.3);
-	final_movement += (noise_value - 0.5) * noise_strength;
-	
-	VERTEX.y += final_movement * wind_strength * mask * game_speed;
-	
-	VERTEX.y += speed_inertia * (mask * mask) * game_speed;
+	if (animated_shaders){
+		float mask = 0.0;
+		float wave_axis = 0.0;
+		
+		if (attachment_type == 0) {
+			mask = smoothstep(0.0, 0.2, UV.x);
+			wave_axis = VERTEX.x;
+	    } else {
+			mask = smoothstep(0.0, 0.2, UV.y);
+			wave_axis = VERTEX.y;
+		}
+		
+		vec2 noise_uv = VERTEX.xy * 0.2 * noise_scale;
+		vec2 noise_scroll = vec2(TIME * (wind_speed * 0.1), TIME * (wind_speed * 0.05));
+		float noise_value = texture(wind_noise_tex, noise_uv - noise_scroll).r;
+		
+		float wave = sin(wave_axis * wave_frequency - TIME * wind_speed);
+		
+		float cross_axis = (attachment_type == 0) ? VERTEX.y : VERTEX.x;
+		float wave_noise = cos(cross_axis * (wave_frequency * 0.6) + TIME * (wind_speed * 0.7));
+		
+		float final_movement = (wave + wave_noise * 0.3);
+		final_movement += (noise_value - 0.5) * noise_strength;
+		
+		VERTEX.y += final_movement * wind_strength * mask * game_speed;
+		
+		VERTEX.y += speed_inertia * (mask * mask) * game_speed;
+		}
 	}
 
 void fragment() {

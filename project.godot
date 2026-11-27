@@ -159,3 +159,7 @@ game_speed={
 "type": "float",
 "value": 1.0
 }
+animated_shaders={
+"type": "bool",
+"value": true
+}

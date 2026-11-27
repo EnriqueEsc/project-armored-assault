@@ -29,34 +29,44 @@ extends Menu
 
 
 @onready var settings_window: Control = $Settings_Menu
-@onready var fullscreen_button: CheckButton = $Settings_Menu/Buttons/Fullscreen
+@onready var fullscreen_button: CheckButton = $Settings_Menu/Video/Cont/Cont/Fullscreen/FullscreenButton
 
-@onready var aim_3d_button: CheckButton = $"Settings_Menu/Buttons/3D_Aim"
-@onready var aim_guideline_button: CheckButton = $Settings_Menu/Buttons/Aim_guideline
-@onready var aim_limited_button: CheckButton = $Settings_Menu/Buttons/Aim_limited
-@onready var third_person_button: CheckButton = $Settings_Menu/Buttons/Third_person
-@onready var use_csg_button: CheckButton = $Settings_Menu/Buttons/Use_CSG
-@onready var see_trough: CheckButton = $Settings_Menu/Buttons/See_trough
-@onready var max_effects_text: RichTextLabel = $Settings_Menu/Buttons/Max_effects_text
-@onready var max_effects_bar: HScrollBar = $Settings_Menu/Buttons/Max_effects_bar
-@onready var mouse_visible_button: CheckButton = $Settings_Menu/Buttons/Mouse_Visible
+@onready var aim_3d_button: CheckButton = $Settings_Menu/Gameplay/Cont/Cont/Aim3D/Aim3DButton
+@onready var aim_guideline_button: CheckButton = $Settings_Menu/Gameplay/Cont/Cont/AimGuideline/AimGuidelineButton
+@onready var aim_limited_button: CheckButton = $Settings_Menu/Gameplay/Cont/Cont/AimLimited/AimLimitedButton
+@onready var third_person_button: CheckButton = $Settings_Menu/Gameplay/Cont/Cont/ThirdPerson/ThirdPersonButton
+@onready var use_csg_button: CheckButton = $Settings_Menu/Video/Cont/Cont/UseCSG/UseCSGButton
+@onready var see_trough: CheckButton = $Settings_Menu/Gameplay/Cont/Cont/SeeTrough/SeeTroughButton
+@onready var max_effects_text: RichTextLabel = $Settings_Menu/Video/Cont/Cont/MaxParticleEffects/MaxParticleEffectsText
+@onready var max_effects_bar: HScrollBar = $Settings_Menu/Video/Cont/Cont/MaxParticleEffects/MaxParticleSlider
+@onready var mouse_visible_button: CheckButton = $Settings_Menu/Video/Cont/Cont/MouseVisible/MouseVisibleButton
 
 
-@onready var destruction_effects_text: RichTextLabel = $Settings_Menu/Buttons/Destruction_effect_text
-@onready var destruction_effects_option: OptionButton = $Settings_Menu/Buttons/Destruction_effect_option
+@onready var destruction_effects_text: RichTextLabel = $Settings_Menu/Video/Cont/Cont/DestructionEffects/DestructionEffectsText
+@onready var destruction_effects_option: OptionButton = $Settings_Menu/Video/Cont/Cont/DestructionEffects/DestructionEffectsSelection
 
-@onready var aim_assist_text: RichTextLabel = $Settings_Menu/Buttons/Aim_Assist_text
-@onready var aim_assist_option: OptionButton = $Settings_Menu/Buttons/Aim_Assist_option
+@onready var aim_assist_text: RichTextLabel = $Settings_Menu/Gameplay/Cont/Cont/AimAssistType/AimAssistTypeText
+@onready var aim_assist_option: OptionButton = $Settings_Menu/Gameplay/Cont/Cont/AimAssistType/AimAssistTypeSelection
 
-@onready var enable_emmisions_button: CheckButton = $Settings_Menu/Buttons/Enable_Emmision
+@onready var enable_emmisions_button: CheckButton = $Settings_Menu/Video/Cont/Cont/EnableEmmision/EnableEmmisionButton
 
-@onready var use_controller: CheckButton = $Settings_Menu/Buttons/Use_Controller
-@onready var use_controller_vibration: CheckButton = $Settings_Menu/Buttons/Controller_Vibration
+@onready var use_controller: CheckButton = $Settings_Menu/Gameplay/Cont/Cont/UseController/UseControllerButton
+@onready var use_controller_vibration: CheckButton = $Settings_Menu/Gameplay/Cont/Cont/ControllerVibration/ControllerVibrationButton
 
-@onready var move_type_text: RichTextLabel = $Settings_Menu/Buttons/Move_type_text
-@onready var move_type_option: OptionButton = $Settings_Menu/Buttons/Move_type_option
+@onready var move_type_text: RichTextLabel = $Settings_Menu/Gameplay/Cont/Cont/MovementType/MovementTypeText
+@onready var move_type_option: OptionButton = $Settings_Menu/Gameplay/Cont/Cont/MovementType/MovementTypeSelection
 
-@onready var enable_vsync_button: CheckButton = $Settings_Menu/Buttons/Enable_Vsync
+@onready var enable_vsync_button: CheckButton = $Settings_Menu/Video/Cont/Cont/EnableVsync/EnableVsyncButton
+
+@onready var flamable_mode_selection: OptionButton = $Settings_Menu/Gameplay/Cont/Cont/FlamableMode/FlamableModeSelection
+@onready var max_active_fire_text: RichTextLabel = $Settings_Menu/Gameplay/Cont/Cont/MaxActiveFire/MaxActiveFireText
+@onready var max_active_fire_bar: HScrollBar = $Settings_Menu/Gameplay/Cont/Cont/MaxActiveFire/MaxActiveFireSlider
+@onready var odds_fire_exp_text: RichTextLabel = $Settings_Menu/Gameplay/Cont/Cont/OddsFireOnExplosion/OddsFireOnExplosionText
+@onready var odds_fire_exp_bar: HScrollBar = $Settings_Menu/Gameplay/Cont/Cont/OddsFireOnExplosion/OddsFireOnExplosionSlider
+
+@onready var folliage_density_text: RichTextLabel = $Settings_Menu/Video/Cont/Cont/FolliageDensity/FolliageDensityText
+@onready var folliage_density_bar: HScrollBar = $Settings_Menu/Video/Cont/Cont/FolliageDensity/FolliageDensitySlider
+@onready var animated_shaders_button: CheckButton = $Settings_Menu/Video/Cont/Cont/AnimatedShaders/AnimatedShadersButton
 
 @onready var save_settings_button: Button = $Settings_Menu/Buttons/Save
 @onready var settings_back: Button = $Settings_Menu/Buttons/Back
@@ -71,6 +81,11 @@ var tanks_preview_models: Array[Node3D] = []
 @onready var tank_point: Node3D = $Tank_Preview/SubViewport/Point
 
 var attachments: Array[Attachment] = []
+
+@onready var settigns_panels: Array[Control] = [$Settings_Menu/Video,$Settings_Menu/Gameplay]
+
+@onready var video_settings_button: Button = $Settings_Menu/Buttons/Video
+@onready var gameplay_settings_button: Button = $Settings_Menu/Buttons/Gameplay
 
 func _set_buttons() -> void:
 	#mission_list_button.button_down.connect(show_briefing)
@@ -105,6 +120,13 @@ func _set_buttons() -> void:
 	save_settings_button.button_down.connect(save_settings)
 	settings_back.button_down.connect(switch_active.bind(settings_window))
 	
+	max_active_fire_bar.value_changed.connect(update_max_active_fire_text)
+	odds_fire_exp_bar.value_changed.connect(update_odds_fire_exp_text)
+	folliage_density_bar.value_changed.connect(update_folliage_density_text)
+	
+	settings_button.button_down.connect(activate_settings_panel.bind(0))
+	video_settings_button.button_down.connect(activate_settings_panel.bind(0))
+	gameplay_settings_button.button_down.connect(activate_settings_panel.bind(1))
 	
 	
 	mission_list_window.visible = false
@@ -125,6 +147,18 @@ func _set_buttons() -> void:
 	create_tank_selection_buttons()
 	create_mission_selection_buttons()
 	create_attachments_options()
+	
+	create_flamable_modes_options()
+
+
+func activate_settings_panel(i: int) -> void:
+	if i < 0 or i > settigns_panels.size():
+		return
+	for x in range(settigns_panels.size()):
+		if x != i:
+			settigns_panels[x].visible = false
+			continue
+		settigns_panels[x].visible = true
 
 
 func load_scene() -> void:
@@ -182,6 +216,19 @@ func update_settings_window() -> void:
 	use_controller_vibration.button_pressed = Settings_Manager.INSTANCE.use_vibration 
 	
 	enable_vsync_button.button_pressed = Settings_Manager.INSTANCE.vsync_enabled
+	
+	flamable_mode_selection.selected = Settings_Manager.INSTANCE.flamable_mode
+	
+	max_active_fire_bar.value = Settings_Manager.INSTANCE.max_active_fire
+	update_max_active_fire_text(max_active_fire_bar.value)
+	
+	odds_fire_exp_bar.value = Settings_Manager.INSTANCE.odds_start_fire_on_explosion
+	update_odds_fire_exp_text(odds_fire_exp_bar.value)
+	
+	folliage_density_bar.value = Settings_Manager.INSTANCE.folliage_density
+	update_folliage_density_text(folliage_density_bar.value)
+	
+	animated_shaders_button.button_pressed = Settings_Manager.INSTANCE.use_animated_shaders
 
 func check_mission_can_start() -> void:
 	start_mission_button.visible = selected_mission != null and selected_tank
@@ -347,6 +394,20 @@ func show_tank_info() -> void:
 
 func update_max_effects_text(i: int) -> void:
 	max_effects_text.text = "Max particle effects ("+str(i)+")"
+	
+func update_max_active_fire_text(i: int) -> void:
+	max_active_fire_text.text = "Max concurrent fire ("+str(i)+")"
+	
+func update_odds_fire_exp_text(i: int) -> void:
+	odds_fire_exp_text.text = "Odds of start fire on explosion ("+str(i)+")%"
+	
+func update_folliage_density_text(i: int) -> void:
+	folliage_density_text.text = "Folliage density ("+str(i)+")%"
+
+func create_flamable_modes_options() -> void:
+	for a in Settings_Manager.INSTANCE.FlamableModes:
+		flamable_mode_selection.add_item(a)
+
 
 func save_settings() -> void:
 	Settings_Manager.INSTANCE.fullscreen = fullscreen_button.button_pressed
@@ -373,5 +434,13 @@ func save_settings() -> void:
 	Settings_Manager.INSTANCE.use_vibration = use_controller_vibration.button_pressed
 	
 	Settings_Manager.INSTANCE.vsync_enabled = enable_vsync_button.button_pressed
+	
+	Settings_Manager.INSTANCE.flamable_mode = flamable_mode_selection.selected
+	
+	Settings_Manager.INSTANCE.max_active_fire = max_active_fire_bar.value
+	Settings_Manager.INSTANCE.odds_start_fire_on_explosion = odds_fire_exp_bar.value
+	Settings_Manager.INSTANCE.folliage_density = folliage_density_bar.value
+	
+	Settings_Manager.INSTANCE.use_animated_shaders = animated_shaders_button.button_pressed
 	
 	Settings_Manager.INSTANCE.save_settings()

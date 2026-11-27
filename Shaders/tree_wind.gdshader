@@ -23,6 +23,7 @@ uniform float push_curve = 1.5;
 varying float vertex_height;
 
 global uniform float game_speed;
+global uniform bool animated_shaders;
 
 float get_wind(vec3 world_pos, float time) {
 	float wave_1 = sin(world_pos.x * wind_frequency + time * wind_speed);
@@ -33,26 +34,28 @@ float get_wind(vec3 world_pos, float time) {
 
 
 void vertex() {
-	vec3 world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
-	float height_mask = clamp(VERTEX.y / max_height, 0.0, 1.0);
-	vertex_height = height_mask;
-	
-	float wind_mask = pow(height_mask, wind_curve);
-	float wind = get_wind(world_pos, TIME) * wind_strength * wind_mask;
-	vec3 wind_offset = vec3(wind, 0.0, wind * 0.5);
-	
-	vec3 direction = world_pos - player_pos;
-	direction.y = 0.0;
-	float distance_to_player = length(direction);
-	vec3 push_offset = vec3(0.0);
-	
-	if (distance_to_player < player_radius && distance_to_player > 0.001) {
-		float influence = 1.0 - distance_to_player / player_radius;
-		influence = pow(influence, push_curve);
-		push_offset = normalize(direction) * influence * push_strength * height_mask;
+	if (animated_shaders){
+		vec3 world_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+		float height_mask = clamp(VERTEX.y / max_height, 0.0, 1.0);
+		vertex_height = height_mask;
+		
+		float wind_mask = pow(height_mask, wind_curve);
+		float wind = get_wind(world_pos, TIME) * wind_strength * wind_mask;
+		vec3 wind_offset = vec3(wind, 0.0, wind * 0.5);
+		
+		vec3 direction = world_pos - player_pos;
+		direction.y = 0.0;
+		float distance_to_player = length(direction);
+		vec3 push_offset = vec3(0.0);
+		
+		if (distance_to_player < player_radius && distance_to_player > 0.001) {
+			float influence = 1.0 - distance_to_player / player_radius;
+			influence = pow(influence, push_curve);
+			push_offset = normalize(direction) * influence * push_strength * height_mask;
+		}
+		
+		VERTEX += (wind_offset + push_offset) * game_speed;
 	}
-	
-	VERTEX += (wind_offset + push_offset) * game_speed;
 }
 
 
