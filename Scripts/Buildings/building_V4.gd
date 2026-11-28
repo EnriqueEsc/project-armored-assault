@@ -65,12 +65,26 @@ var meshes_type: Dictionary = {}
 
 
 
-var occlusion_node: DistanceOccluder = DistanceOccluder.new(self)
+#var occlusion_node: DistanceOccluder = DistanceOccluder.new(self)
 
 func _ready() -> void:
 	
-	if occlusion_node:
-		get_tree().current_scene.call_deferred("add_child",occlusion_node)
+	#if occlusion_node:
+	#	get_tree().current_scene.call_deferred("add_child",occlusion_node)
+	
+	
+	
+	var occlusion_manager: OcclusionManager = OcclusionManager.INSTANCE
+	if occlusion_manager:
+		var dict: Dictionary = {
+			"parent_node": self,
+			"max_render_distance": 1000.0,
+			"max_process_distance": 2000.0,
+			"node_type": occlusion_manager.NodeTypes.Building
+		}
+		
+		occlusion_manager.add_to_occlusion(dict)
+	
 	
 	csg_active = Settings_Manager.INSTANCE.use_csg
 	see_trough = Settings_Manager.INSTANCE.see_trough_buildings

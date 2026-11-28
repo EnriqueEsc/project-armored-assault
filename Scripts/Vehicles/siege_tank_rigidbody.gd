@@ -68,6 +68,10 @@ func _physics_process(delta: float) -> void:
 	
 	
 	for i in get_slide_collision_count():
+		
+		if last_building_impact < 1:
+			return
+		
 		var collision = get_slide_collision(i)
 		var collider = collision.get_collider()
 		
@@ -104,9 +108,6 @@ func _physics_process(delta: float) -> void:
 					Effects_Manager.INSTANCE.sparks_from_pool(global_position)
 			
 		#print(last_building_impact)
-		
-		if last_building_impact < 1:
-			return
 		
 		
 		if collider is Building or collider is Building_Chunk:

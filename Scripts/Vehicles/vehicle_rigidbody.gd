@@ -96,8 +96,10 @@ var collision_lenght: float = 0.0
 
 var consumable: Consumable = null
 
-var allign_tick: float = 0.1
+var allign_tick: float = 0.01
 var allign_counter: float = 0.0
+
+var effects_manager: Effects_Manager = null
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -125,6 +127,8 @@ func _ready() -> void:
 				vehicle_turrets.append(c)
 	
 	for t in vehicle_turrets:
+		if not is_instance_valid(t):
+			continue
 		t.recoil.connect(recoil.bind(true))
 		#t.recoil.connect(recoil)
 		t.shakes_on_shoot.connect(shakes.emit)
@@ -142,6 +146,8 @@ func _ready() -> void:
 	if attachment:
 		attachment.master_vehicle = self
 		attachment.shakes.connect(shakes.emit)
+	
+	effects_manager = Effects_Manager.INSTANCE
 	
 	initialize_effects()
 	
@@ -169,7 +175,7 @@ func _ready() -> void:
 		
 		if c is CollisionShape3D and c.shape is BoxShape3D:
 			collision_shape = c.shape
-			return
+			break
 	boost_last_use = boost_cooldown
 	
 	calculate_collision_lenght()
@@ -306,8 +312,8 @@ func boost(force: float) -> void:
 	var push = Vector3.ZERO.move_toward(dir, friction)
 	#push = Vector3(push.x, 0 ,push.z)
 	velocity += push * force
-	Effects_Manager.INSTANCE.fake_light_from_pool(attachment.global_position,Vector2.ONE * velocity.length() * 0.3,Color.BLUE_VIOLET)
-	Effects_Manager.INSTANCE.shoot_from_pool(attachment.global_position, attachment.global_rotation - Vector3(0,deg_to_rad(180),0), velocity.length() * 0.02)
+	effects_manager.fake_light_from_pool(attachment.global_position,Vector2.ONE * velocity.length() * 0.3,Color.BLUE_VIOLET)
+	effects_manager.shoot_from_pool(attachment.global_position, attachment.global_rotation - Vector3(0,deg_to_rad(180),0), velocity.length() * 0.02)
 
 
 func quick_boost() -> void:
@@ -321,35 +327,42 @@ func quick_boost() -> void:
 	#push = Vector3(push.x, 0 ,push.z)
 	velocity += push * max_speed * boost_speed
 	boost_last_use = 0.0
-	if Effects_Manager.INSTANCE:
-		Effects_Manager.INSTANCE.fake_light_from_pool(global_position, Vector2.ONE * velocity.length() * 0.2,Color.ORANGE)
-		Effects_Manager.INSTANCE.shoot_from_pool(global_position, global_rotation - Vector3(0,deg_to_rad(180),0), velocity.length() * 0.02)
+	if effects_manager:
+		effects_manager.fake_light_from_pool(global_position, Vector2.ONE * velocity.length() * 0.2,Color.ORANGE)
+		effects_manager.shoot_from_pool(global_position, global_rotation - Vector3(0,deg_to_rad(180),0), velocity.length() * 0.02)
 
 func allign_with_floor(delta: float) -> void:
 	allign_counter += delta
 	if allign_counter < allign_tick:
 		return
+	var elapsed: float = allign_counter
 	allign_counter = 0.0
 	
-	var normal: Vector3 = Vector3.UP
+	if not is_on_floor():
+		return
 	
-	if is_on_floor():
-		normal = get_floor_normal()
-	var current_transform = global_transform
-	var current_right = current_transform.basis.x
-	var forward = current_right.cross(normal).normalized()
-	var right = normal.cross(forward).normalized()
-	var target_basis = Basis(right,normal,forward)
-	var new_basis = current_transform.basis.slerp(target_basis, allign_speed * delta)
-	global_transform.basis = new_basis.orthonormalized()
+	var normal: Vector3 = get_floor_normal()
 	
-	if is_on_floor():
-		var angle_to_floor = rad_to_deg(acos(clampf(normal.dot(Vector3.UP),-1.0,1.0)))
-		if angle_to_floor > 40.0:
-			var factor = clampf(angle_to_floor / 40.0, 0.0, 1.0) * 5
-			var aux = abs(velocity)
-			velocity += get_gravity() * delta * factor * aux
-			#print("INCLINACIÓN ",angle_to_floor)
+	var forward: Vector3 = -global_basis.z
+	forward = forward.slide(normal).normalized()
+	
+	if forward.is_zero_approx():
+		return
+	
+	var right: Vector3 = forward.cross(normal).normalized()
+	forward = normal.cross(right).normalized()
+	
+	var target_basis: Basis = Basis(right, normal, -forward)
+	var current_basis: Basis = global_basis.orthonormalized()
+	
+	var weight: float = 1.0 - exp(-allign_speed * elapsed)
+	
+	global_basis = current_basis.slerp(target_basis,weight).orthonormalized()
+	
+	var angle_to_floor: float = rad_to_deg(acos(clampf(normal.dot(Vector3.UP),-1.0,1.0)))
+	if angle_to_floor > 40.0:
+		var factor: float = clampf(angle_to_floor/40.0,0.0,1.0) * 5.0
+		velocity += get_gravity() * elapsed * factor * abs(velocity)
 
 func _physics_process(delta: float) -> void:
 	
@@ -405,15 +418,15 @@ func _physics_process(delta: float) -> void:
 			if collider.has_method("calculate_impact_chunk"):
 				var impact_damage = (armor_points/20.0) * impact
 				collider.calculate_impact_chunk(impact_damage, self, global_position)
-				if Effects_Manager.INSTANCE:
-					Effects_Manager.INSTANCE.sparks_from_pool(global_position)
+				if effects_manager:
+					effects_manager.sparks_from_pool(global_position)
 		
 			
 			elif (not collider is Deformable_Terrain) and collider.has_method("take_damage"):
 				var impact_damage = (armor_points/20.0) * impact
 				collider.take_damage(impact_damage, self, global_position)
-				if Effects_Manager.INSTANCE:
-					Effects_Manager.INSTANCE.sparks_from_pool(global_position)
+				if effects_manager:
+					effects_manager.sparks_from_pool(global_position)
 				
 			
 		#print(last_building_impact)
@@ -424,8 +437,8 @@ func _physics_process(delta: float) -> void:
 		if collider is Building:
 			collider.calculate_impact_chunk(5 ,self, global_position)
 			last_building_impact = 0
-			if Effects_Manager.INSTANCE:
-				Effects_Manager.INSTANCE.failed_sparks_from_pool(global_position)
+			if effects_manager:
+				effects_manager.failed_sparks_from_pool(global_position)
 
 func stagger() -> void:
 	staggered = true
@@ -605,8 +618,8 @@ func deactivate() -> void:
 	var scale: float = collision_lenght * 5
 	var wave_scale: float = collision_lenght
 	
-	if Effects_Manager.INSTANCE:
-		Effects_Manager.INSTANCE.explosion_from_pool(global_position, scale, wave_scale)
+	if effects_manager:
+		effects_manager.explosion_from_pool(global_position, scale, wave_scale)
 	
 	gets_disabled.emit()
 	
@@ -723,14 +736,14 @@ func exec_status_effect() -> void:
 	match current_status_effect:
 		StatusEffects.Burning:
 			take_damage(max_armor_points * 0.10,self,global_position)
-			if Effects_Manager.INSTANCE:
-				Effects_Manager.INSTANCE.fire_from_pool(global_position,collision_shape.size)
+			if effects_manager:
+				effects_manager.fire_from_pool(global_position,collision_shape.size)
 			#print("ME QUEMO")
 		StatusEffects.PEM:
-			if Effects_Manager.INSTANCE:
+			if effects_manager:
 				if collision_lenght <= 0.0:
 					calculate_collision_lenght()
-				Effects_Manager.INSTANCE.explo_wave_from_pool(global_position,collision_lenght * 1.2,collision_lenght * 1.2,Color.SKY_BLUE)
+				effects_manager.explo_wave_from_pool(global_position,collision_lenght * 1.2,collision_lenght * 1.2,Color.SKY_BLUE)
 			#print("AY ME PARO")
 			if not staggered:
 				stagger()

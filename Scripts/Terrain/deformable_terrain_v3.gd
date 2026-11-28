@@ -450,28 +450,45 @@ func generate_visual_chunks(chunk_data: Dictionary, material: Material) -> void:
 		var new_mesh = ArrayMesh.new()
 		new_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES,arrays)
 		
-		var instance = MeshInstance3D.new()
-		instance.name = "Visual_%d_%d" % [coords.x, coords.y]
-		instance.mesh = new_mesh
-		instance.material_override = material.duplicate()
+		var chunk = MeshInstance3D.new()
+		chunk.name = "Visual_%d_%d" % [coords.x, coords.y]
+		chunk.mesh = new_mesh
+		chunk.material_override = material.duplicate()
 		
-		visual_chunks.append(instance)
-		call_deferred("add_child",instance)
-		var occluder: TerrainChunkOccluder = TerrainChunkOccluder.new(instance)
-		call_deferred("add_child",occluder)
+		visual_chunks.append(chunk)
+		#call_deferred("add_child",chunk)
+		#var occluder: TerrainChunkOccluder = TerrainChunkOccluder.new(chunk)
+		#call_deferred("add_child",occluder)
 		
 		
-		var aabb: AABB = instance.mesh.get_aabb()
+		var aabb: AABB = chunk.mesh.get_aabb()
 		#var center_local: Vector3 = Vector3(aabb.get_center().x,0,aabb.get_center().z)
 		var center_local: Vector3 = aabb.get_center()
 		center_local.y = 0.0
 		var center_global: Vector3 = global_transform * center_local
 		
-		occluder.geometric_center = center_global
+		var geometric_center: Vector3 = center_global
 		var factor = sqrt(chunk_size.length() / Vector2(5, 5).length())
-		occluder.max_render_distance = 1500 * factor
-		occluder.max_process_distance = occluder.max_render_distance * 2
-		occluder.occlusion_tick = 0.1
+		var max_render_distance: float = 1500 * factor
+		max_render_distance /= 2.0
+		var max_process_distance: float = max_render_distance * 2
+		#occluder.occlusion_tick = 0.1
+		
+		call_deferred("add_child",chunk)
+		
+		
+		var occlusion_manager: OcclusionManager = OcclusionManager.INSTANCE
+		if occlusion_manager:
+			var dict: Dictionary = {
+				"parent_node": chunk,
+				"max_render_distance": max_render_distance,
+				"max_process_distance": max_process_distance,
+				"node_type": occlusion_manager.NodeTypes.Terrain,
+				"geometric_center": geometric_center
+			}
+			
+			occlusion_manager.add_to_occlusion(dict)
+		
 		
 		#print("COSO ",occluder.geometric_center)
 
@@ -522,11 +539,10 @@ func generate_collisions_new(chunk_data: Dictionary) -> void:
 			vertex_chunks[global_index].append(chunk)
 		
 		#chunk.collision_layer = 2
-		call_deferred("add_child",chunk)
 		chunk.deformation_mode = deformation_mode
 	
-		var occluder: TerrainChunkOccluder = TerrainChunkOccluder.new(chunk)
-		call_deferred("add_child",occluder)
+		#var occluder: TerrainChunkOccluder = TerrainChunkOccluder.new(chunk)
+		#call_deferred("add_child",occluder)
 		
 		
 		var aabb: AABB = AABB()
@@ -542,10 +558,25 @@ func generate_collisions_new(chunk_data: Dictionary) -> void:
 		var center_local: Vector3 = aabb.get_center()
 		var center_global: Vector3 = global_transform * center_local
 		
-		occluder.geometric_center = center_global
+		var geometric_center: Vector3 = center_global
 		var factor = sqrt(chunk_size.length() / Vector2(5, 5).length())
-		occluder.max_render_distance = 2000 * factor
-		occluder.max_process_distance = occluder.max_render_distance
+		var max_render_distance: float = 2000.0 * factor
+		max_render_distance /= 2.0
+		var max_process_distance: float = max_render_distance
+		call_deferred("add_child",chunk)
+		
+		
+		var occlusion_manager: OcclusionManager = OcclusionManager.INSTANCE
+		if occlusion_manager:
+			var dict: Dictionary = {
+				"parent_node": chunk,
+				"max_render_distance": max_render_distance,
+				"max_process_distance": max_process_distance,
+				"node_type": occlusion_manager.NodeTypes.Terrain,
+				"geometric_center": geometric_center
+			}
+			
+			occlusion_manager.add_to_occlusion(dict)
 	return
 	
 	
@@ -681,12 +712,12 @@ func generate_folliage(chunk_data: Dictionary) -> void:
 		#	vertex_chunks[global_index].append(chunk)
 		
 		#chunk.collision_layer = 2
-		call_deferred("add_child",chunk)
+		#call_deferred("add_child",chunk)
 		#chunk.call_deferred("set_global_position",center_global)
 	
-		var occluder: TerrainChunkOccluder = TerrainChunkOccluder.new(chunk)
+		#var occluder: TerrainChunkOccluder = TerrainChunkOccluder.new(chunk)
 		#return
-		call_deferred("add_child",occluder)
+		#call_deferred("add_child",occluder)
 		
 		var aabb: AABB = AABB()
 		
@@ -700,12 +731,16 @@ func generate_folliage(chunk_data: Dictionary) -> void:
 		#center_local.y = 0.0
 		var center_global: Vector3 = global_transform * center_local
 		
-		occluder.geometric_center = center_global
+		#occluder.geometric_center = center_global
 		var factor = sqrt(chunk_size.length() / Vector2(5, 5).length())
-		occluder.max_render_distance = 1500 * factor
-		occluder.max_process_distance = occluder.max_render_distance
-		chunk.occlusion_node = occluder
+		#occluder.max_render_distance = 1500 * factor
+		#occluder.max_process_distance = occluder.max_render_distance
+		#chunk.occlusion_node = occluder
 		chunk.geometrical_position = center_global
+		chunk.max_render_distance = 1500 * factor
+		chunk.max_render_distance /= 2.0
+		chunk.max_process_distance = chunk.max_render_distance
+		call_deferred("add_child",chunk)
 
 func take_damage(damage: int, source: Vehicle_Rigid, impact_point: Vector3, status_effect: Vehicle_Rigid.StatusEffects = Vehicle_Rigid.StatusEffects.None) -> void:
 	

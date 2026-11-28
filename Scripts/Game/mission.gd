@@ -13,6 +13,8 @@ var player_is_in_exfil_zone = false
 
 var effects_manager: Effects_Manager = Effects_Manager.new()
 
+var occlusion_manager: OcclusionManager = OcclusionManager.new()
+
 var dialog_manager: Dialog_Manager = null
 
 signal mission_finished(result: bool)
@@ -55,6 +57,8 @@ func singleton() -> void:
 	set_process(false)
 	
 	add_child(effects_manager)
+	
+	add_child(occlusion_manager)
 	
 	await get_tree().physics_frame
 	

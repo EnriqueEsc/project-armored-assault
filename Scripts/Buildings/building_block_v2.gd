@@ -26,6 +26,8 @@ func initialize() -> void:
 	effects_manager = Effects_Manager.INSTANCE
 	settings_manager = Settings_Manager.INSTANCE
 	destruction_point = global_position
+	set_process(false)
+	set_physics_process(false)
 	if shape:
 		shape = shape.duplicate()
 	return

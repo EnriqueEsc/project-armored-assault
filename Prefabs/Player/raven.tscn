@@ -298,7 +298,8 @@ script = ExtResource("5_rg08m")
 projectile_type = 6
 muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.2
-visual_recoil_limit = 0.5
+visual_recoil_limit = 5.0
+visual_recoil_factor = 1.0
 
 [node name="Gun" type="MeshInstance3D" parent="Minor/Torso/Turret/Gun" unique_id=1346115680]
 mesh = SubResource("ArrayMesh_bdpwl")

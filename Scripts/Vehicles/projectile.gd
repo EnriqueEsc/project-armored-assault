@@ -67,11 +67,13 @@ var power_multiplier: float = 1.0
 
 signal body_entered
 
-@export var caster: ShapeCast3D = null
+var shape_transform: Transform3D = Transform3D.IDENTITY
 
 var stencil_color : Color = Color.WHITE
 
 var tick: float = 0.01
+
+var query: PhysicsShapeQueryParameters3D = PhysicsShapeQueryParameters3D.new()
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -161,12 +163,21 @@ func _ready() -> void:
 
 func set_shape_cast() -> void:
 	var col = $CollisionShape3D
-	caster = ShapeCast3D.new()
+	#caster = ShapeCast3D.new()
 	var shape = col.shape.duplicate()
-	caster.shape = shape
-	caster.collide_with_areas = false
-	caster.collide_with_bodies = true
-	call_deferred("add_child",caster)
+	
+	shape_transform = col.transform
+	
+	#caster.shape = shape
+	#caster.collide_with_areas = false
+	#caster.collide_with_bodies = true
+	#call_deferred("add_child",caster)
+	#caster.call_deferred("set_transform",col.transform)
+	
+	query.shape = shape
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+	
 	col.queue_free()
 
 func _set_originals() -> void:
@@ -320,10 +331,23 @@ func move(delta: float) -> void:
 		deactivate()
 		return
 	
-	var current_pos_2d: Vector2 = (Vector2(0,1).rotated(-rotation.y))
-	var dist = speed * delta
-	var mov = global_basis.z * dist
+	#var current_pos_2d: Vector2 = (Vector2(0,1).rotated(-rotation.y))
+	#var dist: float = speed * delta
+	var mov: Vector3 = global_basis.z * (speed * delta)
+	var next_pos: Vector3 = global_position + mov
 	
+	
+	query.transform = global_transform * shape_transform
+	query.transform.origin = next_pos
+	var space_state = get_world_3d().direct_space_state
+	var hits = space_state.intersect_shape(query,1)
+	
+	if not hits.is_empty():
+		var col = hits[0].collider
+		if is_instance_valid(col):
+			body_entered.emit(col)
+	
+	'''
 	caster.target_position = Vector3(0,0,dist)
 	caster.force_shapecast_update()
 	
@@ -332,8 +356,9 @@ func move(delta: float) -> void:
 			var col = caster.get_collider(i)
 			if is_instance_valid(col):
 				body_entered.emit(col)
+	'''
 	
-	global_position += global_basis.z * speed * delta
+	global_position = next_pos
 
 func _on_body_entered(body):
 	#print(body.collider.get_parent.name)
@@ -408,11 +433,13 @@ func detonate() -> void:
 	explosion.radius = blast_rad
 	
 	var query = PhysicsShapeQueryParameters3D.new()
+	query.collision_mask = 1
 	query.shape = explosion
 	query.transform = Transform3D(Basis(), global_position)
 	query.collision_mask = 1
 	query.collide_with_areas = false
 	query.collide_with_bodies = true
+	query.exclude = ignore
 	
 	#query.exclude = [self.get_rid()] 
 	

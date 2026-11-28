@@ -179,6 +179,8 @@ func _additional_deactivate_process() -> void:
 
 func move(delta: float) -> void:
 	return
+	
+	'''
 	if direction == Vector3.ZERO:
 		return
 	
@@ -200,6 +202,7 @@ func move(delta: float) -> void:
 				body_entered.emit(col)
 	
 	global_position += global_basis.z * speed * delta
+	'''
 
 func _on_body_entered(body):
 	if body == origin:

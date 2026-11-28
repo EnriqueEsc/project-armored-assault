@@ -56,8 +56,9 @@ shader_parameter/softness = 2.5
 [sub_resource type="QuadMesh" id="QuadMesh_sehpw"]
 size = Vector2(1.5, 1.5)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_sn0t7"]
-size = Vector3(0.2, 0.2, 1)
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ebnqi"]
+radius = 0.2
+height = 1.2
 
 [sub_resource type="Curve" id="Curve_6uj0r"]
 _data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.56424576, 0.57142866), 0.0, 0.0, 0, 0, Vector2(1, 0.3303572), 0.0, 0.0, 0, 0]
@@ -108,12 +109,14 @@ material_override = SubResource("ShaderMaterial_i0o53")
 mesh = SubResource("QuadMesh_sehpw")
 script = ExtResource("5_dkapd")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1897963084]
-shape = SubResource("BoxShape3D_sn0t7")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1415147658]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
+shape = SubResource("CapsuleShape3D_ebnqi")
 debug_color = Color(0, 0.6485492, 0.20114565, 0.41960785)
 
 [node name="GPUParticles3D" type="GPUParticles3D" parent="." unique_id=949654003]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0.07188654, 0)
+visible = false
 lifetime = 0.5
 fixed_fps = 24
 process_material = SubResource("ParticleProcessMaterial_bhunq")

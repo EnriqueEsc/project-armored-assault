@@ -35,14 +35,20 @@ func _physics_process(delta: float) -> void:
 	
 	var pre_impact_vel: Vector3 = velocity
 	
-	var lat_vel = transform.basis.x * velocity.dot(transform.basis.x)
-	velocity -= lat_vel * (traction * delta)
+	#var lat_vel = transform.basis.x * velocity.dot(transform.basis.x)
+	#velocity -= lat_vel * (traction * delta)
+	
+	velocity -= transform.basis.x * velocity.dot(transform.basis.x) * traction * delta
 	
 	move_and_slide()
 	
 	
 	
 	for i in get_slide_collision_count():
+		
+		if last_building_impact < 0.1:
+			return
+		
 		var collision = get_slide_collision(i)
 		var collider = collision.get_collider()
 		
@@ -57,9 +63,6 @@ func _physics_process(delta: float) -> void:
 		var normal = collision.get_normal()
 		var impact = pre_impact_vel.dot(-normal)
 		
-		if last_building_impact < 0.1:
-			return
-		
 		if impact > 2.0:
 			shakes.emit(0.5,0.2)
 			
@@ -71,18 +74,18 @@ func _physics_process(delta: float) -> void:
 			if collider.has_method("calculate_impact_chunk"):
 				var impact_damage = (armor_points/20.0) * impact
 				collider.calculate_impact_chunk(impact_damage, self, global_position)
-				if Effects_Manager.INSTANCE:
-					Effects_Manager.INSTANCE.sparks_from_pool(global_position)
+				if effects_manager:
+					effects_manager.sparks_from_pool(global_position)
 			elif (not collider is Deformable_Terrain):
-				if Effects_Manager.INSTANCE:
-					Effects_Manager.INSTANCE.sparks_from_pool(global_position)
+				if effects_manager:
+					effects_manager.sparks_from_pool(global_position)
 			elif (not collider is Deformable_Terrain) and collider.has_method("take_damage"):
 				var impact_damage = (5.0) * impact
 				collider.take_damage(impact_damage, self, global_position)
 				
 				
-				if Effects_Manager.INSTANCE:
-					Effects_Manager.INSTANCE.sparks_from_pool(global_position)
+				if effects_manager:
+					effects_manager.sparks_from_pool(global_position)
 			
 		#print(last_building_impact)
 		
@@ -94,5 +97,5 @@ func _physics_process(delta: float) -> void:
 			shakes.emit(0.2,0.2)
 			collider.calculate_impact_chunk(5 ,self, global_position)
 			last_building_impact = 0
-			if Effects_Manager.INSTANCE:
-				Effects_Manager.INSTANCE.failed_sparks_from_pool(global_position)
+			if effects_manager:
+				effects_manager.failed_sparks_from_pool(global_position)

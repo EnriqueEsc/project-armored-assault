@@ -175,7 +175,6 @@ muzzle_pos = Vector3(0, 0, 0.8)
 fire_rate_prim = 0.2
 recover_recoil_time = 2.0
 visual_recoil_limit = 0.01
-visual_recoil_factor = 0.01
 
 [node name="MachineGun" type="MeshInstance3D" parent="Tower_Turret/auto_turret/Turret/Gun" unique_id=2009566839]
 transform = Transform3D(5, 0, 0, 0, 5, 0, 0, 0, 5, 0, 0, 0.17984009)

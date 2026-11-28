@@ -115,22 +115,23 @@ func _ready() -> void:
 	
 	
 	
-	projectile = projectile_prefab.instantiate() as Projectile
-	projectile.deactivate()
-	get_tree().root.call_deferred("add_child",projectile)
+	#projectile = projectile_prefab.instantiate() as Projectile
+	#projectile.deactivate()
+	#get_tree().root.call_deferred("add_child",projectile)
 	
-	case = case_prefab.instantiate() as Case
-	case.deactivate()
-	get_tree().root.call_deferred("add_child",case)
+	#case = case_prefab.instantiate() as Case
+	#case.deactivate()
+	#get_tree().root.call_deferred("add_child",case)
 	
 	
-	case_prefab = load("res://Prefabs/Test/case.tscn")
 	
 	match projectile_type:
 		Projectile_Type.HE:
 			projectile_prefab = load("res://Prefabs/Test/projectile_he.tscn")
+			case_prefab = load("res://Prefabs/Test/case.tscn")
 		Projectile_Type.AP:
 			projectile_prefab = load("res://Prefabs/Test/projectile.tscn")
+			case_prefab = load("res://Prefabs/Test/case.tscn")
 		Projectile_Type.MachineGun:
 			projectile_prefab = load("res://Prefabs/Test/machine_gun_bullet.tscn")
 			case_prefab = load("res://Prefabs/Test/machine_gun_case.tscn")
@@ -138,11 +139,13 @@ func _ready() -> void:
 			projectile_prefab = load("res://Prefabs/Test/nuke.tscn")
 		Projectile_Type.Flak:
 			projectile_prefab = load("res://Prefabs/Test/flak_bullet.tscn")
+			case_prefab = load("res://Prefabs/Test/case.tscn")
 			#case_prefab = load("res://Prefabs/Test/machine_gun_case.tscn")
 		Projectile_Type.Incinerator:
 			projectile_prefab = load("res://Prefabs/Test/incinerator.tscn")
 		Projectile_Type.Slug:
 			projectile_prefab = load("res://Prefabs/Test/slug.tscn")
+			case_prefab = load("res://Prefabs/Test/case.tscn")
 		Projectile_Type.Laser:
 			projectile_prefab = load("res://Prefabs/Test/laser.tscn")
 			case_prefab = null
@@ -201,6 +204,8 @@ func _ready() -> void:
 				override = c.get_active_material(0)
 	if not override:
 		override = StandardMaterial3D.new()
+	if proj:
+		proj.free()
 		#override.albedo_color.a = 0.0
 		#override.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	override.emission_enabled = true
@@ -268,9 +273,12 @@ func rotate_weapon_to_point_3d(point: Vector3) -> void:
 	if global_position.is_equal_approx(point):
 		return
 	
+	var parent_basis: Basis = get_parent_node_3d().global_transform.basis
+	var parent_inverse: Basis = parent_basis.inverse()
+	
 	var parent_up = get_parent_node_3d().global_transform.basis.y
 	var target_global_transform = global_transform.looking_at(point, parent_up)
-	var target_local_basis = get_parent_node_3d().global_transform.basis.inverse() * target_global_transform.basis
+	var target_local_basis = parent_inverse * target_global_transform.basis
 	var target_rot_euler = target_local_basis.get_euler()
 	
 	var target_y = lerp_angle(rotation.y, target_rot_euler.y - (PI), turret_turning_speed)
@@ -284,7 +292,7 @@ func rotate_weapon_to_point_3d(point: Vector3) -> void:
 	
 	var barrel_up =  get_parent_node_3d().global_transform.basis.y
 	var barrel_target_transform = global_transform.looking_at(point, barrel_up)
-	var barrel_local_basis =  get_parent_node_3d().global_transform.basis.inverse() * barrel_target_transform.basis
+	var barrel_local_basis =  parent_inverse * barrel_target_transform.basis
 	var barrel_rot_euler = barrel_local_basis.get_euler()
 	
 	var target_x = lerp_angle(rotation.x, -barrel_rot_euler.x, turret_turning_speed)
@@ -403,16 +411,14 @@ func _process(delta: float) -> void:
 	#print("HEAT ",current_heat," ",overheat)
 
 func instant_recoil(dir: Vector3, force: float) -> void:
-	var aux = visual_recoil_factor * force
-	for i in range(meshes.size()):
-		if recoil_type == RecoilTypes.Backwards:
-			if meshes[i].position.is_equal_approx(abs(meshes_max_pos[i])):
-				continue
-			var pos = meshes[i].position - (meshes[i].basis.z * aux)
-			meshes[i].position = clamp(meshes[i].position,meshes_max_pos[i],-meshes_max_pos[i])
-		if recoil_type == RecoilTypes.Rotation:
-			var pos = meshes[i].rotation_degrees.z + 10.0
-			meshes[i].rotation_degrees.z = pos
+	if recoil_type != RecoilTypes.Backwards:
+		return
+	var aux: float = visual_recoil_factor * force
+	
+	for i in meshes.size():
+		var mesh: MeshInstance3D = meshes[i]
+		var target: Vector3 = meshes_original_pos[i] - mesh.basis.z * aux
+		mesh.position = target
 
 func recoil_process(delta: float) -> void:
 	if recoil_type != RecoilTypes.Backwards:
@@ -429,7 +435,7 @@ func cooling(delta: float) -> void:
 	if current_heat <= 0:
 		return
 	
-	current_heat -= cooling_factor * delta
+	current_heat = maxf(0.0, current_heat - cooling_factor * delta)
 	
 	if not overheat:
 		return

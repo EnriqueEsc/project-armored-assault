@@ -452,7 +452,11 @@ func _physics_process(delta: float) -> void:
 		if controller_aim:
 		#pointer_pos = tank_camera.get_mouse_3d_pos()
 		#HUD_mouse.position = get_viewport().get_mouse_position()
-			aim_dir_input = Input.get_vector("Aim_Left","Aim_Right","Aim_Up","Aim_Down").normalized() * 3 if Input.get_vector("Aim_Left","Aim_Right","Aim_Up","Aim_Down").length_squared() > 0.2 else aim_dir_input
+			#aim_dir_input = Input.get_vector("Aim_Left","Aim_Right","Aim_Up","Aim_Down").normalized() * 3 if Input.get_vector("Aim_Left","Aim_Right","Aim_Up","Aim_Down").length_squared() > 0.2 else aim_dir_input
+			
+			var aim_input: Vector2 = Input.get_vector("Aim_Left","Aim_Right","Aim_Up","Aim_Down")
+			if aim_input.length_squared() > 0.2:
+				aim_dir_input = aim_dir_input.normalized()
 			aim_dir_3d = tank_rigid.global_position + Vector3(aim_dir_input.x,0.0,aim_dir_input.y)
 			pointer_pos = aim_dir_3d
 			#HUD_mouse.position = tank_camera.unproject_position(pointer_pos)
@@ -705,7 +709,7 @@ func change_move_type() -> void:
 func controller_movement(target_pos: Vector2, delta: float) -> void:
 	var next_pos: Vector3 = tank_rigid.global_position + Vector3(target_pos.x,0.0,target_pos.y)
 	
-	print(target_pos)
+	#print(target_pos)
 	
 	if target_pos == Vector2.ZERO:
 		tank_rigid.move(Vector2.ZERO, delta)
@@ -1036,7 +1040,7 @@ func untarget_enemy(e: NodeInGameData) -> void:
 	if not e:
 		return
 	if e == enemy_locked:
-		enemy_locked.parent_node.gets_disabled.disconnect(untarget_enemy)
+		enemy_locked.parent_node.gets_disabled.disconnect(untarget_enemy.bind(e))
 		
 		var lock = tank_camera.get_closest_enemy_to_mouse(enemy_locked.parent_node.global_position)
 		if lock:

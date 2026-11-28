@@ -69,6 +69,8 @@ var mean_fire_rate: float = 1.0
 
 var last_aim_point: Vector3 = Vector3.ZERO
 
+var mean_rotation: Vector3 = Vector3.ZERO
+
 var excluded: Array[RID] = []
 	
 func spawn() -> void:
@@ -116,7 +118,10 @@ func calculate_mean_bullet_speed() -> void:
 			counter += 1
 	
 	#mean_bullet_speed /= (turret_barrel.size())
-	
+	if counter == 0:
+		mean_bullet_speed = 1.0
+		mean_fire_rate = 1.0
+		return
 	mean_bullet_speed /= (counter)
 	mean_bullet_speed *= mean_bullet_speed
 	mean_fire_rate /= counter
@@ -155,6 +160,8 @@ func calculate_travel_time_to_point(point: Vector3) -> float:
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	
+	set_process(fire_mode == Turret_Weapon.Fire_Mode.Burst)
+	
 	if static_model:
 		return
 	
@@ -165,6 +172,7 @@ func _ready() -> void:
 	ignore.append(self)
 	ignore.append(get_parent_node_3d())
 	
+	mean_rotation = global_basis.z.normalized()
 	
 	aim_limited = Settings_Manager.INSTANCE.aim_limited
 	
@@ -254,8 +262,8 @@ func rotate_turret_to_point_3d(point: Vector3,node_info: NodeInGameData = null, 
 	if node_info:
 		point = node_info.get_pre_position(calculate_travel_time_to_point(node_info.parent_node.global_position))
 	
-	if last_aim_point.is_equal_approx(point):
-		return
+	#if last_aim_point.is_equal_approx(point):
+	#	return
 	
 	#if global_position.is_equal_approx(point):
 	#	return
@@ -289,12 +297,17 @@ func rotate_turret_to_point_3d(point: Vector3,node_info: NodeInGameData = null, 
 	var barrel_up = global_transform.basis.y
 	var barrel_target_transform = sight_pos.global_transform.looking_at(point, barrel_up)
 	var barrel_local_basis = global_transform.basis.inverse() * barrel_target_transform.basis
-	var barrel_rot_euler = barrel_local_basis.get_euler()
+	#var barrel_rot_euler = barrel_local_basis.get_euler()
 	
+	
+	var aux: Vector3 = Vector3.ZERO
 	for w in turret_barrel:
 		if not is_instance_valid(w):
 			continue
 		w.rotate_weapon_to_point_3d(point)
+		aux += w.global_basis.z.normalized()
+	
+	mean_rotation = aux.normalized()
 	
 
 func get_aim_point(point: Vector2) -> Vector2:
@@ -306,6 +319,7 @@ func get_aim_point(point: Vector2) -> Vector2:
 
 func get_aim_point_3d(distance: float) -> Vector3:
 	var res: Vector3 = Vector3.ZERO
+	#return res
 	var ray_range = 12
 	if aim_limited:
 		ray_range = distance
@@ -342,19 +356,10 @@ func get_aim_point_3d(distance: float) -> Vector3:
 
 
 func calculate_mean_rotation() -> Vector3:
-	var aux: Vector3 = Vector3.ZERO
-	var counter: int = 0
-	
-	for w in turret_barrel:
-		if not is_instance_valid(w):
-			continue
-		aux += w.global_basis.z.normalized()
-		
-		counter += 1
-	if counter == 0:
+	if turret_barrel.size() < 1:
 		return global_basis.z.normalized()
 	
-	return (aux/float(counter)).normalized()
+	return mean_rotation
 
 
 func shoot() -> void:
@@ -472,6 +477,8 @@ func all_weapons_can_shoot() -> bool:
 func set_fire_mode(mode: Turret_Weapon.Fire_Mode) -> void:
 	if turret_barrel.is_empty():
 		return
+	fire_mode = mode
+	set_process(mode == Turret_Weapon.Fire_Mode.Burst)
 	for w in turret_barrel:
 		if not is_instance_valid(w):
 			continue
@@ -492,15 +499,13 @@ func set_fire_mode(mode: Turret_Weapon.Fire_Mode) -> void:
 	'''
 
 func equal_overheat(overheat: bool) -> void:
-	print("SEXOOOOOOO")
+	#print("SEXOOOOOOO")
 	for t in turret_barrel:
 		if t.overheat == overheat:
 			continue
 		t.overheat = overheat
 
 func _process(delta: float) -> void:
-	if fire_mode != Turret_Weapon.Fire_Mode.Burst:
-		return
 	if waiting_time < time_between_burst:
 		waiting_time += delta
 		

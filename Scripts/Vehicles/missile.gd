@@ -70,13 +70,28 @@ func move(delta: float) -> void:
 	var current_forward = -global_basis.z.normalized()
 
 	if current_forward.angle_to(target_direction) < 1.0:
-		global_position += -global_basis.z * speed * delta
 		
 		
-		var current_pos_2d: Vector2 = (Vector2(0,1).rotated(-rotation.y))
-		var dist = speed * delta
-		var mov = -global_basis.z * dist
+		#var current_pos_2d: Vector2 = (Vector2(0,1).rotated(-rotation.y))
+		#var dist = speed * delta
+		var mov: Vector3 = -global_basis.z * (speed * delta)
+		var next_pos: Vector3 = global_position + mov
 		
+		
+		
+		query.transform = global_transform * shape_transform
+		query.transform.origin = next_pos
+		var space_state = get_world_3d().direct_space_state
+		var hits = space_state.intersect_shape(query,1)
+		
+		if not hits.is_empty():
+			var col = hits[0].collider
+			if is_instance_valid(col):
+				body_entered.emit(col)
+			
+		global_position = next_pos
+		
+		'''
 		caster.target_position = Vector3(0,0,-dist)
 		caster.force_shapecast_update()
 		
@@ -87,7 +102,7 @@ func move(delta: float) -> void:
 					body_entered.emit(col)
 					#detonate()
 					#print("EXP")
-		
+		'''
 		return
 		
 	var corrected_direction = current_forward.slerp(target_direction,clamp(25 * delta, 0.0, 1.0)).normalized()
@@ -95,10 +110,25 @@ func move(delta: float) -> void:
 	look_at(global_position + corrected_direction, Vector3.UP)
 	#print(current_forward.angle_to(target_direction))
 	
-	var current_pos_2d: Vector2 = (Vector2(0,1).rotated(-rotation.y))
-	var dist = speed * delta
-	var mov = -global_basis.z * dist
+	#var current_pos_2d: Vector2 = (Vector2(0,1).rotated(-rotation.y))
+	#var dist = speed * delta
+	var mov: Vector3 = -global_basis.z * (speed * delta)
+	var next_pos: Vector3 = global_position + mov
+		
+		
 	
+	query.transform = global_transform * shape_transform
+	query.transform.origin = next_pos
+	var space_state = get_world_3d().direct_space_state
+	var hits = space_state.intersect_shape(query,1)
+		
+	if not hits.is_empty():
+		var col = hits[0].collider
+		if is_instance_valid(col):
+			body_entered.emit(col)
+			
+	
+	'''
 	caster.target_position = Vector3(0,0,-dist)
 	caster.force_shapecast_update()
 	
@@ -110,8 +140,8 @@ func move(delta: float) -> void:
 				#detonate()
 				print("EXP")
 	
-	
-	global_position += -global_basis.z * speed * delta
+	'''
+	global_position = next_pos
 
 func update_fake_light() -> void:
 	if not fake_light:

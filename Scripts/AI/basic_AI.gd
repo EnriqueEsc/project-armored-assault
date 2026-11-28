@@ -62,7 +62,7 @@ var next_node: Vector3 = Vector3.ZERO
 
 var map_icon: Sprite3D = null
 
-var occlusion_node: AIDistanceOccluder = AIDistanceOccluder.new(self)
+#var occlusion_node: AIDistanceOccluder = AIDistanceOccluder.new(self)
 
 var thinking_counter: float = 0.0
 var thinking_tick: float = 0.01
@@ -91,10 +91,12 @@ func _init_rigid() -> void:
 
 
 func _ready() -> void:
+	
 	set_physics_process(false)
 	
-	if occlusion_node:
-		get_tree().current_scene.call_deferred("add_child",occlusion_node)
+	#if occlusion_node:
+	#	get_tree().current_scene.call_deferred("add_child",occlusion_node)
+	
 	
 	_init_rigid()
 	
@@ -163,12 +165,15 @@ func _ready() -> void:
 	#	print(a)
 	
 	for t in tank_turrets:
+		if not is_instance_valid(t):
+			continue
 		aim_to.connect(t.rotate_turret_to_point_3d)
 	
 	
 	
 	if not tank_turrets.is_empty():
-		tank_turrets[0].turret_turning_speed /= 2
+		if is_instance_valid(tank_turrets[0]):
+			tank_turrets[0].turret_turning_speed /= 2
 	
 		tank_rigid.got_hit.connect(got_hit)
 		tank_rigid.gets_disabled.connect(Save_File_Manager.INSTANCE.tank_kills_record)
@@ -190,6 +195,20 @@ func _ready() -> void:
 			HUD_boss_info.update_boss_current_ap(tank_rigid.armor_points)
 	
 	tank_rigid.gets_disabled.connect(destroyed_dialog)
+	
+	
+	var occlusion_manager: OcclusionManager = OcclusionManager.INSTANCE
+	if occlusion_manager:
+		var dict: Dictionary = {
+			"parent_node": tank_rigid,
+			"ai_parent": self,
+			"max_render_distance": 500.0,
+			"max_process_distance": 1000.0,
+			"node_type": occlusion_manager.NodeTypes.AI
+		}
+		
+		occlusion_manager.add_to_occlusion(dict)
+	
 	
 	if current_team == Team.ALLY:
 		message_color = (Color.GREEN)

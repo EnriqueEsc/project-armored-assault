@@ -300,11 +300,22 @@ shadow_mesh = SubResource("ArrayMesh_1vufy")
 
 [node name="Enemy_tank13" type="CharacterBody3D" unique_id=160921655 node_paths=PackedStringArray("vehicle_turrets", "model")]
 script = ExtResource("1_3wmue")
+traction = null
+vehicle_pilot_name = null
 max_speed = 5.0
+acceleration = null
 turn_speed = 3.0
+boost_speed = null
+boost_cooldown = null
+turning_velocity = null
+turning_acceleration = null
+is_player = null
 friction = 2.0
 vehicle_turrets = [NodePath("Turret")]
+max_armor_points = null
+allign_speed = null
 model = [NodePath("Truck/TruckBody"), NodePath("Truck/Wheel"), NodePath("Truck/Wheel_001"), NodePath("Truck/Wheel_002"), NodePath("Truck/Wheel_003"), NodePath("Turret/Turret"), NodePath("Turret/Gun/MachineGun")]
+status_effect_recovery = null
 
 [node name="Truck" type="Node3D" parent="." unique_id=219094846]
 transform = Transform3D(4, 0, 0, 0, 4, 0, 0, 0, 4, 0, -0.16641355, 0)
@@ -356,6 +367,8 @@ projectile_type = 2
 muzzle_pos = Vector3(0, 0, 0.3)
 fire_rate_prim = 0.2
 cooling_factor = 5.0
+recover_recoil_time = 2.0
+visual_recoil_factor = 0.2
 
 [node name="MachineGun" type="MeshInstance3D" parent="Turret/Gun" unique_id=452125964]
 transform = Transform3D(2.5, 0, 0, 0, 2.5, 0, 0, 0, 2.5, 0, 0, 0)

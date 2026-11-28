@@ -12,9 +12,9 @@ var counter: int = 0
 var active: bool = false
 
 func _init_rigid() -> void:
-	if is_instance_valid(occlusion_node):
+	#if is_instance_valid(occlusion_node):
 		#occlusion_node.queue_free()
-		occlusion_node.max_process_distance = 999999
+	#	occlusion_node.max_process_distance = 999999
 		#occlusion_node.max_render_distance = 999999
 	tank_rigid = get_parent() as Plane_Rigid
 	#current_team = randi_range(1,Team.size()-1)

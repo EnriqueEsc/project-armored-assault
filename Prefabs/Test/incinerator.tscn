@@ -27,8 +27,8 @@ shader_parameter/softness = 2.5
 [sub_resource type="QuadMesh" id="QuadMesh_6eeun"]
 size = Vector2(2, 2)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_sn0t7"]
-size = Vector3(0.5, 0.5, 0.5)
+[sub_resource type="SphereShape3D" id="SphereShape3D_sn0t7"]
+radius = 0.4
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lejfw"]
 render_priority = 0
@@ -69,8 +69,9 @@ material_override = SubResource("ShaderMaterial_1185n")
 mesh = SubResource("QuadMesh_6eeun")
 script = ExtResource("5_2qu57")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1897963084]
-shape = SubResource("BoxShape3D_sn0t7")
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=666367513]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
+shape = SubResource("SphereShape3D_sn0t7")
 debug_color = Color(0, 0.6485492, 0.20114565, 0.41960785)
 
 [node name="Proy" type="MeshInstance3D" parent="." unique_id=2133887607]

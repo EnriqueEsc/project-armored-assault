@@ -180,7 +180,8 @@ func stretch() -> void:
 	
 	global_position = middle_point
 	
-	caster.shape.size.z = dist
+	query.shape.height = dist
+	#caster.shape.height = dist
 	#collision.shape.size.z = dist
 	proy.scale.z = original_proy_size * dist
 	fake_light.mesh.size.y = original_fake_light_size * dist

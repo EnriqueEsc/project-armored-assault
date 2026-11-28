@@ -29,6 +29,9 @@ var enemies_unprojected: Array[NodeInGameData] = []
 var hud_aim_box: HUD_Aim_Box = null
 var last_enemy_inside_box: NodeInGameData = null
 
+var visibility_tick: float = 0.05
+var visibility_counter: float = 0.0
+
 func _ready() -> void:
 	singleton()
 
@@ -66,7 +69,10 @@ func move_cam(move: Vector3, delta: float) -> void:
 func _process(delta: float) -> void:
 	#hud_aim_box.draw_line_to_points(enemies_unprojected)
 	#hud_aim_box.draw_aim_box_basic(2)
-	check_visibility()
+	visibility_counter += delta
+	if visibility_counter > visibility_tick:
+		visibility_counter = 0.0
+		check_visibility()
 	if time_since_shaking <= shake_time:
 		time_since_shaking += delta
 
@@ -160,7 +166,8 @@ func get_mouse_3d_pos() -> Vector3:
 	var mouse_2d_pos = get_viewport().get_mouse_position()
 	var ray_range = 10000
 	var from = project_ray_origin(mouse_2d_pos)
-	var to = from + project_ray_normal(mouse_2d_pos) * ray_range
+	var ray_direction: Vector3 = project_ray_normal(mouse_2d_pos)
+	var to = from + ray_direction * ray_range
 	
 	var space = get_world_3d().direct_space_state
 	var query = PhysicsRayQueryParameters3D.create(from,to)
@@ -183,7 +190,7 @@ func get_mouse_3d_pos() -> Vector3:
 		#if player and res.y >= global_position.y - player.global_position.y:
 		#	res.y = global_position.y - player.global_position.y
 	else:
-		res = from + project_ray_normal(mouse_2d_pos) * 10
+		res = from + ray_direction * 10
 		#if player and res.y >= global_position.y - player.global_position.y:
 		#	res.y = global_position.y - player.global_position.y
 	#print(res)

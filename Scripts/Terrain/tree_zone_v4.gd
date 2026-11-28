@@ -30,10 +30,13 @@ var tree_spatial_grid: Dictionary = {}
 var folliage_type: PackedByteArray = PackedByteArray()
 
 var geometrical_position: Vector3 = Vector3.ZERO
+var max_render_distance: float = 2000.0
+var max_process_distance: float = 1000.0
+
 
 var flamable_mode: SettingsManager.FlamableModes = SettingsManager.FlamableModes.OnDirectFire
 
-var occlusion_node: TerrainChunkOccluder = TerrainChunkOccluder.new(self)
+#var occlusion_node: TerrainChunkOccluder = TerrainChunkOccluder.new(self)
 
 var texture: Texture2D = null
 
@@ -47,9 +50,26 @@ var current_active_fire: int = 0
 func _ready() -> void:
 	
 	if tree_points.size() < 1:
-		if occlusion_node:
-			occlusion_node.queue_free()
+		#if occlusion_node:
+		#	occlusion_node.queue_free()
+		
 		queue_free()
+		return
+	
+	
+		
+		
+	var occlusion_manager: OcclusionManager = OcclusionManager.INSTANCE
+	if occlusion_manager:
+		var dict: Dictionary = {
+			"parent_node": self,
+			"max_render_distance": max_render_distance,
+			"max_process_distance": max_process_distance,
+			"node_type": occlusion_manager.NodeTypes.Terrain,
+			"geometric_center": geometrical_position
+		}
+			
+		occlusion_manager.add_to_occlusion(dict)
 	
 	#print("SEXOOOOOOOO VIVO")
 	flamable_mode = Settings_Manager.INSTANCE.flamable_mode
@@ -93,8 +113,8 @@ func _ready() -> void:
 func init_grid() -> void:
 	
 	if tree_points.size() < 1:
-		if occlusion_node:
-			occlusion_node.queue_free()
+		#if occlusion_node:
+		#	occlusion_node.queue_free()
 		queue_free()
 	
 	material = Settings_Manager.INSTANCE.Folliage_Shader_Material.duplicate()
@@ -254,8 +274,8 @@ func destroy_tree(id: int, free_empty_zone: bool = true) -> void:
 	#print("Destroy2 ",id," ",mm.get_instance_transform(id).basis)
 	active_count -= 1
 	if active_count <= 0 and free_empty_zone:
-		if occlusion_node:
-			occlusion_node.queue_free()
+		#if occlusion_node:
+		#	occlusion_node.queue_free()
 		queue_free()
 
 func burn_tree(damage: int, id: int) -> void:
@@ -329,8 +349,8 @@ func burn_tree(damage: int, id: int) -> void:
 		
 		zone.burn_tree(damage, neighbor_id)
 	if active_count <= 0:
-		if occlusion_node:
-			occlusion_node.queue_free()
+		#if occlusion_node:
+		#	occlusion_node.queue_free()
 		queue_free()
  
 
